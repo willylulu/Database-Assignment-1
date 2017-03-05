@@ -29,7 +29,7 @@ namespace Assignment1
                 {
                     if (keyRepeatTimes[element[i]] > 0) return -1; //primary key duplicated
                 }
-                if(element[i].GetType().Name == "String")
+                if(info.type == 1)
                 {
                     if (element[i].Length > info.maxStringLength) return -2;    //varchar is too short
                 }
