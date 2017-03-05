@@ -10,7 +10,9 @@ namespace Assignment1
     {
         static void Main(string[] args)
         {
-            Table table = new Table("Dick");
+            TableManager tableManager = new TableManager();
+
+            tableManager.createTable("Dick");
 
             //Test element for inserting data in table
             List<dynamic> tableElement = new List<dynamic>();
@@ -18,10 +20,10 @@ namespace Assignment1
             tableElement.Add(8888);
             tableElement.Add("Jerk");
             tableElement.Add(8888);
-            table.insert(tableElement);
+            tableManager.insertTable("Dick",tableElement);
 
             //print all of data in table
-            List<List<dynamic>> ans = table.getTableData();
+            List<List<dynamic>> ans = tableManager.getTable("Dick").getTableData();
 
             foreach(List<dynamic> ele in ans)
             {
