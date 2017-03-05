@@ -16,9 +16,9 @@ namespace Assignment1
             this.maxStringLength = maxStringLength;
         }
 
-        private string name;
-        private int type;   //0:int, 1:varchar
-        private bool isPrimery;
-        private int maxStringLength;
+        public string name;
+        public int type;   //0:int, 1:varchar
+        public bool isPrimery;
+        public int maxStringLength;
     }
 }

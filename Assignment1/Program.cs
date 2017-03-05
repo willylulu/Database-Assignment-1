@@ -15,7 +15,7 @@ namespace Assignment1
             //Test element for inserting data in table
             List<dynamic> tableElement = new List<dynamic>();
             tableElement.Add("Fuck");
-            tableElement.Add(123456);
+            tableElement.Add(8888);
             tableElement.Add("Jerk");
             tableElement.Add(8888);
             table.insert(tableElement);
@@ -27,10 +27,11 @@ namespace Assignment1
             {
                 foreach(dynamic eleAttr in ele)
                 {
-                    Console.Write(eleAttr + " ");
+                    Console.Write(eleAttr + "/" + eleAttr.GetType().Name + " ");
                 }
                 Console.Write("\n");
             }
+
         }
     }
 }
