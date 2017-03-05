@@ -53,8 +53,8 @@ namespace Assignment1
         }
 
         private string name;
-        private List<TableAttributeInfo> TableAttributesInfo = new List<TableAttributeInfo>();
-        private List<List<dynamic>> data = new List<List<dynamic>>();
-        private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>();
+        private List<TableAttributeInfo> TableAttributesInfo = new List<TableAttributeInfo>(10);
+        private List<List<dynamic>> data = new List<List<dynamic>>(1000000);
+        private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
     }
 }

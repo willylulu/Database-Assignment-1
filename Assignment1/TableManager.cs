@@ -25,6 +25,6 @@ namespace Assignment1
             return tables[name];
         }
 
-        private Dictionary<string, Table> tables = new Dictionary<string, Table>();
+        private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
     }
 }
