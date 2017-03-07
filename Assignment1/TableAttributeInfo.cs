@@ -8,16 +8,14 @@ namespace Assignment1
 {
     class TableAttributeInfo
     {
-        public TableAttributeInfo(string name, int type, bool isPrimery, int maxStringLength)
+        public TableAttributeInfo(string type, bool isPrimery, int maxStringLength)
         {
-            this.name = name;
             this.type = type;
             this.isPrimery = isPrimery;
             this.maxStringLength = maxStringLength;
         }
 
-        public string name;
-        public int type;   //0:int, 1:varchar
+        public string type;
         public bool isPrimery;
         public int maxStringLength;
     }

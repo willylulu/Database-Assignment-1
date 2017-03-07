@@ -12,28 +12,45 @@ namespace Assignment1
         {
             TableManager tableManager = new TableManager();
 
-            tableManager.createTable("Dick");
+            List<string> order = new List<string>();
+            order.Add("studentId");
+            order.Add("name");
+            order.Add("gender");
+            order.Add("age");
+
+            TableAttributeInfo studentIdProp = new TableAttributeInfo("Int32", true, 0);
+            TableAttributeInfo nameProp = new TableAttributeInfo("String", false, 15);
+            TableAttributeInfo genderProp = new TableAttributeInfo("String", false, 1);
+            TableAttributeInfo ageProp = new TableAttributeInfo("Int32", false, 0);
+
+            Dictionary<string, TableAttributeInfo> atributes = new Dictionary<string, TableAttributeInfo>(order.Count);
+            atributes.Add("studentId", studentIdProp);
+            atributes.Add("name", nameProp);
+            atributes.Add("gender", genderProp);
+            atributes.Add("age", ageProp);
+
+            tableManager.createTable("student", order, atributes);
 
             //Test element for inserting data in table
-            List<dynamic> tableElement = new List<dynamic>();
-            tableElement.Add("Fuck");
-            tableElement.Add(8888);
-            tableElement.Add("Jerk");
-            tableElement.Add(8888);
-            tableManager.insertTable("Dick",tableElement);
+            Dictionary<string, dynamic> turbel = new Dictionary<string, dynamic>();
+            turbel.Add("studentId", 1);
+            turbel.Add("name", "Willy");
+            //turbel.Add("gender", "M");
+            turbel.Add("age", 21);
+            tableManager.insertTable("student", turbel);
 
             //print all of data in table
-            List<List<dynamic>> ans = tableManager.getTable("Dick").getTableData();
+            List<List<dynamic>> ans = tableManager.getTable("student").getTableData();
 
             foreach(List<dynamic> ele in ans)
             {
                 foreach(dynamic eleAttr in ele)
                 {
-                    Console.Write(eleAttr + "/" + eleAttr.GetType().Name + " ");
+                    Console.Write(eleAttr + "(" + eleAttr.GetType().Name + ") ");
                 }
                 Console.Write("\n");
             }
-
+            Console.ReadLine();
         }
     }
 }

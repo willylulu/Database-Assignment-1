@@ -8,41 +8,68 @@ namespace Assignment1
 {
     class Table
     {
-        public Table(string name)
-        {
-            this.name = name;
-        }
 
-        public Table(string name, List<TableAttributeInfo> TableAttributesInfo)
+        public Table(List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
         {
-            this.name = name;
+            this.TableAttributesOrder = TableAttributesOrder;
             this.TableAttributesInfo = TableAttributesInfo;
         }
 
-        public int insert(List<dynamic> element)
+        public int insert(Dictionary<string,dynamic> turbel)
         {
-            //Check format legality
-            for (int i=0;i<TableAttributesInfo.Count;i++)
+            //retrive each attribute in table
+            foreach(KeyValuePair<string, TableAttributeInfo> infoPair in TableAttributesInfo)
             {
-                TableAttributeInfo info = TableAttributesInfo[i];
-                if(info.isPrimery)
+                String name = infoPair.Key;
+                TableAttributeInfo info = infoPair.Value;
+                
+                //check is every value in attribute is defined in turbel
+                //if not replace by default value
+                if (!turbel.ContainsKey(name))
                 {
-                    if (keyRepeatTimes[element[i]] > 0) return -1; //primary key duplicated
+                    if(info.isPrimery) return -4;
+                    else
+                    {
+                        switch(info.type)
+                        {
+                            case "String":
+                                turbel.Add(name,"N/A");
+                                break;
+                            case "Int32":
+                                turbel.Add(name, 0);
+                                break;
+                        }
+                    }
                 }
-                if(info.type == 1)
+                else
                 {
-                    if (element[i].Length > info.maxStringLength) return -2;    //varchar is too short
+                    //Check format legality
+                    dynamic value = turbel[name];
+                    if (info.isPrimery)
+                    {
+                        if (keyRepeatTimes.ContainsKey(value) && keyRepeatTimes[value] > 0) return -1; //primary key duplicated
+                        else keyRepeatTimes.Add(value, 1);
+                    }
+                    if (info.type == "String")
+                    {
+                        if (value.Length > info.maxStringLength) return -2;    //varchar is too short
+                    }
+                    if (value.GetType().Name != info.type)
+                    {
+                        return -3;  //type is incorrected
+                    }
                 }
+                
             }
 
-            //Check Success, Add in database
-            data.Add(element);
-            //Add in Dictionary(map) to check for primary key
-            foreach(dynamic o in element)
+            //because map is not order garented, so we need a list defined the order in database
+            List<dynamic> row_data = new List<dynamic>();
+            foreach(string s in TableAttributesOrder)
             {
-                if (keyRepeatTimes.ContainsKey(o)) keyRepeatTimes[o] = keyRepeatTimes[o] + 1;
-                else keyRepeatTimes.Add(o, 1);
+                row_data.Add(turbel[s]);
             }
+            //Check Success, Add in database
+            data.Add(row_data);
 
             return 1;   //Success
         }
@@ -52,8 +79,8 @@ namespace Assignment1
             return data;
         }
 
-        private string name;
-        private List<TableAttributeInfo> TableAttributesInfo = new List<TableAttributeInfo>(10);
+        private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
+        private List<string> TableAttributesOrder = new List<string>(10);
         private List<List<dynamic>> data = new List<List<dynamic>>(1000000);
         private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
     }
