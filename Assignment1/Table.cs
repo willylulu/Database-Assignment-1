@@ -33,7 +33,7 @@ namespace Assignment1
                         switch(info.type)
                         {
                             case "String":
-                                turbel.Add(name,"N/A");
+                                turbel.Add(name,string.Empty);
                                 break;
                             case "Int32":
                                 turbel.Add(name, 0);
