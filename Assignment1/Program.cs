@@ -28,6 +28,7 @@ namespace Assignment1
             atributes.Add("name", nameProp);
             atributes.Add("gender", genderProp);
             atributes.Add("age", ageProp);
+            //Important！！！Order and Attributes must be Aligned.
 
             tableManager.createTable("student", order, atributes);
 
