@@ -40,11 +40,12 @@ namespace Assignment1
             tableManager.insertTable("student", turbel);
 
             //print all of data in table
-            List<List<dynamic>> ans = tableManager.getTable("student").getTableData();
+            Dictionary<Guid, List<dynamic>> ans = tableManager.getTable("student").getTableData();
 
-            foreach(List<dynamic> ele in ans)
+            foreach(KeyValuePair<Guid,List<dynamic>> ele in ans)
             {
-                foreach(dynamic eleAttr in ele)
+                Console.Write(ele.Key.ToString() +"\n");
+                foreach (dynamic eleAttr in ele.Value)
                 {
                     Console.Write(eleAttr + "(" + eleAttr.GetType().Name + ") ");
                 }

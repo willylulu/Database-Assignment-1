@@ -69,19 +69,20 @@ namespace Assignment1
                 row_data.Add(turbel[s]);
             }
             //Check Success, Add in database
-            data.Add(row_data);
+            Guid guid = Guid.NewGuid();
+            data.Add(guid,row_data);
 
             return 1;   //Success
         }
 
-        public List<List<dynamic>> getTableData()
+        public Dictionary<Guid, List<dynamic>> getTableData()
         {
             return data;
         }
 
         private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
         private List<string> TableAttributesOrder = new List<string>(10);
-        private List<List<dynamic>> data = new List<List<dynamic>>(1000000);
+        private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
         private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
     }
 }
