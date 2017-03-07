@@ -27,7 +27,7 @@ namespace Assignment1
                 //if not replace by default value
                 if (!turbel.ContainsKey(name))
                 {
-                    if(info.isPrimery) return -4;
+                    if(info.isPrimery) return -4;   //primary key can not be null
                     else
                     {
                         switch(info.type)
@@ -80,8 +80,8 @@ namespace Assignment1
             return data;
         }
 
-        private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
         private List<string> TableAttributesOrder = new List<string>(10);
+        private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
         private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
     }

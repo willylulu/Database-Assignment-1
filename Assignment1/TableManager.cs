@@ -15,9 +15,32 @@ namespace Assignment1
             return 1;   //Success
         }
 
-        public void insertTable(string name, Dictionary<string, dynamic> ele)
+        public void insert(string name, Dictionary<string, dynamic> ele)
         {
             int res = tables[name].insert(ele);
+            if(res!=1)
+            {
+                string errorString;
+                switch (res)
+                {
+                    case -1:
+                        errorString = "Primary key duplicated";
+                        break;
+                    case -2:
+                        errorString = "Varchar is too short";
+                        break;
+                    case -3:
+                        errorString = "Type is incorrected";
+                        break;
+                    case -4:
+                        errorString = "Primary key can not be null";
+                        break;
+                    default:
+                        errorString = "Unknown error";
+                        break;
+                }
+                Console.WriteLine(errorString);
+            }
         }
 
         public Table getTable(string name)

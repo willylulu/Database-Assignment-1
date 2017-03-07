@@ -35,9 +35,9 @@ namespace Assignment1
             Dictionary<string, dynamic> turbel = new Dictionary<string, dynamic>();
             turbel.Add("studentId", 1);
             turbel.Add("name", "Willy");
-            //turbel.Add("gender", "M");
+            turbel.Add("gender", "M");
             turbel.Add("age", 21);
-            tableManager.insertTable("student", turbel);
+            tableManager.insert("student", turbel);
 
             //print all of data in table
             Dictionary<Guid, List<dynamic>> ans = tableManager.getTable("student").getTableData();
