@@ -22,6 +22,10 @@ namespace Assignment1
         {
             this.TableAttributesOrder = TableAttributesOrder;
             this.TableAttributesInfo = TableAttributesInfo;
+            foreach(string s in TableAttributesOrder)
+            {
+                attribIndex.Add(s,new Dictionary<dynamic, List<Guid>>());
+            }
         }
 
         public InstructionResult insert(Dictionary<string,dynamic> turbel)
@@ -71,14 +75,20 @@ namespace Assignment1
                 
             }
 
+            //Check Success, Add in database
             //because map is not order garented, so we need a list defined the order in database
             List<dynamic> row_data = new List<dynamic>();
-            foreach(string s in TableAttributesOrder)
+            Guid guid = Guid.NewGuid();
+            foreach (string s in TableAttributesOrder)
             {
                 row_data.Add(turbel[s]);
+
+                //let the every element in turbel put in the attribIndex for selection
+                if (!attribIndex[s].ContainsKey(turbel[s]))
+                    attribIndex[s].Add(turbel[s],new List<Guid>());
+                attribIndex[s][turbel[s]].Add(guid);
             }
-            //Check Success, Add in database
-            Guid guid = Guid.NewGuid();
+
             data.Add(guid,row_data);
 
             return InstructionResult.success;   //Success
@@ -91,7 +101,8 @@ namespace Assignment1
 
         private List<string> TableAttributesOrder = new List<string>(10);
         private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
-        private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
         private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
+        private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
+        private Dictionary<string, Dictionary<dynamic, List<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, List<Guid>>>(10);
     }
 }
