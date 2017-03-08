@@ -43,7 +43,7 @@ namespace Assignment1
             //print all of data in table
             Dictionary<Guid, List<dynamic>> ans = tableManager.getTable("student").getTableData();
 
-            foreach(KeyValuePair<Guid,List<dynamic>> ele in ans)
+            foreach(System.Collections.Generic.KeyValuePair<Guid, List<dynamic>> ele in ans)
             {
                 Console.Write(ele.Key.ToString() +"\n");
                 foreach (dynamic eleAttr in ele.Value)
@@ -52,6 +52,7 @@ namespace Assignment1
                 }
                 Console.Write("\n");
             }
+
             Console.ReadLine();
         }
     }
