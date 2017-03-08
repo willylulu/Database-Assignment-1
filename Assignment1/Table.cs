@@ -8,49 +8,51 @@ namespace Assignment1
 {
     enum InstructionResult
     {
-        success,
-        primaryKeyDuplicate,
-        varcharTooShort,
-        incorrectType,
-        nullPrimaryKey,
-        tableNameDuplicate
+        SUCCESS,
+        PRIMARY_KEY_DUPLICATE,
+        VARCHAR_TOO_SHORT,
+        INCORRECT_TYPE,
+        NULL_PRIMARY_KEY,
+        TABLE_NAME_DUPLICATE,
     }
+
 
     class Table
     {
 
-        public Table(List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
+        public Table(List<string> TableAttributesOrder, Dictionary<string, TableAttribute> TableAttributes)
         {
             this.TableAttributesOrder = TableAttributesOrder;
-            this.TableAttributesInfo = TableAttributesInfo;
+            this.TableAttributes= TableAttributes;
             foreach(string s in TableAttributesOrder)
             {
                 attribIndex.Add(s,new Dictionary<dynamic, List<Guid>>());
             }
         }
 
-        public InstructionResult insert(Dictionary<string,dynamic> turbel)
+
+        public InstructionResult insert(Dictionary<string,dynamic> tuple)
         {
             //retrive each attribute in table
-            foreach(KeyValuePair<string, TableAttributeInfo> infoPair in TableAttributesInfo)
+            foreach(KeyValuePair<string, TableAttribute> infoPair in TableAttributes)
             {
                 String name = infoPair.Key;
-                TableAttributeInfo info = infoPair.Value;
+                TableAttribute info = infoPair.Value;
                 
-                //check is every value in attribute is defined in turbel
+                //check is every value in attribute is defined in tuple
                 //if not replace by default value
-                if (!turbel.ContainsKey(name))
+                if (!tuple.ContainsKey(name))
                 {
-                    if(info.isPrimery) return InstructionResult.nullPrimaryKey;   //primary key can not be null
+                    if(info.isPrimary) return InstructionResult.NULL_PRIMARY_KEY;   //primary key can not be null
                     else
                     {
                         switch(info.type)
                         {
-                            case TableAttributeInfo.varchar:
-                                turbel.Add(name,string.Empty);
+                            case TableAttribute.STRING_TYPE:
+                                tuple.Add(name, string.Empty);
                                 break;
-                            case TableAttributeInfo.integer:
-                                turbel.Add(name, 0);
+                            case TableAttribute.INT_TYPE:
+                                tuple.Add(name, 0);
                                 break;
                         }
                     }
@@ -58,18 +60,18 @@ namespace Assignment1
                 else
                 {
                     //Check format legality
-                    dynamic value = turbel[name];
-                    if (info.isPrimery)
+                    dynamic value = tuple[name];
+                    if (info.isPrimary)
                     {
-                        if (attribIndex[name].ContainsKey(value)) return InstructionResult.primaryKeyDuplicate; //primary key duplicated
+                        if (attribIndex[name].ContainsKey(value)) return InstructionResult.PRIMARY_KEY_DUPLICATE; //primary key duplicated
                     }
                     if (info.type == "String")
                     {
-                        if (value.Length > info.maxStringLength) return InstructionResult.varcharTooShort;    //varchar is too short
+                        if (value.Length > info.maxStringLength) return InstructionResult.VARCHAR_TOO_SHORT;    //varchar is too short
                     }
                     if (value.GetType().Name != info.type)
                     {
-                        return InstructionResult.incorrectType;  //type is incorrected
+                        return InstructionResult.INCORRECT_TYPE;  //type is incorrected
                     }
                 }
                 
@@ -81,17 +83,17 @@ namespace Assignment1
             Guid guid = Guid.NewGuid();
             foreach (string s in TableAttributesOrder)
             {
-                row_data.Add(turbel[s]);
+                row_data.Add(tuple[s]);
 
-                //let the every element in turbel put in the attribIndex for selection
-                if (!attribIndex[s].ContainsKey(turbel[s]))
-                    attribIndex[s].Add(turbel[s],new List<Guid>());
-                attribIndex[s][turbel[s]].Add(guid);
+                //let the every element in tuple put in the attribIndex for selection
+                if (!attribIndex[s].ContainsKey(tuple[s]))
+                    attribIndex[s].Add(tuple[s],new List<Guid>());
+                attribIndex[s][tuple[s]].Add(guid);
             }
 
             data.Add(guid,row_data);
 
-            return InstructionResult.success;   //Success
+            return InstructionResult.SUCCESS;   //Success
         }
 
         public Dictionary<Guid, List<dynamic>> getTableData()
@@ -100,7 +102,7 @@ namespace Assignment1
         }
 
         private List<string> TableAttributesOrder = new List<string>(10);
-        private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
+        private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(10);
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
         private Dictionary<string, Dictionary<dynamic, List<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, List<Guid>>>(10);
     }

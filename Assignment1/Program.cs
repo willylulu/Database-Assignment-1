@@ -18,12 +18,12 @@ namespace Assignment1
             order.Add("gender");
             order.Add("age");
 
-            TableAttributeInfo studentIdProp = new TableAttributeInfo("Int32", true, 0);
-            TableAttributeInfo nameProp = new TableAttributeInfo("String", false, 15);
-            TableAttributeInfo genderProp = new TableAttributeInfo("String", false, 1);
-            TableAttributeInfo ageProp = new TableAttributeInfo("Int32", false, 0);
+            TableAttribute studentIdProp = new TableAttribute("Int32", true, 0);
+            TableAttribute nameProp = new TableAttribute("String", false, 15);
+            TableAttribute genderProp = new TableAttribute("String", false, 1);
+            TableAttribute ageProp = new TableAttribute("Int32", false, 0);
 
-            Dictionary<string, TableAttributeInfo> atributes = new Dictionary<string, TableAttributeInfo>(order.Count);
+            Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(order.Count);
             atributes.Add("studentId", studentIdProp);
             atributes.Add("name", nameProp);
             atributes.Add("gender", genderProp);

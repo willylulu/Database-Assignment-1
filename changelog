@@ -1,0 +1,30 @@
+1. Class TableAttributeInfo 
+	>Define types (use public const)
+		const string STRING_TYPE = "String"
+		const string INT_TYPE = "Int32"
+	>const int MAX_STRING_LENGTH = 40;
+	>Typo: isPrimery -> isPrimary
+	>Can just named TableAttribute
+	
+2. Class Table
+	>naming:
+		public(List<string> TableAttributesOrder,
+			Dictionary<string, TableAttribute> TableAttributes)
+		//plz no TableAttributesInfo ... too difficult to tell
+	>typo
+		turbel -> tuple
+	>Define Error message
+		const int PREIMARY_KEY_DUPLICATED = -1
+		const int VARCHAR_TOO_SHORT = -2
+		const int TYPE_iNCORRECT = -3
+		const int PRIMARY_KEY_NULL = -4
+	>31~40:
+		string: tuple.Add(name, null);
+		int: tuple.Add(name, null);
+		if null will cause exception,
+		you should define your won null_type
+		EX:
+		const string NULL_STRING = "NULLLLLLLXXDDXDDD"
+		const int NULL_INT = -2147483611
+		
+

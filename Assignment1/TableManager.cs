@@ -9,31 +9,31 @@ namespace Assignment1
 
     class TableManager
     {
-        public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
+        public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttribute> TableAttributes)
         {
-            if (tables.ContainsKey(name)) return InstructionResult.tableNameDuplicate;    //table name duplicated
-            else tables.Add(name,new Table(TableAttributesOrder, TableAttributesInfo));
-            return InstructionResult.success;   //Success
+            if (tables.ContainsKey(name)) return InstructionResult.TABLE_NAME_DUPLICATE;    //table name duplicated
+            else tables.Add(name,new Table(TableAttributesOrder, TableAttributes));
+            return InstructionResult.SUCCESS;   //Success
         }
 
         public void insert(string name, Dictionary<string, dynamic> ele)
         {
             InstructionResult res = tables[name].insert(ele);
-            if(res!= InstructionResult.success)
+            if(res!= InstructionResult.SUCCESS)
             {
                 string errorString;
                 switch (res)
                 {
-                    case InstructionResult.primaryKeyDuplicate:
+                    case InstructionResult.PRIMARY_KEY_DUPLICATE:
                         errorString = "Primary key duplicated";
                         break;
-                    case InstructionResult.varcharTooShort:
+                    case InstructionResult.VARCHAR_TOO_SHORT:
                         errorString = "Varchar is too short";
                         break;
-                    case InstructionResult.incorrectType:
+                    case InstructionResult.INCORRECT_TYPE:
                         errorString = "Type is incorrected";
                         break;
-                    case InstructionResult.nullPrimaryKey:
+                    case InstructionResult.NULL_PRIMARY_KEY:
                         errorString = "Primary key can not be null";
                         break;
                     default:
