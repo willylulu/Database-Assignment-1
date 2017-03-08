@@ -9,11 +9,11 @@ namespace Assignment1
 
     class TableManager
     {
-        public int createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
+        public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
         {
-            if (tables.ContainsKey(name)) return -1;    //table name duplicated
+            if (tables.ContainsKey(name)) return InstructionResult.tableNameDuplicate;    //table name duplicated
             else tables.Add(name,new Table(TableAttributesOrder, TableAttributesInfo));
-            return 1;   //Success
+            return InstructionResult.success;   //Success
         }
 
         public void insert(string name, Dictionary<string, dynamic> ele)

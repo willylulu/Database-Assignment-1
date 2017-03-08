@@ -12,7 +12,8 @@ namespace Assignment1
         primaryKeyDuplicate,
         varcharTooShort,
         incorrectType,
-        nullPrimaryKey
+        nullPrimaryKey,
+        tableNameDuplicate
     }
 
     class Table
@@ -60,8 +61,7 @@ namespace Assignment1
                     dynamic value = turbel[name];
                     if (info.isPrimery)
                     {
-                        if (keyRepeatTimes.ContainsKey(value) && keyRepeatTimes[value] > 0) return InstructionResult.primaryKeyDuplicate; //primary key duplicated
-                        else keyRepeatTimes.Add(value, 1);
+                        if (attribIndex[name].ContainsKey(value)) return InstructionResult.primaryKeyDuplicate; //primary key duplicated
                     }
                     if (info.type == "String")
                     {
@@ -101,7 +101,6 @@ namespace Assignment1
 
         private List<string> TableAttributesOrder = new List<string>(10);
         private Dictionary<string,TableAttributeInfo> TableAttributesInfo = new Dictionary<string,TableAttributeInfo>(10);
-        private Dictionary<dynamic, int> keyRepeatTimes = new Dictionary<dynamic, int>(1000000);
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
         private Dictionary<string, Dictionary<dynamic, List<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, List<Guid>>>(10);
     }
