@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+    enum InstructionResult
+    {
+        success,
+        primaryKeyDuplicate,
+        varcharTooShort,
+        incorrectType,
+        nullPrimaryKey
+    }
+
     class Table
     {
 
@@ -15,7 +24,7 @@ namespace Assignment1
             this.TableAttributesInfo = TableAttributesInfo;
         }
 
-        public int insert(Dictionary<string,dynamic> turbel)
+        public InstructionResult insert(Dictionary<string,dynamic> turbel)
         {
             //retrive each attribute in table
             foreach(KeyValuePair<string, TableAttributeInfo> infoPair in TableAttributesInfo)
@@ -27,15 +36,15 @@ namespace Assignment1
                 //if not replace by default value
                 if (!turbel.ContainsKey(name))
                 {
-                    if(info.isPrimery) return -4;   //primary key can not be null
+                    if(info.isPrimery) return InstructionResult.nullPrimaryKey;   //primary key can not be null
                     else
                     {
                         switch(info.type)
                         {
-                            case "String":
+                            case TableAttributeInfo.varchar:
                                 turbel.Add(name,string.Empty);
                                 break;
-                            case "Int32":
+                            case TableAttributeInfo.integer:
                                 turbel.Add(name, 0);
                                 break;
                         }
@@ -47,16 +56,16 @@ namespace Assignment1
                     dynamic value = turbel[name];
                     if (info.isPrimery)
                     {
-                        if (keyRepeatTimes.ContainsKey(value) && keyRepeatTimes[value] > 0) return -1; //primary key duplicated
+                        if (keyRepeatTimes.ContainsKey(value) && keyRepeatTimes[value] > 0) return InstructionResult.primaryKeyDuplicate; //primary key duplicated
                         else keyRepeatTimes.Add(value, 1);
                     }
                     if (info.type == "String")
                     {
-                        if (value.Length > info.maxStringLength) return -2;    //varchar is too short
+                        if (value.Length > info.maxStringLength) return InstructionResult.varcharTooShort;    //varchar is too short
                     }
                     if (value.GetType().Name != info.type)
                     {
-                        return -3;  //type is incorrected
+                        return InstructionResult.incorrectType;  //type is incorrected
                     }
                 }
                 
@@ -72,7 +81,7 @@ namespace Assignment1
             Guid guid = Guid.NewGuid();
             data.Add(guid,row_data);
 
-            return 1;   //Success
+            return InstructionResult.success;   //Success
         }
 
         public Dictionary<Guid, List<dynamic>> getTableData()

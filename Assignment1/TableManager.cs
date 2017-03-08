@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+
     class TableManager
     {
         public int createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttributeInfo> TableAttributesInfo)
@@ -17,22 +18,22 @@ namespace Assignment1
 
         public void insert(string name, Dictionary<string, dynamic> ele)
         {
-            int res = tables[name].insert(ele);
-            if(res!=1)
+            InstructionResult res = tables[name].insert(ele);
+            if(res!= InstructionResult.success)
             {
                 string errorString;
                 switch (res)
                 {
-                    case -1:
+                    case InstructionResult.primaryKeyDuplicate:
                         errorString = "Primary key duplicated";
                         break;
-                    case -2:
+                    case InstructionResult.varcharTooShort:
                         errorString = "Varchar is too short";
                         break;
-                    case -3:
+                    case InstructionResult.incorrectType:
                         errorString = "Type is incorrected";
                         break;
-                    case -4:
+                    case InstructionResult.nullPrimaryKey:
                         errorString = "Primary key can not be null";
                         break;
                     default:

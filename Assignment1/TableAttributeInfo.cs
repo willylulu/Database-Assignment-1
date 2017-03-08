@@ -8,6 +8,9 @@ namespace Assignment1
 {
     class TableAttributeInfo
     {
+        public const string varchar = "String";
+        public const string integer = "Int32";
+
         public TableAttributeInfo(string type, bool isPrimery, int maxStringLength)
         {
             this.type = type;
