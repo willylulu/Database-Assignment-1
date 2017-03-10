@@ -86,9 +86,7 @@ namespace Assignment1
                 row_data.Add(tuple[s]);
 
                 //let the every element in tuple put in the attribIndex for selection
-                if (!attribIndex[s].ContainsKey(tuple[s]))
-                    attribIndex[s].Add(tuple[s],new List<Guid>());
-                attribIndex[s][tuple[s]].Add(guid);
+                setAttribIndex(s,tuple[s],guid);
             }
 
             data.Add(guid,row_data);
@@ -99,6 +97,18 @@ namespace Assignment1
         public Dictionary<Guid, List<dynamic>> getTableData()
         {
             return data;
+        }
+
+        private void setAttribIndex(string name, dynamic value, Guid address)
+        {
+            if (!attribIndex[name].ContainsKey(value))
+                attribIndex[name].Add(value, new List<Guid>());
+            attribIndex[name][value].Add(address);
+        }
+
+        private List<Guid> getAttribIndex(string name, dynamic value)
+        {
+            return attribIndex[name][value];
         }
 
         private List<string> TableAttributesOrder = new List<string>(10);
