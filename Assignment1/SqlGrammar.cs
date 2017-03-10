@@ -46,16 +46,17 @@ namespace Assignment1
         public static Parser<string> Instruction =
             (from instruction_1 in Identifier
              from instruction_2 in Identifier
-             select instruction_1 + instruction_2
+             select instruction_1 + " " + instruction_2
+
              ).Token();
 
         internal static Parser<Sql_TableAttribute> TableAttribute =
             (from name in Identifier
              from type in Parse.LetterOrDigit.XOr(Parse.Char('-')).XOr(Parse.Char('_')).Many().Text()
              from maxLength in ParenthsisedText.Or(Parse.Return("-1"))
-             from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return("NO"))
+             from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return(""))
              from end in Parse.Char(',').Once().Text().Or(Parse.Return("END"))
-             select new Sql_TableAttribute(name, type, maxLength, isPrimary)
+             select new Sql_TableAttribute(name, type, maxLength, isPrimary, (end=="END"))
              //select new List<string> { name, type, maxLength, isPrimary, end}
              ).Token();
 
@@ -87,6 +88,25 @@ namespace Assignment1
              ).Token();
 
 
+        public Boolean checkVariableName(string str)
+        {
+            char[] invalidChar = {'!', '@', '#', '$', '%', '^', '&', '*', '(',
+                                    ')', '+', '=', '[', ']', '{', '}', '<', '>', ';', ':', '~'};
+            //check if space in it
+            if (str.IndexOf(' ') != -1)
+                return false;
+            if (str.IndexOfAny(invalidChar) != -1)
+                return false;
+
+            //number cannot be the first
+            int number;
+            if (Int32.TryParse(str[0].ToString(), out number))
+                return false;
+
+            return true;
+        }
+
+
         public class Sql_Item
         {
             public string name;
@@ -98,9 +118,12 @@ namespace Assignment1
             public bool isPrimary = false;
             //public int maxStringLength = 0; //-1 if type is int
             public int maxStringLength = 0; //-1 if type is int
+            public bool isLastOne;
             private const string TEXT_FOR_PRIAMRY = "primary key";
+            public const string TYPE_STRING = "varchar";
+            public const string TYPE_INT = "int";
 
-            public Sql_TableAttribute(string name, string type, string maxStringLength, string isPriamry)
+            public Sql_TableAttribute(string name, string type, string maxStringLength, string isPriamry, bool isLastOne)
             {
                 this.name = name;
                 this.type = type;
@@ -109,6 +132,11 @@ namespace Assignment1
                     this.isPrimary = true;
                 else
                     this.isPrimary = false;
+                this.isLastOne = isLastOne;
+
+                if (!type.Equals(TYPE_STRING) && !type.Equals(TYPE_INT))
+                    throw new DbException.UnknownTypeException("Unkown Data Type: " + type);
+                    
             }
 
             public override string ToString()
@@ -125,7 +153,17 @@ namespace Assignment1
             {
                 this.name = name;
                 this.tableAttributes = attributes;
+
+                //check more or less comma
+                for (int i = 0; i < attributes.Count; i++)
+                {
+                    if (i != attributes.Count - 1 && attributes[i].isLastOne == true)
+                        throw new DbException.InvalidCommaException("less comma"); 
+                    else if (i == attributes.Count - 1 && attributes[i].isLastOne != true)
+                        throw new DbException.InvalidCommaException("More comma"); 
+                }
             }
+            
 
             public override string ToString()
             {
@@ -144,38 +182,79 @@ namespace Assignment1
         public class Sql_Insertion
         {
             public string table;
-            public List<string> AttrItem;
-            public List<string> AttrValues;
+            public List<string> AttrNames;
+            public List<dynamic> AttrValues;
+            public const string NO_ATTRIBUTE_NAME = "NO_ATTRIBUTE_NAME";
+            public const string NO_ATTRIBUTE_VALUE = "NO_ATTRIBUTE_VALUE";
             //public string AttrItem;
             //public string AttrValues;
 
-            public Sql_Insertion(string table, List<string> attrs, List<string> values)
-            {
-                this.table = table;
-                //this.AttrValues = values;
-                //this.AttrItem = attrs;
-            }
             public Sql_Insertion(string table, string attrs, string values)
             {
                 this.table = table;
-                if (attrs.Equals("NO_ATTRIBUTE_NAME"))
-                {
-                    this.AttrItem = new List<string>();
-                }
-                else
-                {
-                    string[] attrsArray = attrs.Split(',');
-                    this.AttrItem = attrsArray.ToList();
-                }
-                string[] valuesArray = values.Split(',');
-                this.AttrValues = valuesArray.ToList();
-                
+                this.AttrNames = (attrs.Equals(NO_ATTRIBUTE_NAME)) ? null : attrs.Split(',').Select(t => t.Trim()).ToList();
+                this.AttrValues = values.Split(',').Select(t => checkQuoted(t)).ToList<dynamic>();
+            }
 
+            private dynamic checkQuoted(string str)
+            {
+                //IF WRONG, raise exception.... like 'asdf'asdf, 'asf''', 
+                int number;
+                if (Int32.TryParse(str, out number))
+                    return number;
+
+                str = str.Trim();
+                if (str.Equals(""))
+                    throw new DbException.InvalidSQLArguments("empty argument...");
+
+
+                int startQ = str.IndexOf('\'');
+                int endQ = str.LastIndexOf('\'');
+                //Check if text is wraped by ''
+                if (startQ != 0 || endQ != str.Length - 1)
+                    throw new DbException.InvalidSQLArguments("mismatch of ' ");
+
+                str = str.Substring(1, str.Length - 2);
+                //Check no more ' in the string
+                if (str.IndexOf('\'') != -1)
+                    throw new DbException.InvalidSQLArguments("mismatch of ' ");
+
+                return str;
             }
             public override string ToString()
             {
                 string intro = "(Insertion) ";
-                return intro + table + "\n  " + AttrItem + "\n  " +AttrValues + "\n";
+                string stringForAttrName = "";
+                string stringForAttrValues = "";
+
+                if (AttrNames == null)
+                    stringForAttrName = "NO Attribute Name, ";
+                else
+                {
+                    stringForAttrName += "(";
+                    for (int attrNameCount=0; attrNameCount < AttrNames.Count; attrNameCount++)
+                    {
+                        stringForAttrName += AttrNames[attrNameCount].ToString();
+                        if (attrNameCount != AttrNames.Count-1)
+                            stringForAttrName += ",";
+                    }
+                    stringForAttrName += ")";
+                }
+                if (AttrValues == null)
+                    stringForAttrName = "NO Attribute Values, ";
+                else
+                {
+                    stringForAttrValues += "(";
+                    for (int valuesCount=0; valuesCount < AttrValues.Count; valuesCount++)
+                    {
+                        stringForAttrValues += AttrValues[valuesCount].ToString();
+                        if (valuesCount != AttrValues.Count-1)
+                            stringForAttrValues += ",";
+                    }
+                    stringForAttrValues += ")";
+                       
+                }
+                return intro + table + "\n  " + stringForAttrName + "\n  " +stringForAttrValues + "\n";
 
             }
         }
