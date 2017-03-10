@@ -11,8 +11,8 @@ namespace Assignment1
     {
         static void Main(string[] args)
         {
-            TestCreateTable();
 
+            TestInsertion();
 
 
             Console.ReadKey(true);
@@ -24,7 +24,7 @@ namespace Assignment1
             println(input_insert1);
 
             var insertion = SqlGrammar.Insertion.Parse(input_insert1);
-            printList(insertion);
+            println(insertion);
         }
 
         private static void TestCreateTable()
@@ -37,20 +37,20 @@ namespace Assignment1
             //var input_attribute = "name varchar(15) primary key,";
             //printList(attribute);*/
             var table = SqlGrammar.Table.Parse(input_table);
-            printTable(table);
+            println(table.ToString());
 
 
            input_table = "CREATE tAbLe PerSon(\n   personId int PRIMARY KEY, \n name varchar(20), \n   m_gender varchar(1)   )";
             input_table = input_table.ToLower();
             println(input_table);
             table = SqlGrammar.Table.Parse(input_table);
-            printTable(table);
+            println(table.ToString());
 
             input_table = "CREATE tAbLe department(\n   department_name varchar(20), \n type varchar(20), \n   num_employees int ) ";
             input_table = input_table.ToLower();
             println(input_table);
             table = SqlGrammar.Table.Parse(input_table);
-            printTable(table);
+            println(table.ToString());
 
         }
         private static void println(dynamic str)

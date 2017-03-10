@@ -12,7 +12,7 @@ namespace Assignment1
     {
         public static readonly Parser<string> Identifier =
            (from first in Parse.Letter.Once()
-            //can parse letter, digit, -, _ for many
+                //can parse letter, digit, -, _ for many
             from rest in Parse.LetterOrDigit.XOr(Parse.Char('-')).XOr(Parse.Char('_')).Many()
             select new string(first.Concat(rest).ToArray())).Token();
 
@@ -25,10 +25,10 @@ namespace Assignment1
         internal static Parser<string> QuotedText =
             (from lquot in Parse.Char('\'')
                  // from content in Parse.CharExcept('"').Many().Text()
-                     from content in Parse.CharExcept('\'').Many().Text().Token()
+             from content in Parse.CharExcept('\'').Many().Text().Token()
              from rquot in Parse.Char('\'')
-             //prefix "(str)" to indicate that it is a string format
-             select "(str)"+content).Token();
+                 //prefix "(str)" to indicate that it is a string format
+             select "(str)" + content).Token();
 
         internal static Parser<string> CsvElement =
             (from content in QuotedText.Or(Identifier)
@@ -49,40 +49,41 @@ namespace Assignment1
              select instruction_1 + instruction_2
              ).Token();
 
-
-
-
-
-        internal static Parser<List<string>> TableAttribute =
+        internal static Parser<Sql_TableAttribute> TableAttribute =
             (from name in Identifier
              from type in Parse.LetterOrDigit.XOr(Parse.Char('-')).XOr(Parse.Char('_')).Many().Text()
-             from maxLength in ParenthsisedText.Or(Parse.Return("INT"))
+             from maxLength in ParenthsisedText.Or(Parse.Return("-1"))
              from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return("NO"))
              from end in Parse.Char(',').Once().Text().Or(Parse.Return("END"))
-             select new List<string> { name, type, maxLength, isPrimary, end}
+             select new Sql_TableAttribute(name, type, maxLength, isPrimary)
+             //select new List<string> { name, type, maxLength, isPrimary, end}
              ).Token();
 
-        internal static Parser<List<dynamic>> Table =
+        internal static Parser<Sql_Table> Table =
             (from instruction in Instruction
-             //what is ok in table name?
+                 //what is ok in table name?
              from name in Identifier
              from startParenthesis in Parse.Char('(').Once().Token().Text()
              from attributes in TableAttribute.Many()
              from endParenthesis in Parse.Char(')').Once().Token().Text()
-             //select new List<dynamic> { name, attributes}
-             select new List<dynamic> {name, attributes, startParenthesis, endParenthesis}
+                 //select new List<dynamic> { name, attributes}
+                 //select new List<dynamic> {name, attributes, startParenthesis, endParenthesis}
+             select new Sql_Table(name, attributes.ToList())
             ).Token();
 
-        internal static Parser<List<dynamic>> Insertion =
+
+        internal static Parser<Sql_Insertion> Insertion =
             (from instruction in Instruction
-             //What is ok in table name?
+                 //What is ok in table name?
              from name in Identifier
              from attributes in ParenthsisedText.Or(Parse.Return("NO_ATTRIBUTE_NAME"))
+             //from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
              from values_word in Parse.Chars("values").Many().Token().Text()
-             from values in ParenthsisedText
+             //from values in ParenthsisedElements 
+             from values in ParenthsisedText.Or(Parse.Return("NO_ATTRIBUTE_VALUE"))
              //select new List<dynamic> { name, attributes}
-             select new List<dynamic> {name, attributes, values_word, values}
-             //select new List<dynamic> {name, attributes}
+             //select new List<dynamic> {name, attributes, values_word, values}
+             select new Sql_Insertion(name, attributes, values)
              ).Token();
 
 
@@ -95,14 +96,15 @@ namespace Assignment1
         {
             public string type;
             public bool isPrimary = false;
+            //public int maxStringLength = 0; //-1 if type is int
             public int maxStringLength = 0; //-1 if type is int
             private const string TEXT_FOR_PRIAMRY = "primary key";
 
-            public Sql_TableAttribute(string name, string type, string isPriamry, int maxStringLength)
+            public Sql_TableAttribute(string name, string type, string maxStringLength, string isPriamry)
             {
                 this.name = name;
                 this.type = type;
-                this.maxStringLength = maxStringLength;
+                this.maxStringLength = Int32.Parse(maxStringLength);
                 if (isPriamry.Equals(TEXT_FOR_PRIAMRY))
                     this.isPrimary = true;
                 else
@@ -112,7 +114,7 @@ namespace Assignment1
             public override string ToString()
             {
                 string intro = "(Attr) ";
-                return intro + name +": "+ type + ((isPrimary == true)? " isPriamry":"");
+                return intro + name +": "+ type + "("+Convert.ToString(maxStringLength)+") "+((isPrimary == true)? " isPriamry":"");
             }
         }
 
@@ -144,14 +146,38 @@ namespace Assignment1
             public string table;
             public List<string> AttrItem;
             public List<string> AttrValues;
+            //public string AttrItem;
+            //public string AttrValues;
 
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
                 this.table = table;
-                this.AttrValues = values;
-                this.AttrItem = attrs;
+                //this.AttrValues = values;
+                //this.AttrItem = attrs;
             }
+            public Sql_Insertion(string table, string attrs, string values)
+            {
+                this.table = table;
+                if (attrs.Equals("NO_ATTRIBUTE_NAME"))
+                {
+                    this.AttrItem = new List<string>();
+                }
+                else
+                {
+                    string[] attrsArray = attrs.Split(',');
+                    this.AttrItem = attrsArray.ToList();
+                }
+                string[] valuesArray = values.Split(',');
+                this.AttrValues = valuesArray.ToList();
+                
 
+            }
+            public override string ToString()
+            {
+                string intro = "(Insertion) ";
+                return intro + table + "\n  " + AttrItem + "\n  " +AttrValues + "\n";
+
+            }
         }
 
     }
