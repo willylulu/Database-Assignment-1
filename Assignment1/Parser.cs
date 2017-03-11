@@ -9,7 +9,7 @@ namespace Assignment1
 {
     class Parser
     {
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             //TestCase -- open for updating
             //1. Insertion that has no values
@@ -19,8 +19,16 @@ namespace Assignment1
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
 
-            TestCreateTable();
-            TestInsertion();
+            string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
+            text = text.ToLower();
+            string[] seperated_query = text.Split(';');
+            foreach (string s in seperated_query)
+            {
+                sql_selector(s.TrimStart());
+            }
+
+            //TestCreateTable();
+            //TestInsertion();
             Console.ReadKey(true);
         }
         public static SqlGrammar.Sql_Table CreateTable(string sql)
@@ -50,6 +58,20 @@ namespace Assignment1
             }
 
         }
+
+        public static void sql_selector(string sql)
+        {
+            string[] seperated_query = sql.Split();
+            if (string.Compare(seperated_query[0], "create", true) == 0)
+            {
+                CreateTable(sql);
+            }
+            else if (string.Compare(seperated_query[0], "insert", true) == 0)
+            {
+                Insert(sql);
+            }
+        }
+
         public static SqlGrammar.Sql_Insertion Insert(string sql)
         {
             try

@@ -94,6 +94,11 @@ namespace Assignment1
             return InstructionResult.SUCCESS;   //Success
         }
 
+        public List<string> getAttributesOrder()
+        {
+            return this.TableAttributesOrder;
+        }
+
         public Dictionary<Guid, List<dynamic>> getTableData()
         {
             return data;

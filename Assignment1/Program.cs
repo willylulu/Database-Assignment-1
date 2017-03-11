@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace Assignment1
 {
     class Program
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             TableManager tableManager = new TableManager();
 
@@ -40,19 +41,8 @@ namespace Assignment1
             turbel.Add("age", 21);
             tableManager.insert("student", turbel);
 
-            //print all of data in table
-            Dictionary<Guid, List<dynamic>> ans = tableManager.getTable("student").getTableData();
-
-            foreach(System.Collections.Generic.KeyValuePair<Guid, List<dynamic>> ele in ans)
-            {
-                Console.Write(ele.Key.ToString() +"\n");
-                foreach (dynamic eleAttr in ele.Value)
-                {
-                    Console.Write(eleAttr + "(" + eleAttr.GetType().Name + ") ");
-                }
-                Console.Write("\n");
-            }
-
+            //print table data to csv file
+            tableManager.print_table_context();
             Console.ReadLine();
         }
     }
