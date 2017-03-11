@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,6 +50,39 @@ namespace Assignment1
             return tables[name];
         }
 
+
+        public void print_table_context() //Print table data to csv file
+        {
+            foreach (System.Collections.Generic.KeyValuePair<string, Table> tablePair in tables)
+            {
+                var csv = new StringBuilder();
+                Dictionary<Guid, List<dynamic>> ans = tablePair.Value.getTableData();
+                List<string> attr_order = tablePair.Value.getAttributesOrder();
+
+                //Print table name
+                var newLine = string.Format(tablePair.Key);
+                csv.AppendLine(newLine);
+
+                foreach (System.Collections.Generic.KeyValuePair<Guid, List<dynamic>> ele in ans)
+                {
+                    //Print attribute order
+                    var attr = String.Join(", ", attr_order.ToArray());
+                    csv.AppendLine(attr);
+
+                    //Print each tuple
+                    var eleattr = String.Join(", ", ele.Value.ToArray());
+                    csv.AppendLine(eleattr);
+                }
+
+                File.WriteAllText("../../table_conetxt.csv", csv.ToString());
+
+            }
+           
+            
+            
+
+            
+        }
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
     }
 }
