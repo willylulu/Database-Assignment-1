@@ -8,33 +8,34 @@ namespace Assignment1
 {
     class DbException
     {
-        public class UnknownTypeException : Exception
+
+
+        public class OtherSyntaxError : Exception
         {
-            public UnknownTypeException() : base("Unkown Type Error") { }
-            public UnknownTypeException(string message) : base(message) { }
-            public UnknownTypeException(string message, Exception inner) : base(message, inner) { }
+            public OtherSyntaxError() : base("Other Syntax Error") { }
+            public OtherSyntaxError(string message) : base(message) { }
+            public OtherSyntaxError(string message, Exception inner) : base(message, inner) { }
         }
 
-
-        public class InvalidCommaException : Exception
+        public class InvalidKeyword : Exception
         {
-            public InvalidCommaException() : base("Invalid Comma Error") { }
-            public InvalidCommaException(string message) : base(message) { }
-            public InvalidCommaException(string message, Exception inner) : base(message, inner) { }
+            public InvalidKeyword() : base("Invalid Keyword Error") { }
+            public InvalidKeyword(string message) : base(message) { }
+            public InvalidKeyword(string message, Exception inner) : base(message, inner) { }
         }
 
-        public class InvalidSQLArguments : Exception
+        public class UnkownKeyword : Exception
         {
-            public InvalidSQLArguments() : base("Invalid Sql Arguments") { }
-            public InvalidSQLArguments(string message) : base(message) { }
-            public InvalidSQLArguments(string message, Exception inner) : base(message, inner) { }
+            public UnkownKeyword() : base("Unkown Keyword Error") { }
+            public UnkownKeyword(string message) : base(message) { }
+            public UnkownKeyword(string message, Exception inner) : base(message, inner) { }
         }
 
-        public class UnkownInstruction : Exception
+         public class MismatchingArguments: Exception
         {
-            public UnkownInstruction() : base("Unkown Instruction") { }
-            public UnkownInstruction(string message) : base(message) { }
-            public UnkownInstruction(string message, Exception inner) : base(message, inner) { }
+            public MismatchingArguments() : base("Unkown Keyword Error") { }
+            public MismatchingArguments(string message) : base(message) { }
+            public MismatchingArguments(string message, Exception inner) : base(message, inner) { }
         }
 
 

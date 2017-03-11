@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sprache;
+using System.Text.RegularExpressions;
 
 
 namespace Assignment1
@@ -12,8 +13,8 @@ namespace Assignment1
     {
         public static readonly Parser<string> Identifier =
            (from first in Parse.Letter.Once()
-                //can parse letter, digit, -, _ for many
-            from rest in Parse.LetterOrDigit.XOr(Parse.Char('-')).XOr(Parse.Char('_')).Many()
+            //can parse A-Z a-z 0-9 _ 
+            from rest in Parse.LetterOrDigit.XOr(Parse.Char('_')).Many()
             select new string(first.Concat(rest).ToArray())).Token();
 
         internal static Parser<string> ParenthsisedText =
@@ -41,8 +42,6 @@ namespace Assignment1
             from rparenthesis in Parse.Char(')')
             select contents.ToList());
 
-
-
         public static Parser<string> Instruction =
             (from instruction_1 in Identifier
              from instruction_2 in Identifier
@@ -50,59 +49,52 @@ namespace Assignment1
 
              ).Token();
 
+        public static Parser<string> PrimaryKey = (
+            from leading in Parse.WhiteSpace.Many().Or(Parse.Return(""))
+            from i1 in Parse.Chars("primary").Many().Text().Or(Parse.Return(""))
+            from mid in Parse.WhiteSpace.Once().Text().Or(Parse.Return(""))
+            from i2 in Parse.Chars("key").Many().Text().Token().Or(Parse.Return(""))
+            from trailing in Parse.WhiteSpace.Many().Or(Parse.Return(""))
+            select i1 + mid + i2
+            ).Token();
+
         internal static Parser<Sql_TableAttribute> TableAttribute =
             (from name in Identifier
-             from type in Parse.LetterOrDigit.XOr(Parse.Char('-')).XOr(Parse.Char('_')).Many().Text()
-             from maxLength in ParenthsisedText.Or(Parse.Return("-1"))
-             from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return(""))
-             from end in Parse.Char(',').Once().Text().Or(Parse.Return("END"))
-             select new Sql_TableAttribute(name, type, maxLength, isPrimary, (end=="END"))
-             //select new List<string> { name, type, maxLength, isPrimary, end}
+             from type in Parse.LetterOrDigit.XOr(Parse.Char('_')).Many().Text()
+             from maxLength in ParenthsisedText.Token().Or(Parse.Return(Sql_TableAttribute.STRING_LENGTH_FOR_INT))
+                 //from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return(""))
+             from isPrimary in PrimaryKey
+             from endComma in Parse.Char(',').Once().Text().Or(Parse.Return(Sql_TableAttribute.LAST_ONE))
+             //select new Sql_TableAttribute(name, type, maxLength, isPrimary_1+isPrimary_2, (endComma==Sql_TableAttribute.LAST_ONE))
+             select new Sql_TableAttribute(name, type, maxLength, isPrimary, (endComma==Sql_TableAttribute.LAST_ONE))
              ).Token();
 
         internal static Parser<Sql_Table> Table =
             (from instruction in Instruction
-                 //what is ok in table name?
              from name in Identifier
-             from startParenthesis in Parse.Char('(').Once().Token().Text()
+             from startParenthesis in Parse.Char('(').Once().Token()
              from attributes in TableAttribute.Many()
-             from endParenthesis in Parse.Char(')').Once().Token().Text()
-                 //select new List<dynamic> { name, attributes}
-                 //select new List<dynamic> {name, attributes, startParenthesis, endParenthesis}
+             from endParenthesis in Parse.Char(')').Once().Token()
              select new Sql_Table(name, attributes.ToList())
             ).Token();
 
 
         internal static Parser<Sql_Insertion> Insertion =
             (from instruction in Instruction
-                 //What is ok in table name?
              from name in Identifier
-             from attributes in ParenthsisedText.Or(Parse.Return("NO_ATTRIBUTE_NAME"))
-             //from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
-             from values_word in Parse.Chars("values").Many().Token().Text()
-             //from values in ParenthsisedElements 
-             from values in ParenthsisedText.Or(Parse.Return("NO_ATTRIBUTE_VALUE"))
-             //select new List<dynamic> { name, attributes}
-             //select new List<dynamic> {name, attributes, values_word, values}
+             from attributes in ParenthsisedText.Or(Parse.Return(Sql_Insertion.NO_ATTRIBUTE_NAME))
+             from values_word in Parse.String("values").Once().Token()
+             from values in ParenthsisedText.Or(Parse.Return(Sql_Insertion.NO_ATTRIBUTE_VALUE))
              select new Sql_Insertion(name, attributes, values)
              ).Token();
 
 
-        public Boolean checkVariableName(string str)
+        public static Boolean checkVariableNameValid(string str)
         {
-            char[] invalidChar = {'!', '@', '#', '$', '%', '^', '&', '*', '(',
-                                    ')', '+', '=', '[', ']', '{', '}', '<', '>', ';', ':', '~'};
-            //check if space in it
-            if (str.IndexOf(' ') != -1)
-                return false;
-            if (str.IndexOfAny(invalidChar) != -1)
-                return false;
+            Regex validVariableRgx = new Regex(@"^[a-zA-Z_$][a-zA-Z_$0-9]*$");
 
-            //number cannot be the first
-            int number;
-            if (Int32.TryParse(str[0].ToString(), out number))
-                return false;
-
+            if (!validVariableRgx.IsMatch(str))
+                throw new DbException.InvalidKeyword("Invalid Keyword Error: '" + str + "' is invalid variable name");
             return true;
         }
 
@@ -116,27 +108,47 @@ namespace Assignment1
         {
             public string type;
             public bool isPrimary = false;
-            //public int maxStringLength = 0; //-1 if type is int
             public int maxStringLength = 0; //-1 if type is int
             public bool isLastOne;
             private const string TEXT_FOR_PRIAMRY = "primary key";
             public const string TYPE_STRING = "varchar";
             public const string TYPE_INT = "int";
+            public const string LAST_ONE = "END";
+            public const string STRING_LENGTH_FOR_INT = "-2147483640";
 
-            public Sql_TableAttribute(string name, string type, string maxStringLength, string isPriamry, bool isLastOne)
+            public Sql_TableAttribute(string name, string type, string maxStringLength, string PriamryStr, bool isLastOne)
             {
-                this.name = name;
+                this.name = name.Trim();
                 this.type = type;
-                this.maxStringLength = Int32.Parse(maxStringLength);
-                if (isPriamry.Equals(TEXT_FOR_PRIAMRY))
+                //Console.WriteLine("~~~~" + name + " : " + PriamryStr + " , type:"+type);
+                if (PriamryStr.Equals(TEXT_FOR_PRIAMRY))
                     this.isPrimary = true;
-                else
+                else if (PriamryStr == "")
                     this.isPrimary = false;
+                else if (PriamryStr.Equals(""))
+                    this.isPrimary = false;
+                else
+                    throw new DbException.InvalidKeyword("Invalid Keyword: 'primary key' typo or other parsing error '" + PriamryStr + "'");
+
+
+
                 this.isLastOne = isLastOne;
 
+                //not number string in () error ... 
+                if(!Int32.TryParse(maxStringLength, out this.maxStringLength))
+                    throw new FormatException("Improper Arguments Error: The Length argument of '" + this.name + "' in () should be a number");
+                //Int type has string length error
+                if(type.Equals(TYPE_INT) && !maxStringLength.Equals(STRING_LENGTH_FOR_INT))
+                    throw new FormatException("Improper Arguments Error: Int type '" + this.name + "' should not has string length" +maxStringLength);
+                //string type wrong length error
+                if(type.Equals(TYPE_STRING) && (this.maxStringLength < 0 || this.maxStringLength > 40)) 
+                    throw new FormatException("Improper Arguments Error: String type '" + this.name + "' has invalid length" +
+                                                this.maxStringLength + ", Size of string length should located in 0 between 40");
+                //Unkown type
                 if (!type.Equals(TYPE_STRING) && !type.Equals(TYPE_INT))
-                    throw new DbException.UnknownTypeException("Unkown Data Type: " + type);
-                    
+                    throw new DbException.UnkownKeyword("Unkown Data Type: " + type);
+                //Invalid name
+                checkVariableNameValid(this.name);
             }
 
             public override string ToString()
@@ -151,16 +163,19 @@ namespace Assignment1
             public List<Sql_TableAttribute> tableAttributes;
             public Sql_Table(string name, List<Sql_TableAttribute> attributes)
             {
-                this.name = name;
+                this.name = name.Trim();
                 this.tableAttributes = attributes;
+                
+                //Check variable name is valid or not, if not, rasie exception
+                checkVariableNameValid(this.name);
 
                 //check more or less comma
                 for (int i = 0; i < attributes.Count; i++)
                 {
                     if (i != attributes.Count - 1 && attributes[i].isLastOne == true)
-                        throw new DbException.InvalidCommaException("less comma"); 
+                        throw new ParseException("Invalid Comma Error: Missing Comma"); 
                     else if (i == attributes.Count - 1 && attributes[i].isLastOne != true)
-                        throw new DbException.InvalidCommaException("More comma"); 
+                        throw new ParseException("Invalid Comma Error: Redundent Comma"); 
                 }
             }
             
@@ -186,13 +201,13 @@ namespace Assignment1
             public List<dynamic> AttrValues;
             public const string NO_ATTRIBUTE_NAME = "NO_ATTRIBUTE_NAME";
             public const string NO_ATTRIBUTE_VALUE = "NO_ATTRIBUTE_VALUE";
-            //public string AttrItem;
-            //public string AttrValues;
 
             public Sql_Insertion(string table, string attrs, string values)
             {
                 this.table = table;
-                this.AttrNames = (attrs.Equals(NO_ATTRIBUTE_NAME)) ? null : attrs.Split(',').Select(t => t.Trim()).ToList();
+                this.AttrNames = (attrs.Equals(NO_ATTRIBUTE_NAME)) ? 
+                                  null : attrs.Split(',').Select(t => 
+                                    (checkVariableNameValid(t.Trim()))? t.Trim() : null ).ToList();
                 this.AttrValues = values.Split(',').Select(t => checkQuoted(t)).ToList<dynamic>();
             }
 
@@ -202,22 +217,23 @@ namespace Assignment1
                 int number;
                 if (Int32.TryParse(str, out number))
                     return number;
-
+                
                 str = str.Trim();
                 if (str.Equals(""))
-                    throw new DbException.InvalidSQLArguments("empty argument...");
-
+                    return null;
+                
 
                 int startQ = str.IndexOf('\'');
                 int endQ = str.LastIndexOf('\'');
                 //Check if text is wraped by ''
+                
                 if (startQ != 0 || endQ != str.Length - 1)
-                    throw new DbException.InvalidSQLArguments("mismatch of ' ");
+                    throw new ParseException("mismatch of ' or  uncompleted ()");
 
                 str = str.Substring(1, str.Length - 2);
                 //Check no more ' in the string
                 if (str.IndexOf('\'') != -1)
-                    throw new DbException.InvalidSQLArguments("mismatch of ' ");
+                    throw new ParseException("mismatch of ' or  uncompleted ()");
 
                 return str;
             }
