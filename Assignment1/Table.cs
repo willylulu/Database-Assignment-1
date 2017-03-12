@@ -67,6 +67,7 @@ namespace Assignment1
                     }
                     if (info.type == "String")
                     {
+                        Console.WriteLine("Attrname = " + name);
                         if (value.Length > info.maxStringLength) return InstructionResult.VARCHAR_TOO_SHORT;    //varchar is too short
                     }
                     if (value.GetType().Name != info.type)

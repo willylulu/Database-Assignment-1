@@ -1,6 +1,6 @@
 CreaTe tABle stUDent(stUDENTId int PRimaRY KEY,
  nAMe vARCHar(15),
- gENDEr vaRCHar(1), age vaRCHAr(22));
+ gENDEr vaRCHar(1), age int);
  CREATE tAbLe PerSon(
  personId int PRIMARY KEY, 
  name varchar(20) PRiMArY KEY, 

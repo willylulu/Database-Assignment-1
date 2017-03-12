@@ -1,3 +1,9 @@
 student
-studentId, name, gender, age
-1, Willy, M, 21
+studentid, name, gender, age
+10, john- smith, m, 22
+112, ccccc+  |+ccccc, f, 22
+13, fernando sierra, m, 20
+person
+personid, name, m_gender
+department
+department_name, type, num_employees
