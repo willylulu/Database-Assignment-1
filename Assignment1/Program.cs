@@ -21,7 +21,6 @@ namespace Assignment1
             //To determine which instruction, use  getInstruction(str str)
 
             string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
-            text = text.ToLower();
             string[] seperated_query = text.Split(';');
             foreach (string s in seperated_query)
             {

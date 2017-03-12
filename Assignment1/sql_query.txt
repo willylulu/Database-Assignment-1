@@ -26,10 +26,29 @@ CreaTe tABle stUDent(stUDENTId int PRimaRY KEY,
  type DATE, 
  num_employees int, ) ;
  string input = "";
-INSERT INTO Student
+INSERT INTO Student 
+ VALUES(10,   'John- Smith'   , 'M', 22);
+INsErT InTo sTUDEnt 
+ ValUEs(112, 'cCcCc+  |+ccccc', 'F', 22);
+INSERT INTO Student (age, studentId, gender, name)
+ vaLUES (20, 13, 'M', 'Fernando Sierra');
+INSERT 
+ INTO 
+ Student 
+ (name, 
+ age, 
+ studentId, gender) 
+ VAlues\n ('Ai>> Toshiko', 21
+ , 12, 'F');
+INSERT INTO Student age, studentId, gender, name) 
+ vaLUES (20, 13, 'M', 'Fernando Sierra');
+INSERT INTO Student (age, studentId gender, name) 
+ vaLUES (20, 13, 'M', 'Fernando Sierra');
+INSERT 
+ INTO 
+ Student
  (name, 
  age, 
  studentId, gender,) 
  VAlues
  ('Ai>> Toshiko', 21\n, 12, 'F');
-

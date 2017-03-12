@@ -1,5 +1,7 @@
 student
 studentid, name, gender, age
+10, John- Smith, M, 22
+112, cCcCc+  |+ccccc, F, 22
 13, Fernando Sierra, M, 20
 person
 personid, name, m_gender

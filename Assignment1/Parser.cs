@@ -77,7 +77,7 @@ namespace Assignment1
                 Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
                 if (Insertion != null)
                 {
-                    if (Insertion.AttrNames == null) //AttrNames equal null
+                    if (Insertion.AttrNames.Count==0) //AttrNames equal null
                     {
                         List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
                         int i = 0;
@@ -177,7 +177,7 @@ namespace Assignment1
         }
         private static void println(dynamic str)
         {
-            Console.WriteLine(str.ToString());
+            //Console.WriteLine(str.ToString());
         }
 
     }
