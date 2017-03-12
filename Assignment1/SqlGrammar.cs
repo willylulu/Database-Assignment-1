@@ -223,11 +223,15 @@ namespace Assignment1
             }
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
-                Console.WriteLine("~~~~~~~~~~~ " + values.Count);
+//                Console.WriteLine("~~~~~~~~~~~ " + values.Count);
                 table = table.ToLower();
                 this.table = table;
                 this.AttrNames = attrs.Select(t => (checkVariableNameValid(t.Trim()))? t.ToLower().Trim() : null).ToList<string>();
                 this.AttrValues = values.Select(t => checkQuoted(t)).ToList<dynamic>();
+
+                if (this.AttrNames.Count != 0 && this.AttrValues.Count != this.AttrNames.Count)
+                    throw new DbException.MismatchingArguments("Mismatch of arguments: " + AttrNames.Count +
+                        " attributes can't match " + AttrValues.Count + " values");
             }
 
 
@@ -250,12 +254,12 @@ namespace Assignment1
                 //Check if text is wraped by ''
                 
                 if (startQ != 0 || endQ != str.Length - 1)
-                    throw new ParseException("mismatch of ' or  uncompleted ()");
+                    throw new ParseException("mismatch of ' or  uncompleted () or missing ',' ");
 
                 str = str.Substring(1, str.Length - 2);
                 //Check no more ' in the string
                 if (str.IndexOf('\'') != -1)
-                    throw new ParseException("mismatch of ' or  uncompleted ()");
+                    throw new ParseException("mismatch of ' or  uncompleted () or missing ',' ");
 
                 return str;
             }

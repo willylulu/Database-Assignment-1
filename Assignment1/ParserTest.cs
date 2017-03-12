@@ -17,37 +17,36 @@ namespace Assignment1
             string input = "";
 
             //Error case, losing attribute name (
-            input = "INSERT INTO Student7   age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO losing_attrs_lP   age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute name )
-            input = "INSERT INTO Student6   (age, studentId, gender, name \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO losing_attrs_rP   (age, studentId, gender, name \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute value(
-            input = "INSERT INTO Student5   (age, studentId, gender, name) \n vaLUES 20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO losing_values_lP   (age, studentId, gender, name) \n vaLUES 20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute value )
-            input = "INSERT INTO Student4   (age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra';";
+            input = "INSERT INTO losing_values_rP   (age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra';";
             Parser.Insert(input);
 
-            //Error case, losing attribute value )
-            input = "INSERT INTO Student3   ( age, studentId, gender, name, ) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            //Error case, losing redundent_comma_in_attrs
+            input = "INSERT INTO redundent_comma_in_attrs   ( age, studentId, gender, name, ) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
-            //Error case, losing , -- to be sloved
-            input = "INSERT INTO Student2 (age, studentId gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
-            Parser.Insert(input);
-
-            //Error case, arguments not match 
-            input = "INSERT INTO Student1 (age, studentId gender, name) \n vaLUES (13, 'M', 'Fernando Sierra');";
+            //Error case, losing , in attrs
+            input = "INSERT INTO losing_comma_in_attrs (age, studentId gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, redundent '
-            input = "INSERT INTO REDUNDENT ( age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernand'o Sierra');";
+            input = "INSERT INTO redundent_Q_in_values ( age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernand'o Sierra');";
             Parser.Insert(input);
 
+            //Error case, mismatching arguments 
+            input = "INSERT INTO mismatching_arguments  ( age, studentId, gender, name, haha, zz) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            Parser.Insert(input);
         }
         public static void TestInsertion()
         {
@@ -89,15 +88,15 @@ namespace Assignment1
         {
             string input = "";
             //Error case, losing ,                                           |   
-            input = "CREATE tAbLe department\n  ( department_name varchar(20) \n type varchar(20), \n   num_employees int ) ";
+            input = "CREATE tAbLe losing_comma\n  ( department_name varchar(20) \n type varchar(20), \n   num_employees int ) ";
             Parser.CreateTable(input);
 
             //Error case, losing (              |
-            input = "CREATE tAbLe losing_left_P\n   department_name varchar(20), \n type varchar(20), \n   num_employees int ) ";
+            input = "CREATE tAbLe losing_lP\n   department_name varchar(20), \n type varchar(20), \n   num_employees int ) ";
             Parser.CreateTable(input);
             
             //Error case, more ,                                                                                          |
-            input = "CREATE tAbLe more_comma\n (  department_name varchar(20), \n type varchar(20), \n   num_employees int, ) ";
+            input = "CREATE tAbLe redundant_comma\n (  department_name varchar(20), \n type varchar(20), \n   num_employees int, ) ";
             Parser.CreateTable(input);
 
             //Error case, unkown type date                                             |
@@ -105,11 +104,11 @@ namespace Assignment1
             Parser.CreateTable(input);
 
             //more )                                                      |   
-            input = "CreaTe tABle MORE_right_P(stUDENTId int PRimaRY KEY, )\n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle Redundant_rP(stUDENTId int PRimaRY KEY, )\n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
             //more (                                                           |
-            input = "CreaTe tABle MORE_left_P(stUDENTId int PRimaRY KEY, \n nAM(e vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle rEdundant_lP(stUDENTId int PRimaRY KEY, \n nAM(e vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
             //string in () is not a number                                                             | 
@@ -125,21 +124,25 @@ namespace Assignment1
             Parser.CreateTable(input);
 
             //string 'primary key' not complete                     |
-            input = "CreaTe tABle primary_key_error(stUDENTId int PRmaRY KEY, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle primary_key_error_PRmaRY(stUDENTId int PRmaRY KEY, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
             //string 'primary key' wrong                              |
-            input = "CreaTe tABle primary_key_error(stUDENTId int PRmaRY, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle primary_key_error_noKey(stUDENTId int PRmaRY, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
             //string 'primary key' wrong                                  |
-            input = "CreaTe tABle primary_key_error(stUDENTId int PRimaRY primary key, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle primary_key_error_REdundant_words(stUDENTId int PRimaRY primary key, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
             //string 'primary key' wrong                                  |
-            input = "CreaTe tABle primary_key_error(stUDENTId int          zzz key, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            input = "CreaTe tABle primary_key_error_wrong_words(stUDENTId int          zzz key, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
             Parser.CreateTable(input);
 
+
+            //string 'primary key' wrong                                  |
+            input = "CreaTe tABle primary_key_error_wrong_word(stUDENTId int z, \n nAMe vARCHar(15), \n   gENDEr vaRCHar(1), age vaRCHAr(22))";
+            Parser.CreateTable(input);
         }
         public static void TestCreateTable()
         {
