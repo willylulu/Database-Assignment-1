@@ -9,7 +9,7 @@ namespace Assignment1
     class DbException
     {
 
-
+        [Serializable]
         public class OtherSyntaxError : Exception
         {
             public OtherSyntaxError() : base("Other Syntax Error") { }
@@ -17,6 +17,7 @@ namespace Assignment1
             public OtherSyntaxError(string message, Exception inner) : base(message, inner) { }
         }
 
+        [Serializable]
         public class InvalidKeyword : Exception
         {
             public InvalidKeyword() : base("Invalid Keyword Error") { }
@@ -24,6 +25,7 @@ namespace Assignment1
             public InvalidKeyword(string message, Exception inner) : base(message, inner) { }
         }
 
+        [Serializable]
         public class UnkownKeyword : Exception
         {
             public UnkownKeyword() : base("Unkown Keyword Error") { }
@@ -31,13 +33,13 @@ namespace Assignment1
             public UnkownKeyword(string message, Exception inner) : base(message, inner) { }
         }
 
-         public class MismatchingArguments: Exception
+        [Serializable]
+        public class MismatchingArguments: Exception
         {
             public MismatchingArguments() : base("Unkown Keyword Error") { }
             public MismatchingArguments(string message) : base(message) { }
             public MismatchingArguments(string message, Exception inner) : base(message, inner) { }
         }
-
 
     }
 }
