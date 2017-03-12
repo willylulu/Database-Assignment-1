@@ -52,9 +52,9 @@ namespace Assignment1
 
         public static Parser<string> PrimaryKey = (
             from leading in Parse.WhiteSpace.Many().Or(Parse.Return(""))
-            from i1 in Parse.Chars("primary").Many().Text().Or(Parse.Return(""))
+            from i1 in Parse.Chars("primaryPRIMARY").Many().Text().Or(Parse.Return(""))
             from mid in Parse.WhiteSpace.Once().Text().Or(Parse.Return(""))
-            from i2 in Parse.Chars("key").Many().Text().Token().Or(Parse.Return(""))
+            from i2 in Parse.Chars("keyKEY").Many().Text().Token().Or(Parse.Return(""))
             from trailing in Parse.WhiteSpace.Many().Or(Parse.Return(""))
             select i1 + mid + i2
             ).Token();
@@ -84,7 +84,7 @@ namespace Assignment1
             (from instruction in Instruction
              from name in Identifier
              from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
-             from values_word in Parse.String("values").Once().Token()
+             from values_word in Parse.IgnoreCase("values").Once().Token()
              from values in ParenthsisedElements.Or(Parse.Return(new List<string>()))
              select new Sql_Insertion(name, attributes, values)
              ).Token();
@@ -92,6 +92,7 @@ namespace Assignment1
 
         public static Boolean checkVariableNameValid(string str)
         {
+            
             Regex validVariableRgx = new Regex(@"^[a-zA-Z_$][a-zA-Z_$0-9]*$");
 
             if (!validVariableRgx.IsMatch(str))
@@ -117,19 +118,23 @@ namespace Assignment1
             public const string LAST_ONE = "END";
             public const string STRING_LENGTH_FOR_INT = "-2147483640";
 
-            public Sql_TableAttribute(string name, string type, string maxStringLength, string PriamryStr, bool isLastOne)
+            public Sql_TableAttribute(string name, string type, string maxStringLength, string PrimaryStr, bool isLastOne)
             {
+                name = name.ToLower();
+                type = type.ToLower();
+                maxStringLength = maxStringLength.ToLower();
+                PrimaryStr = PrimaryStr.ToLower();
                 this.name = name.Trim();
                 this.type = type;
                 //Console.WriteLine("~~~~" + name + " : " + PriamryStr + " , type:"+type);
-                if (PriamryStr.Equals(TEXT_FOR_PRIAMRY))
+                if (PrimaryStr.Equals(TEXT_FOR_PRIAMRY))
                     this.isPrimary = true;
-                else if (PriamryStr == "")
+                else if (PrimaryStr == "")
                     this.isPrimary = false;
-                else if (PriamryStr.Equals(""))
+                else if (PrimaryStr.Equals(""))
                     this.isPrimary = false;
                 else
-                    throw new DbException.InvalidKeyword("Invalid Keyword: 'primary key' typo or other parsing error '" + PriamryStr + "'");
+                    throw new DbException.InvalidKeyword("Invalid Keyword: 'primary key' typo or other parsing error '" + PrimaryStr + "'");
 
 
 
@@ -164,6 +169,7 @@ namespace Assignment1
             public List<Sql_TableAttribute> tableAttributes;
             public Sql_Table(string name, List<Sql_TableAttribute> attributes)
             {
+                name = name.ToLower();
                 this.name = name.Trim();
                 this.tableAttributes = attributes;
                 
@@ -205,6 +211,8 @@ namespace Assignment1
 
             public Sql_Insertion(string table, string attrs, string values)
             {
+                table = table.ToLower();
+                attrs = attrs.ToLower();
                 this.table = table;
                 this.AttrNames = (attrs.Equals(NO_ATTRIBUTE_NAME)) ? 
                                   null : attrs.Split(',').Select(t => 
@@ -213,8 +221,9 @@ namespace Assignment1
             }
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
+                table = table.ToLower();
                 this.table = table;
-                this.AttrNames = attrs;
+                this.AttrNames = attrs.Select(t => t.ToLower()).ToList<string>();
                 this.AttrValues = values.Select(t => checkQuoted(t)).ToList<dynamic>();
             }
 

@@ -10,7 +10,7 @@ namespace Assignment1
 {
     class Parser
     {
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             TableManager tableManager = new TableManager();
             //TestCase -- open for updating
@@ -29,9 +29,11 @@ namespace Assignment1
                 sql_selector(s.TrimStart(), tableManager);
             }
 
-            tableManager.print_table_context();
+            //tableManager.print_table_context();
             //ParserTest.TestCreateTable();
+            //ParserTest.TestCreateTableError();
             //ParserTest.TestInsertion();
+            //ParserTest.TestInsertionError();
             Console.ReadKey(true);
         }
         public static void sql_selector(string sql, TableManager tableManager)
@@ -105,7 +107,7 @@ namespace Assignment1
             string error_prifix = "[CREATEION ERROR] - ";
             try
             {
-                sql = sql.ToLower();
+                //sql = sql.ToLower();
                 println(sql);
                 var table = SqlGrammar.Table.Parse(sql);
                 println(table + "\n");
@@ -142,7 +144,7 @@ namespace Assignment1
             string error_prefix = "[INSERTION ERROR] - ";
             try
             {
-                sql = sql.ToLower();
+                //sql = sql.ToLower();
                 println(sql);
                 var insertion = SqlGrammar.Insertion.Parse(sql);
                 println(insertion + "\n");
