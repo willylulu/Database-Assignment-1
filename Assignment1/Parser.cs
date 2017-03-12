@@ -30,8 +30,8 @@ namespace Assignment1
             }
 
             tableManager.print_table_context();
-            //TestCreateTable();
-            //TestInsertion();
+            //ParserTest.TestCreateTable();
+            //ParserTest.TestInsertion();
             Console.ReadKey(true);
         }
         public static void sql_selector(string sql, TableManager tableManager)
