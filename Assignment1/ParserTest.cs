@@ -17,35 +17,35 @@ namespace Assignment1
             string input = "";
 
             //Error case, losing attribute name (
-            input = "INSERT INTO Student   age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student7   age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute name )
-            input = "INSERT INTO Student   (age, studentId, gender, name \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student6   (age, studentId, gender, name \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute value(
-            input = "INSERT INTO Student   (age, studentId, gender, name) \n vaLUES 20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student5   (age, studentId, gender, name) \n vaLUES 20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing attribute value )
-            input = "INSERT INTO Student   (age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra';";
+            input = "INSERT INTO Student4   (age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra';";
             Parser.Insert(input);
 
             //Error case, losing attribute value )
-            input = "INSERT INTO Student   ( age, studentId, gender, name, ) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student3   ( age, studentId, gender, name, ) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, losing , -- to be sloved
-            input = "INSERT INTO Student (age, studentId gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student2 (age, studentId gender, name) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, arguments not match 
-            input = "INSERT INTO Student (age, studentId gender, name) \n vaLUES (13, 'M', 'Fernando Sierra');";
+            input = "INSERT INTO Student1 (age, studentId gender, name) \n vaLUES (13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
 
             //Error case, redundent '
-            input = "INSERT INTO Student  ( age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernand'o Sierra');";
+            input = "INSERT INTO REDUNDENT ( age, studentId, gender, name) \n vaLUES (20, 13, 'M', 'Fernand'o Sierra');";
             Parser.Insert(input);
 
         }

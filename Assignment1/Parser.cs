@@ -34,6 +34,8 @@ namespace Assignment1
             //ParserTest.TestCreateTableError();
             //ParserTest.TestInsertion();
             //ParserTest.TestInsertionError();
+            //Insert("INSERT INTO Student (name, age, studentId, gender,) VAlues ('Ai>> Toshiko', 21\n, 12, 'F'); ");
+
             Console.ReadKey(true);
         }
         public static void sql_selector(string sql, TableManager tableManager)
