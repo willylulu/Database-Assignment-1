@@ -12,42 +12,92 @@ namespace Assignment1
     {
         static void Main(string[] args)
         {
+            TableManager tableManager = new TableManager();
             //TestCase -- open for updating
-            // is ' == " ?? "asdf" is a string??
-            // ( ')' ) is valid but in the code would throw exception -- to be fixed
-            //double primary key?
+            //1. Insertion that has no values
+            //2. Insertion that values('1'1, '2'3' ) raise exception
 
             //To use Create Table , just call CreateTable(str sql)
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
 
-
-            /*string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
-            text = text.ToLower();
+            string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
+            //text = text.ToLower();
             string[] seperated_query = text.Split(';');
             foreach (string s in seperated_query)
             {
-                sql_selector(s.TrimStart());
-            }*/
+                sql_selector(s.TrimStart(), tableManager);
+            }
 
-
-            //ParserTest.TestCreateTable();
-            //ParserTest.TestCreateTableError();
-            ParserTest.TestInsertion();
-            //ParserTest.TestInsertionError();
-            Console.ReadKey(true);
+            tableManager.print_table_context();
+            //TestCreateTable();
+            //TestInsertion();
             Console.ReadKey(true);
         }
-        public static void sql_selector(string sql)
+        public static void sql_selector(string sql, TableManager tableManager)
         {
             string[] seperated_query = sql.Split();
-            if (string.Compare(seperated_query[0], "create", true) == 0)
+            if (string.Compare(seperated_query[0].ToLower(), "create", true) == 0)
             {
-                CreateTable(sql);
+                SqlGrammar.Sql_Table table = CreateTable(sql);
+                List<string> order = new List<string>();
+                if (table != null)
+                {
+                    Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(table.tableAttributes.Count);
+                    foreach (var item in table.tableAttributes)
+                    {
+                        order.Add(item.name);
+                        Console.WriteLine("type = " + item.type);
+                        switch (item.type)
+                        {
+                            case "int":
+                                item.type = "Int32";
+                                break;
+                            case "varchar":
+                                item.type = "String";
+                                break;
+                        }
+                        Console.WriteLine("size = " + item.maxStringLength);
+                        atributes.Add(item.name, new TableAttribute(item.type, item.isPrimary, item.maxStringLength));
+                    }
+                    tableManager.createTable(table.name, order, atributes);
+                }
             }
-            else if (string.Compare(seperated_query[0], "insert", true) == 0)
+            else if (string.Compare(seperated_query[0].ToLower(), "insert", true) == 0)
             {
-                Insert(sql);
+                Console.WriteLine("Inserting");
+                SqlGrammar.Sql_Insertion Insertion = Insert(sql);
+                //public string table;
+                //public List<string> AttrNames;
+                //public List<dynamic> AttrValues;
+                Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
+                if (Insertion != null)
+                {
+                    if (Insertion.AttrNames == null) //AttrNames equal null
+                    {
+                        List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
+                        int i = 0;
+                        foreach (dynamic Attrvalue in Insertion.AttrValues)
+                        {
+                            tuple.Add(AttrOrder[i], Attrvalue);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        int i = 0;
+                        foreach (dynamic Attrname in Insertion.AttrNames)
+                        {
+                            tuple.Add(Attrname, Insertion.AttrValues[i]);
+                            i++;
+                        }
+                    }
+                    tableManager.insert(Insertion.table, tuple);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Unknown keywords");
             }
         }
         public static SqlGrammar.Sql_Table CreateTable(string sql)

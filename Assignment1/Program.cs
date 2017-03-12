@@ -9,40 +9,29 @@ namespace Assignment1
 {
     class Program
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             TableManager tableManager = new TableManager();
+            //TestCase -- open for updating
+            //1. Insertion that has no values
+            //2. Insertion that values('1'1, '2'3' ) raise exception
 
-            List<string> order = new List<string>();
-            order.Add("studentId");
-            order.Add("name");
-            order.Add("gender");
-            order.Add("age");
+            //To use Create Table , just call CreateTable(str sql)
+            //To use Insert Table , just call Insert(str sql)
+            //To determine which instruction, use  getInstruction(str str)
 
-            TableAttribute studentIdProp = new TableAttribute("Int32", true, 0);
-            TableAttribute nameProp = new TableAttribute("String", false, 15);
-            TableAttribute genderProp = new TableAttribute("String", false, 1);
-            TableAttribute ageProp = new TableAttribute("Int32", false, 0);
+            string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
+            text = text.ToLower();
+            string[] seperated_query = text.Split(';');
+            foreach (string s in seperated_query)
+            {
+                Parser.sql_selector(s.TrimStart(), tableManager);
+            }
 
-            Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(order.Count);
-            atributes.Add("studentId", studentIdProp);
-            atributes.Add("name", nameProp);
-            atributes.Add("gender", genderProp);
-            atributes.Add("age", ageProp);
-            //Important！！！Order and Attributes must be Aligned.
-
-            tableManager.createTable("student", order, atributes);
-
-            //Test element for inserting data in table
-            Dictionary<string, dynamic> turbel = new Dictionary<string, dynamic>();
-            turbel.Add("studentId", 1);
-            turbel.Add("name", "Willy");
-            turbel.Add("gender", "M");
-            turbel.Add("age", 21);
-            tableManager.insert("student", turbel);
-
-            //print table data to csv file
             tableManager.print_table_context();
+            //TestCreateTable();
+            //TestInsertion();
+            Console.ReadKey(true);
         }
     }
 }
