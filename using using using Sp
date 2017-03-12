@@ -1,0 +1,318 @@
+[33mcommit 9d6af3b22673f9ccecc80e3a94fc76dece9838e7[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sun Mar 12 01:59:57 2017 +0800
+
+    Handling lots of SQL Parsing Error
+
+ Assignment1/Parser.cs | 190 [32m+++++++++++++++++++++++++++++++++++++[m[31m-------------[m
+ 1 file changed, 141 insertions(+), 49 deletions(-)
+
+[33mcommit cdefd8865080ff587eab7628d49dc991e382f6ac[m
+Merge: 704d500 1474475
+Author: Fong <fong1143@gmail.com>
+Date:   Sun Mar 12 01:55:22 2017 +0800
+
+    'QQ'
+
+[33mcommit 704d5004d55a6a059214d4ae6f6f3c731d12aae6[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sun Mar 12 01:47:22 2017 +0800
+
+    add some input exception handler
+
+ Assignment1/DbException.cs |  35 [32m+++++[m[31m-----[m
+ Assignment1/Parser.cs      | 167 [32m++++++++++++++++++++++++++++++++++[m[31m-----------[m
+ Assignment1/SqlGrammar.cs  | 126 [32m+++++++++++++++++++[m[31m---------------[m
+ 3 files changed, 217 insertions(+), 111 deletions(-)
+
+[33mcommit 14744758501c9168944ee044148e6dee5de91b77[m
+Author: radical0829 <jason0829@gmail.com>
+Date:   Sat Mar 11 23:33:35 2017 +0800
+
+    add input/output operation
+
+ Assignment1/Parser.cs         | 28 [32m+++++++++++++++++++[m[31m---[m
+ Assignment1/Program.cs        | 18 [32m++++[m[31m-----------[m
+ Assignment1/Table.cs          |  5 [32m++++[m
+ Assignment1/TableManager.cs   | 34 [32m+++++++++++++++++++++++++++[m
+ Assignment1/sql_query.txt     | 54 [32m+++++++++++++++++++++++++++++++++++++++++++[m
+ Assignment1/table_conetxt.csv |  3 [32m+++[m
+ 6 files changed, 125 insertions(+), 17 deletions(-)
+
+[33mcommit dbb7f39e67a6c170c5046da7de8b46066c5ea468[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Sat Mar 11 14:51:56 2017 +0800
+
+    delete parse repository
+
+ Parser/App.config                 |  6 [31m----[m
+ Parser/Parser.csproj              | 66 [31m---------------------------------------[m
+ Parser/Program.cs                 | 18 [31m-----------[m
+ Parser/Properties/AssemblyInfo.cs | 36 [31m---------------------[m
+ 4 files changed, 126 deletions(-)
+
+[33mcommit 8fe2c73eef7be195fcc84b6f738731e8a75ace8c[m
+Merge: 14c87c3 d0c7942
+Author: willylulu <maya6282@gmail.com>
+Date:   Sat Mar 11 14:48:47 2017 +0800
+
+    Merge branch 'master' of https://github.com/willylulu/Database-Assignment-1.git
+
+[33mcommit 14c87c3c06e0895680baee490daea04ac08bd42c[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sat Mar 11 05:05:30 2017 +0800
+
+    add some input exception handler
+
+ Assignment1.sln                |   6 [31m--[m
+ Assignment1/Assignment1.csproj |   1 [32m+[m
+ Assignment1/DbException.cs     |  42 [32m+++++++++++[m
+ Assignment1/Parser.cs          | 168 [32m+++++++++++++++++++++++++++++[m[31m------------[m
+ Assignment1/SqlGrammar.cs      | 127 [32m+++++++++++++++++++++++++[m[31m------[m
+ 5 files changed, 265 insertions(+), 79 deletions(-)
+
+[33mcommit d0c79422b9d3e976be76c0b3fb46ad2eb2bd18b2[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sat Mar 11 05:05:30 2017 +0800
+
+    add some input exception handler
+
+ Assignment1.sln                |   6 [31m--[m
+ Assignment1/Assignment1.csproj |   1 [32m+[m
+ Assignment1/DbException.cs     |  42 [32m+++++++++++[m
+ Assignment1/Parser.cs          | 168 [32m+++++++++++++++++++++++++++++[m[31m------------[m
+ Assignment1/SqlGrammar.cs      | 127 [32m+++++++++++++++++++++++++[m[31m------[m
+ 5 files changed, 265 insertions(+), 79 deletions(-)
+
+[33mcommit 8cabc3accf4f393c10427d4d8e21097c47eb2973[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sat Mar 11 00:15:37 2017 +0800
+
+    delete Empty Parser Project
+
+ Parser/Program.cs | 1 [32m+[m
+ 1 file changed, 1 insertion(+)
+
+[33mcommit 02fa4d7ed5b61d3b2ae55ae5386c534ca4b11a32[m
+Merge: fe81c13 62151bb
+Author: Fong <fong1143@gmail.com>
+Date:   Sat Mar 11 00:09:57 2017 +0800
+
+    Merge branch 'master' of https://github.com/willylulu/Database-Assignment-1
+
+[33mcommit fe81c136f9790231ec34935e886cb8db7e2aae89[m
+Author: Fong <fong1143@gmail.com>
+Date:   Sat Mar 11 00:08:23 2017 +0800
+
+    Create & Insert
+
+ Assignment1/Parser.cs     | 10 [32m+++[m[31m----[m
+ Assignment1/SqlGrammar.cs | 76 [32m+++++++++++++++++++++++++++++++[m[31m----------------[m
+ 2 files changed, 56 insertions(+), 30 deletions(-)
+
+[33mcommit bd01b0499fc794cafcdc9b59d94c1ef93e2240fe[m
+Author: Fong <fong1143@gmail.com>
+Date:   Fri Mar 10 23:31:54 2017 +0800
+
+    create and insertion done (not in class)
+
+ Assignment1.sln                                    |   6 [32m+[m
+ Assignment1/Assignment1.csproj                     |   9 [32m+[m[31m-[m
+ Assignment1/Parser.cs                              |  86 [32m+++++++++++[m
+ Assignment1/Program.cs                             |   2 [32m+[m[31m-[m
+ Assignment1/SqlGrammar.cs                          | 158 [32m+++++++++++++++++++++[m
+ .../{TableAttributeInfo.cs => TableAttribute.cs}   |   0
+ Assignment1/packages.config                        |   4 [32m+[m
+ Parser/App.config                                  |   6 [32m+[m
+ Parser/Parser.csproj                               |  66 [32m+++++++++[m
+ Parser/Program.cs                                  |  17 [32m+++[m
+ Parser/Properties/AssemblyInfo.cs                  |  36 [32m+++++[m
+ 11 files changed, 388 insertions(+), 2 deletions(-)
+
+[33mcommit 62151bb0aad74172ef5a8f30695119efb4ffff0e[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Fri Mar 10 11:52:31 2017 +0800
+
+    refactor
+
+ Assignment1/Table.cs | 16 [32m+++++++++++++[m[31m---[m
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+[33mcommit b29f125806ab58b879704e3858c33584548397b8[m
+Author: Fong <fong1143@gmail.com>
+Date:   Wed Mar 8 23:01:41 2017 +0800
+
+    Various naming changes, see changelog to learn more
+
+ Assignment1/Program.cs            | 10 [32m+++[m[31m----[m
+ Assignment1/Table.cs              | 62 [32m++++++++++++++++++++[m[31m-------------------[m
+ Assignment1/TableAttributeInfo.cs | 13 [32m++++[m[31m----[m
+ Assignment1/TableManager.cs       | 18 [32m++++++[m[31m------[m
+ changelog                         | 30 [32m+++++++++++++++++++[m
+ 5 files changed, 83 insertions(+), 50 deletions(-)
+
+[33mcommit b23d66f37a2ca3a209cde8462bba3a4f83cdbf94[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Wed Mar 8 14:03:04 2017 +0800
+
+    dictionary dafa
+
+ Assignment1/Table.cs        | 7 [32m+++[m[31m----[m
+ Assignment1/TableManager.cs | 6 [32m+++[m[31m---[m
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+[33mcommit a71d99f4966354d42a6001a3e06bac4bec77ab4a[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Wed Mar 8 13:53:56 2017 +0800
+
+    select
+
+ Assignment1/Table.cs | 19 [32m+++++++++++++++[m[31m----[m
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+[33mcommit 29e75f4c38edf9738708d00ac475f1f65fd8bb1a[m
+Merge: d194d65 239fc80
+Author: willylulu <maya6282@gmail.com>
+Date:   Wed Mar 8 13:27:26 2017 +0800
+
+    Merge branch 'master' of https://github.com/willylulu/Database-Assignment-1.git
+
+[33mcommit d194d650e08263fdfb34847609c31667b52c270a[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Wed Mar 8 13:27:18 2017 +0800
+
+    add emun
+
+ Assignment1/Table.cs              | 25 [32m+++++++++++++++++[m[31m--------[m
+ Assignment1/TableAttributeInfo.cs |  3 [32m+++[m
+ Assignment1/TableManager.cs       | 13 [32m+++++++[m[31m------[m
+ 3 files changed, 27 insertions(+), 14 deletions(-)
+
+[33mcommit 239fc805e0cf33bccc787c5239d9d8911d8ce9d3[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 22:33:35 2017 +0800
+
+    import data structure lib for future usage
+
+ Assignment1/Assignment1.csproj |   3 [32m+++[m
+ Assignment1/C5.dll             | Bin [31m0[m -> [32m276992[m bytes
+ Assignment1/Program.cs         |   3 [32m++[m[31m-[m
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+[33mcommit db1cad5fe2792b78eda9934483ebb18f61776505[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 17:46:03 2017 +0800
+
+    add commet
+
+ Assignment1/Program.cs | 1 [32m+[m
+ 1 file changed, 1 insertion(+)
+
+[33mcommit 6aeaba287dc543da5294d5c18c87d031469cae24[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 17:42:39 2017 +0800
+
+    string empty
+
+ Assignment1/Table.cs | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit 97133c47b1c46a245534a2724d8db662fa83c165[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 17:35:32 2017 +0800
+
+    add error message console out
+
+ Assignment1/Program.cs      |  4 [32m++[m[31m--[m
+ Assignment1/Table.cs        |  4 [32m++[m[31m--[m
+ Assignment1/TableManager.cs | 25 [32m++++++++++++++++++++++++[m[31m-[m
+ 3 files changed, 28 insertions(+), 5 deletions(-)
+
+[33mcommit b3b64c469e18d8009f975af64c85b57737199c67[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 17:20:12 2017 +0800
+
+    change table data structor from array to map
+
+ Assignment1/Program.cs | 7 [32m++++[m[31m---[m
+ Assignment1/Table.cs   | 7 [32m++++[m[31m---[m
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+[33mcommit 51b84bf8a7a10359e591b268b2e1f1e1206c55b5[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Tue Mar 7 17:05:23 2017 +0800
+
+    change the constructor of table
+    fuck yet
+
+ Assignment1/Program.cs            | 37 [32m++++++++++++++[m[31m------[m
+ Assignment1/Table.cs              | 71 [32m+++++++++++++++++++++++++++[m[31m------------[m
+ Assignment1/TableAttributeInfo.cs |  6 [32m++[m[31m--[m
+ Assignment1/TableManager.cs       |  8 [32m++[m[31m---[m
+ 4 files changed, 82 insertions(+), 40 deletions(-)
+
+[33mcommit d9c802418ca2a28acf57e4245e55a9a45b4b1c24[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Mon Mar 6 01:42:31 2017 +0800
+
+    add conpacity
+
+ Assignment1/Table.cs        | 6 [32m+++[m[31m---[m
+ Assignment1/TableManager.cs | 2 [32m+[m[31m-[m
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+[33mcommit 447d12f8a50e75f42f64bdc3d00d5a50e7e23081[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Mon Mar 6 01:14:21 2017 +0800
+
+    add table manager
+
+ Assignment1/Assignment1.csproj |  1 [32m+[m
+ Assignment1/Program.cs         |  8 [32m+++++[m[31m---[m
+ Assignment1/TableManager.cs    | 30 [32m++++++++++++++++++++++++++++++[m
+ 3 files changed, 36 insertions(+), 3 deletions(-)
+
+[33mcommit b0b739ed27f9ce7efff46689f48bc88ce63a2ff8[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Mon Mar 6 00:50:59 2017 +0800
+
+    fix some bug
+
+ Assignment1/Table.cs | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit c57ed496d90ab2fb01907658462be2cd5e4de450[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Mon Mar 6 00:43:51 2017 +0800
+
+    add format check
+
+ Assignment1/Program.cs            |  5 [32m+++[m[31m--[m
+ Assignment1/Table.cs              | 28 [32m++++++++++++++++++++++++++[m[31m--[m
+ Assignment1/TableAttributeInfo.cs |  8 [32m++++[m[31m----[m
+ 3 files changed, 33 insertions(+), 8 deletions(-)
+
+[33mcommit cefbff37814d4fd602c3625312695239abb13a1d[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Sat Mar 4 23:05:22 2017 +0800
+
+    write a table implement by array
+
+ Assignment1/Assignment1.csproj    |  2 [32m++[m
+ Assignment1/Program.cs            | 21 [32m+++++++++++++++++++++[m
+ Assignment1/Table.cs              | 36 [32m++++++++++++++++++++++++++++++++++++[m
+ Assignment1/TableAttributeInfo.cs | 24 [32m++++++++++++++++++++++++[m
+ 4 files changed, 83 insertions(+)
+
+[33mcommit e0357cf1f693dcf60d11fde864c102898f7b9243[m
+Author: willylulu <maya6282@gmail.com>
+Date:   Fri Mar 3 22:40:19 2017 +0800
+
+    加入專案檔案。
+
+ Assignment1.sln                        | 22 [32m+++++++++++++[m
+ Assignment1/App.config                 |  6 [32m++++[m
+ Assignment1/Assignment1.csproj         | 60 [32m++++++++++++++++++++++++++++++++++[m
+ Assignment1/Program.cs                 | 15 [32m+++++++++[m
+ Assignment1/Properties/AssemblyInfo.cs | 36 [32m++++++++++++++++++++[m
+ 5 files changed, 139 insertions(+)

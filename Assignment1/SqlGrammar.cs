@@ -24,23 +24,24 @@ namespace Assignment1
             select content);
 
         internal static Parser<string> QuotedText =
-            (from lquot in Parse.Char('\'')
-                 // from content in Parse.CharExcept('"').Many().Text()
+        (from lquot in Parse.Char('\'')
+             // from content in Parse.CharExcept('"').Many().Text()
              from content in Parse.CharExcept('\'').Many().Text().Token()
-             from rquot in Parse.Char('\'')
-                 //prefix "(str)" to indicate that it is a string format
-             select "(str)" + content).Token();
+         from rquot in Parse.Char('\'')
+             //prefix "(str)" to indicate that it is a string format
+             select "'" + content + "'").Token();
 
         internal static Parser<string> CsvElement =
-            (from content in QuotedText.Or(Identifier)
-             from comma in Parse.Char(',').Once().Token().Or(Parse.Return("END"))
+            (from comma in Parse.Char(',').Once().Token()
+             from content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
              select content);
 
         internal static Parser<List<string>> ParenthsisedElements =
-           (from lparenthesis in Parse.Char('(')
+           (from lparenthesis in Parse.Char('(').Once().Token()
+            from first_content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
             from contents in CsvElement.Many()
-            from rparenthesis in Parse.Char(')')
-            select contents.ToList());
+            from rparenthesis in Parse.Char(')').Once().Token()
+            select (new List<string> { first_content }.Concat(contents.ToList())).ToList());
 
         public static Parser<string> Instruction =
             (from instruction_1 in Identifier
@@ -82,9 +83,9 @@ namespace Assignment1
         internal static Parser<Sql_Insertion> Insertion =
             (from instruction in Instruction
              from name in Identifier
-             from attributes in ParenthsisedText.Or(Parse.Return(Sql_Insertion.NO_ATTRIBUTE_NAME))
+             from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
              from values_word in Parse.String("values").Once().Token()
-             from values in ParenthsisedText.Or(Parse.Return(Sql_Insertion.NO_ATTRIBUTE_VALUE))
+             from values in ParenthsisedElements.Or(Parse.Return(new List<string>()))
              select new Sql_Insertion(name, attributes, values)
              ).Token();
 
@@ -210,6 +211,13 @@ namespace Assignment1
                                     (checkVariableNameValid(t.Trim()))? t.Trim() : null ).ToList();
                 this.AttrValues = values.Split(',').Select(t => checkQuoted(t)).ToList<dynamic>();
             }
+            public Sql_Insertion(string table, List<string> attrs, List<string> values)
+            {
+                this.table = table;
+                this.AttrNames = attrs;
+                this.AttrValues = values.Select(t => checkQuoted(t)).ToList<dynamic>();
+            }
+
 
             private dynamic checkQuoted(string str)
             {
@@ -220,6 +228,8 @@ namespace Assignment1
                 
                 str = str.Trim();
                 if (str.Equals(""))
+                    return null;
+                if (str.Equals("null"))
                     return null;
                 
 

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="DbException.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="ParserTest.cs" />
     <Compile Include="SqlGrammar.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Program.cs" />
