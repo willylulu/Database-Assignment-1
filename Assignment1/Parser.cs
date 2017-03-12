@@ -29,7 +29,7 @@ namespace Assignment1
                 sql_selector(s.TrimStart(), tableManager);
             }
 
-            //tableManager.print_table_context();
+            tableManager.print_table_context();
             //ParserTest.TestCreateTable();
             //ParserTest.TestCreateTableError();
             //ParserTest.TestInsertion();
