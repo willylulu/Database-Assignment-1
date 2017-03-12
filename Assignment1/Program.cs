@@ -43,7 +43,6 @@ namespace Assignment1
 
             //print table data to csv file
             tableManager.print_table_context();
-            Console.ReadLine();
         }
     }
 }
