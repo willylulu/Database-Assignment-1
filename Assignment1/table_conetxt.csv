@@ -1,6 +1,12 @@
 student
 studentid, name, gender, age
+<<<<<<< HEAD
 13, fernando sierra, m, 20
+=======
+10, John- Smith, M, 22
+112, cCcCc+  |+ccccc, F, 22
+13, Fernando Sierra, M, 20
+>>>>>>> 81b42bc55da171ec29f073dbc2a984996e5bd686
 person
 personid, name, m_gender
 department

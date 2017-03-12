@@ -38,7 +38,6 @@ namespace Assignment1
             {
                 String name = infoPair.Key;
                 TableAttribute info = infoPair.Value;
-                
                 //check is every value in attribute is defined in tuple
                 //if not replace by default value
                 if (!tuple.ContainsKey(name))

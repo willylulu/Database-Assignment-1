@@ -12,11 +12,29 @@ namespace Assignment1
     {
         static void Main2(string[] args)
         {
-          
+            TableManager tableManager = new TableManager();
+            //TestCase -- open for updating
+            //1. Insertion that has no values
+            //2. Insertion that values('1'1, '2'3' ) raise exception
+
+            //To use Create Table , just call CreateTable(str sql)
+            //To use Insert Table , just call Insert(str sql)
+            //To determine which instruction, use  getInstruction(str str)
+
+            string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
+            //text = text.ToLower();
+            string[] seperated_query = text.Split(';');
+            foreach (string s in seperated_query)
+            {
+                sql_selector(s.TrimStart(), tableManager);
+            }
+
+            tableManager.print_table_context();
             //ParserTest.TestCreateTable();
             //ParserTest.TestCreateTableError();
             //ParserTest.TestInsertion();
             //ParserTest.TestInsertionError();
+            //Insert("INSERT INTO Student (name, age, studentId, gender,) VAlues ('Ai>> Toshiko', 21\n, 12, 'F'); ");
 
             Console.ReadKey(true);
         }
@@ -59,7 +77,7 @@ namespace Assignment1
                 Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
                 if (Insertion != null)
                 {
-                    if (Insertion.AttrNames == null) //AttrNames equal null
+                    if (Insertion.AttrNames.Count == 0) //AttrNames equal null
                     {
                         List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
                         int i = 0;
@@ -145,12 +163,6 @@ namespace Assignment1
                 Console.WriteLine(error_prefix + e.Message + "\n");
                 return null;
             }
-            catch (DbException.MismatchingArguments e)
-            {
-                Console.WriteLine(error_prefix + e.Message + "\n");
-                return null;
-
-            }
 
         }
 
@@ -165,7 +177,7 @@ namespace Assignment1
         }
         private static void println(dynamic str)
         {
-            Console.WriteLine(str.ToString());
+            //Console.WriteLine(str.ToString());
         }
 
     }
