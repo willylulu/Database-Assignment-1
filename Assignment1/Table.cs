@@ -26,7 +26,7 @@ namespace Assignment1
             this.TableAttributes= TableAttributes;
             foreach(string s in TableAttributesOrder)
             {
-                attribIndex.Add(s,new Dictionary<dynamic, List<Guid>>());
+                attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>());
             }
         }
 
@@ -107,11 +107,11 @@ namespace Assignment1
         private void setAttribIndex(string name, dynamic value, Guid address)
         {
             if (!attribIndex[name].ContainsKey(value))
-                attribIndex[name].Add(value, new List<Guid>());
+                attribIndex[name].Add(value, new HashSet<Guid>());
             attribIndex[name][value].Add(address);
         }
 
-        private List<Guid> getAttribIndex(string name, dynamic value)
+        private HashSet<Guid> getAttribIndex(string name, dynamic value)
         {
             return attribIndex[name][value];
         }
@@ -119,6 +119,6 @@ namespace Assignment1
         private List<string> TableAttributesOrder = new List<string>(10);
         private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(10);
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
-        private Dictionary<string, Dictionary<dynamic, List<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, List<Guid>>>(10);
+        private Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, HashSet<Guid>>>(10);
     }
 }
