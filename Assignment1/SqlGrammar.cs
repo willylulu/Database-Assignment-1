@@ -85,7 +85,7 @@ namespace Assignment1
              from name in Identifier
              from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
              from values_word in Parse.IgnoreCase("values").Once().Token()
-             from values in ParenthsisedElements.Or(Parse.Return(new List<string>()))
+             from values in ParenthsisedElements
              select new Sql_Insertion(name, attributes, values)
              ).Token();
 
@@ -211,6 +211,8 @@ namespace Assignment1
 
             public Sql_Insertion(string table, string attrs, string values)
             {
+
+                
                 table = table.ToLower();
                 attrs = attrs.ToLower();
                 this.table = table;
@@ -221,9 +223,10 @@ namespace Assignment1
             }
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
+                Console.WriteLine("~~~~~~~~~~~ " + values.Count);
                 table = table.ToLower();
                 this.table = table;
-                this.AttrNames = attrs.Select(t => t.ToLower()).ToList<string>();
+                this.AttrNames = attrs.Select(t => (checkVariableNameValid(t.Trim()))? t.ToLower().Trim() : null).ToList<string>();
                 this.AttrValues = values.Select(t => checkQuoted(t)).ToList<dynamic>();
             }
 

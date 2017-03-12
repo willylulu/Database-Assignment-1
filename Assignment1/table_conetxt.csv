@@ -1,8 +1,6 @@
 student
 studentid, name, gender, age
-10, john- smith, m, 22
-112, ccccc+  |+ccccc, f, 22
-13, fernando sierra, m, 20
+13, Fernando Sierra, M, 20
 person
 personid, name, m_gender
 department
