@@ -22,7 +22,7 @@ namespace Assignment1
             //To determine which instruction, use  getInstruction(str str)
 
             string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
-            text = text.ToLower();
+            //text = text.ToLower();
             string[] seperated_query = text.Split(';');
             foreach (string s in seperated_query)
             {
@@ -37,7 +37,7 @@ namespace Assignment1
         public static void sql_selector(string sql, TableManager tableManager)
         {
             string[] seperated_query = sql.Split();
-            if (string.Compare(seperated_query[0], "create", true) == 0)
+            if (string.Compare(seperated_query[0].ToLower(), "create", true) == 0)
             {
                 SqlGrammar.Sql_Table table = CreateTable(sql);
                 List<string> order = new List<string>();
@@ -63,7 +63,7 @@ namespace Assignment1
                     tableManager.createTable(table.name, order, atributes);
                 }
             }
-            else if (string.Compare(seperated_query[0], "insert", true) == 0)
+            else if (string.Compare(seperated_query[0].ToLower(), "insert", true) == 0)
             {
                 Console.WriteLine("Inserting");
                 SqlGrammar.Sql_Insertion Insertion = Insert(sql);
