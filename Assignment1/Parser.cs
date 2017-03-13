@@ -10,7 +10,7 @@ namespace Assignment1
 {
     class Parser
     {
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             //To use Create Table , just call CreateTable(str sql)
             //To use Insert Table , just call Insert(str sql)

@@ -11,19 +11,31 @@ namespace Assignment1
 {
     class SqlGrammar
     {
+        /**********************
+        * Parse a string (including number, letter, _ ) until space
+        * Return: string
+        **********************/
         public static readonly Parser<string> Identifier =
-           (from first in Parse.Letter.Once()
+           (from first in Parse.LetterOrDigit.Once().XOr(Parse.Char('_').Once())
             //can parse A-Z a-z 0-9 _ 
             from rest in Parse.LetterOrDigit.XOr(Parse.Char('_')).Many()
             select new string(first.Concat(rest).ToArray())).Token();
 
-        internal static Parser<string> ParenthsisedText =
+        /**********************
+        * Parse the string (including any character except ')') between the  ()
+        * Return: string
+        **********************/
+        public static Parser<string> ParenthesisedText =
            (from lparenthesis in Parse.Char('(')
             from content in Parse.CharExcept(')').Many().Text()
             from rparenthesis in Parse.Char(')')
             select content);
 
-        internal static Parser<string> QuotedText =
+        /**********************
+        * Parse the string (including any character except ')') between the  ()
+        * Return: string
+        **********************/
+        public static Parser<string> QuotedText =
         (from lquot in Parse.Char('\'')
              // from content in Parse.CharExcept('"').Many().Text()
              from content in Parse.CharExcept('\'').Many().Text().Token()
@@ -31,11 +43,20 @@ namespace Assignment1
              //prefix "(str)" to indicate that it is a string format
              select "'" + content + "'").Token();
 
+        /**********************
+        * Parse a Csv element (',' + a string) 
+        * Return: string
+        **********************/
         internal static Parser<string> CsvElement =
             (from comma in Parse.Char(',').Once().Token()
              from content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
              select content);
 
+
+        /**********************
+        * Parse a List of string between () and each string is seperated by ',' 
+        * Return: List<string>
+        **********************/
         internal static Parser<List<string>> ParenthsisedElements =
            (from lparenthesis in Parse.Char('(').Once().Token()
             from first_content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
@@ -43,6 +64,10 @@ namespace Assignment1
             from rparenthesis in Parse.Char(')').Once().Token()
             select (new List<string> { first_content }.Concat(contents.ToList())).ToList());
 
+        /**********************
+        * Parse a string of top 2 words of the parameter
+        * Return: string
+        **********************/
         public static Parser<string> Instruction =
             (from instruction_1 in Identifier
              from instruction_2 in Identifier
@@ -50,6 +75,10 @@ namespace Assignment1
 
              ).Token();
 
+        /**********************
+        * Parse a string of "primary" and "key" (non case-sensitive)
+        * Return: string
+        **********************/
         public static Parser<string> PrimaryKey = (
             from leading in Parse.WhiteSpace.Many().Or(Parse.Return(""))
             from i1 in Parse.Chars("primaryPRIMARY").Many().Text().Or(Parse.Return(""))
@@ -59,10 +88,14 @@ namespace Assignment1
             select i1 + mid + i2
             ).Token();
 
-        internal static Parser<Sql_TableAttribute> TableAttribute =
+        /**********************
+        * Parse a Sql_TableAttribute
+        * Return: Sql_TableAttribute
+        **********************/
+        public static Parser<Sql_TableAttribute> TableAttribute =
             (from name in Identifier
              from type in Parse.LetterOrDigit.XOr(Parse.Char('_')).Many().Text()
-             from maxLength in ParenthsisedText.Token().Or(Parse.Return(Sql_TableAttribute.STRING_LENGTH_FOR_INT))
+             from maxLength in ParenthesisedText.Token().Or(Parse.Return(Sql_TableAttribute.STRING_LENGTH_FOR_INT))
                  //from isPrimary in Parse.Chars("primary key").Many().Token().Text().Or(Parse.Return(""))
              from isPrimary in PrimaryKey
              from endComma in Parse.Char(',').Once().Text().Or(Parse.Return(Sql_TableAttribute.LAST_ONE))
@@ -70,7 +103,11 @@ namespace Assignment1
              select new Sql_TableAttribute(name, type, maxLength, isPrimary, (endComma==Sql_TableAttribute.LAST_ONE))
              ).Token();
 
-        internal static Parser<Sql_Table> Table =
+        /**********************
+        * Parse a Sql_Table
+        * Return: Sql_Table
+        **********************/
+        public static Parser<Sql_Table> Table =
             (from instruction in Instruction
              from name in Identifier
              from startParenthesis in Parse.Char('(').Once().Token()
@@ -80,7 +117,11 @@ namespace Assignment1
             ).Token();
 
 
-        internal static Parser<Sql_Insertion> Insertion =
+        /**********************
+        * Parse a Sql_Insertion
+        * Return: Sql_Insertion
+        **********************/
+        public static Parser<Sql_Insertion> Insertion =
             (from instruction in Instruction
              from name in Identifier
              from attributes in ParenthsisedElements.Or(Parse.Return(new List<string>()))
@@ -90,7 +131,12 @@ namespace Assignment1
              ).Token();
 
 
-        public static Boolean checkVariableNameValid(string str)
+        /**********************
+        * Check the string is a valid variable name or not, if not, throw exception
+        * Return: Boolean, or throw exception
+        *Valid: start with letter or '_', then with any amount of letter, number, '_'
+        **********************/
+        public static Boolean checkVariableNameValidOrThrowException(string str)
         {
             
             Regex validVariableRgx = new Regex(@"^[a-zA-Z_$][a-zA-Z_$0-9]*$");
@@ -154,7 +200,7 @@ namespace Assignment1
                 if (!type.Equals(TYPE_STRING) && !type.Equals(TYPE_INT))
                     throw new DbException.UnkownKeyword("Unkown Data Type: " + type);
                 //Invalid name
-                checkVariableNameValid(this.name);
+                checkVariableNameValidOrThrowException(this.name);
             }
 
             public override string ToString()
@@ -174,7 +220,7 @@ namespace Assignment1
                 this.tableAttributes = attributes;
                 
                 //Check variable name is valid or not, if not, rasie exception
-                checkVariableNameValid(this.name);
+                checkVariableNameValidOrThrowException(this.name);
 
                 //check more or less comma
                 for (int i = 0; i < attributes.Count; i++)
@@ -209,24 +255,12 @@ namespace Assignment1
             public const string NO_ATTRIBUTE_NAME = "NO_ATTRIBUTE_NAME";
             public const string NO_ATTRIBUTE_VALUE = "NO_ATTRIBUTE_VALUE";
 
-            public Sql_Insertion(string table, string attrs, string values)
-            {
-
-                
-                table = table.ToLower();
-                attrs = attrs.ToLower();
-                this.table = table;
-                this.AttrNames = (attrs.Equals(NO_ATTRIBUTE_NAME)) ? 
-                                  null : attrs.Split(',').Select(t => 
-                                    (checkVariableNameValid(t.Trim()))? t.Trim() : null ).ToList();
-                this.AttrValues = values.Split(',').Select(t => checkQuoted(t)).ToList<dynamic>();
-            }
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
-//                Console.WriteLine("~~~~~~~~~~~ " + values.Count);
+                Console.WriteLine("~~~~~~~attr: " + attrs.Count + ", values: " + values.Count);
                 table = table.ToLower();
                 this.table = table;
-                this.AttrNames = attrs.Select(t => (checkVariableNameValid(t.Trim()))? t.ToLower().Trim() : null).ToList<string>();
+                this.AttrNames = attrs.Select(t => (checkVariableNameValidOrThrowException(t.Trim()))? t.ToLower().Trim() : null).ToList<string>();
                 this.AttrValues = values.Select(t => checkQuoted(t)).ToList<dynamic>();
 
                 if (this.AttrNames.Count != 0 && this.AttrValues.Count != this.AttrNames.Count)
@@ -235,28 +269,36 @@ namespace Assignment1
             }
 
 
+            /**********************
+            * check the string in the Quoted is valid or not
+            * If the string (not in Quotes) is number, check and return number
+            * If the string is null or '',  check and return null
+            * EX:
+            * 'asdf'asdf'   --- (X)
+            * 'asdf         --- (X)
+            * asdf'         --- (X)
+            **********************/
             private dynamic checkQuoted(string str)
             {
                 //IF WRONG, raise exception.... like 'asdf'asdf, 'asf''', 
                 int number;
                 if (Int32.TryParse(str, out number))
                     return number;
-                
+
+                //Check null 
                 str = str.Trim();
                 if (str.Equals(""))
                     return null;
                 if (str.Equals("null"))
                     return null;
-                
 
+                //Check if text is wraped by ''
                 int startQ = str.IndexOf('\'');
                 int endQ = str.LastIndexOf('\'');
-                //Check if text is wraped by ''
-                
                 if (startQ != 0 || endQ != str.Length - 1)
                     throw new ParseException("mismatch of ' or  uncompleted () or missing ',' ");
-
                 str = str.Substring(1, str.Length - 2);
+
                 //Check no more ' in the string
                 if (str.IndexOf('\'') != -1)
                     throw new ParseException("mismatch of ' or  uncompleted () or missing ',' ");
@@ -269,7 +311,7 @@ namespace Assignment1
                 string stringForAttrName = "";
                 string stringForAttrValues = "";
 
-                if (AttrNames == null)
+                if (AttrNames == null || AttrNames.Count == 0)
                     stringForAttrName = "NO Attribute Name, ";
                 else
                 {

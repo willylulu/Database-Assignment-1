@@ -9,7 +9,7 @@ namespace Assignment1
 {
     class Program
     {
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             TableManager tableManager = new TableManager();
             //TestCase -- open for updating

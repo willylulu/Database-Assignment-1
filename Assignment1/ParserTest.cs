@@ -47,6 +47,18 @@ namespace Assignment1
             //Error case, mismatching arguments 
             input = "INSERT INTO mismatching_arguments  ( age, studentId, gender, name, haha, zz) \n vaLUES (20, 13, 'M', 'Fernando Sierra');";
             Parser.Insert(input);
+
+            //Error case, empty values 
+            input = "INSERT INTO empty_values  ( age, studentId, gender, name, haha, zz) \n vaLUES ();";
+            Parser.Insert(input);
+
+            //Error case, empty values & attrs 
+            input = "INSERT INTO empty_attrs_values () \n vaLUES ();";
+            Parser.Insert(input);
+
+            //Error case, empty attrs 
+            input = "INSERT INTO empty_attrs_values () \n vaLUES (1, 2, 3);";
+            Parser.Insert(input);
         }
         public static void TestInsertion()
         {
