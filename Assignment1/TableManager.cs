@@ -23,33 +23,41 @@ namespace Assignment1
 
         public void insert(string name, Dictionary<string, dynamic> ele)
         {
-            InstructionResult res = tables[name].insert(ele);
-            if(res!= InstructionResult.SUCCESS)
+            if (tables.ContainsKey(name) == true)
             {
-                string errorString;
-                switch (res)
+                InstructionResult res = tables[name].insert(ele);
+                if (res != InstructionResult.SUCCESS)
                 {
-                    case InstructionResult.PRIMARY_KEY_DUPLICATE:
-                        errorString = "Error : Primary key duplicated";
-                        break;
-                    case InstructionResult.VARCHAR_TOO_SHORT:
-                        errorString = "Error : Varchar is too short";
-                        break;
-                    case InstructionResult.INCORRECT_TYPE:
-                        errorString = "Error : Type is incorrected";
-                        break;
-                    case InstructionResult.NULL_PRIMARY_KEY:
-                        errorString = "Error : Primary key can not be null";
-                        break;
-                    default:
-                        errorString = "Error : Unknown error";
-                        break;
+                    string errorString;
+                    switch (res)
+                    {
+                        case InstructionResult.PRIMARY_KEY_DUPLICATE:
+                            errorString = "Error : Primary key duplicated";
+                            break;
+                        case InstructionResult.VARCHAR_TOO_SHORT:
+                            errorString = "Error : Varchar is too short";
+                            break;
+                        case InstructionResult.INCORRECT_TYPE:
+                            errorString = "Error : Type is incorrected";
+                            break;
+                        case InstructionResult.NULL_PRIMARY_KEY:
+                            errorString = "Error : Primary key can not be null";
+                            break;
+                        default:
+                            errorString = "Error : Unknown error";
+                            break;
+                    }
+                    Console.WriteLine(errorString);
                 }
-                Console.WriteLine(errorString);
+                else
+                {
+                    Console.WriteLine("Success");
+                }
             }
             else
             {
-                Console.WriteLine("Success");
+                string errorString = "Error : Table is not exist";
+                Console.WriteLine(errorString);
             }
         }
 
