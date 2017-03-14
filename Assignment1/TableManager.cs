@@ -30,19 +30,19 @@ namespace Assignment1
                 switch (res)
                 {
                     case InstructionResult.PRIMARY_KEY_DUPLICATE:
-                        errorString = "Primary key duplicated";
+                        errorString = "Error : Primary key duplicated";
                         break;
                     case InstructionResult.VARCHAR_TOO_SHORT:
-                        errorString = "Varchar is too short";
+                        errorString = "Error : Varchar is too short";
                         break;
                     case InstructionResult.INCORRECT_TYPE:
-                        errorString = "Type is incorrected";
+                        errorString = "Error : Type is incorrected";
                         break;
                     case InstructionResult.NULL_PRIMARY_KEY:
-                        errorString = "Primary key can not be null";
+                        errorString = "Error : Primary key can not be null";
                         break;
                     default:
-                        errorString = "Unknown error";
+                        errorString = "Error : Unknown error";
                         break;
                 }
                 Console.WriteLine(errorString);

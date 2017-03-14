@@ -72,9 +72,9 @@ namespace Assignment1
                     tableManager.insert(Insertion.table, tuple);
                 }
             }
-            else
+            else if(seperated_query[0].Length != 0)
             {
-                Console.WriteLine("Unknown keywords");
+                Console.WriteLine("Error : Unknown keywords: {0}", seperated_query[0]);
             }
         }
         public static SqlGrammar.Sql_Table CreateTable(string sql)
