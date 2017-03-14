@@ -16,6 +16,14 @@ namespace Assignment1
         TABLE_NAME_DUPLICATE,
     }
 
+    static class Constants
+    {
+        public const int MAX_ATTR_NUM = 10;
+        public const int DEFAULT_SPACE = 1000000;
+        public const int DEFAULT_SPACE_SM = 100000;
+        public const int DEFAULT_SPACE_SM_COMP = 10;
+    }
+
     class nullEle
     {
         override public string ToString()
@@ -33,7 +41,7 @@ namespace Assignment1
             this.TableAttributes= TableAttributes;
             foreach(string s in TableAttributesOrder)
             {
-                attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>());
+                attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>(Constants.DEFAULT_SPACE_SM));
             }
         }
 
@@ -78,7 +86,7 @@ namespace Assignment1
 
             //Check Success, Add in database
             //because map is not order garented, so we need a list defined the order in database
-            List<dynamic> row_data = new List<dynamic>();
+            List<dynamic> row_data = new List<dynamic>(Constants.MAX_ATTR_NUM);
             Guid guid = Guid.NewGuid();
             foreach (string s in TableAttributesOrder)
             {
@@ -106,7 +114,10 @@ namespace Assignment1
         private void setAttribIndex(string name, dynamic value, Guid address)
         {
             if (!attribIndex[name].ContainsKey(value))
-                attribIndex[name].Add(value, new HashSet<Guid>());
+            {
+                HashSet<Guid> temp = new HashSet<Guid>();
+                attribIndex[name].Add(value, temp);
+            }
             attribIndex[name][value].Add(address);
         }
 
@@ -115,9 +126,9 @@ namespace Assignment1
             return attribIndex[name][value];
         }
 
-        private List<string> TableAttributesOrder = new List<string>(10);
-        private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(10);
-        private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(1000000);
-        private Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, HashSet<Guid>>>(10);
+        private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
+        private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(Constants.MAX_ATTR_NUM);
+        private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(Constants.DEFAULT_SPACE);
+        private Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, HashSet<Guid>>>(Constants.MAX_ATTR_NUM);
     }
 }

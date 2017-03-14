@@ -37,10 +37,10 @@ namespace Assignment1
 
         public static void transCreateTable(TableManager tableManager, SqlGrammar.Sql_Table table)
         {
-            List<string> order = new List<string>();
+            List<string> order = new List<string>(Constants.MAX_ATTR_NUM);
             if (table != null)
             {
-                Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(table.tableAttributes.Count);
+                Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(Constants.MAX_ATTR_NUM);
                 foreach (var item in table.tableAttributes)
                 {
                     order.Add(item.name);
@@ -63,26 +63,22 @@ namespace Assignment1
 
         public static void transInserting(TableManager tableManager, SqlGrammar.Sql_Insertion Insertion)
         {
-            Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>(Constants.MAX_ATTR_NUM);
             if (Insertion != null)
             {
                 if (Insertion.AttrNames.Count == 0) //AttrNames equal null
                 {
                     List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
-                    int i = 0;
-                    foreach (dynamic Attrvalue in Insertion.AttrValues)
+                    for(int i=0;i< Insertion.AttrValues.Count; i++)
                     {
-                        tuple.Add(AttrOrder[i], Attrvalue);
-                        i++;
+                        tuple.Add(AttrOrder[i], Insertion.AttrValues[i]);
                     }
                 }
                 else
                 {
-                    int i = 0;
-                    foreach (dynamic Attrname in Insertion.AttrNames)
+                    for (int i = 0; i < Insertion.AttrNames.Count; i++)
                     {
-                        tuple.Add(Attrname, Insertion.AttrValues[i]);
-                        i++;
+                        tuple.Add(Insertion.AttrNames[i], Insertion.AttrValues[i]);
                     }
                 }
                 tableManager.insert(Insertion.table, tuple);
