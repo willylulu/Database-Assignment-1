@@ -20,7 +20,7 @@ namespace Assignment1
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
 
-            string text = System.IO.File.ReadAllText(@"../../sql_query.txt");
+            string text = System.IO.File.ReadAllText(@"../../sql_query.sql");
             string[] seperated_query = text.Split(';');
             foreach (string s in seperated_query)
             {
