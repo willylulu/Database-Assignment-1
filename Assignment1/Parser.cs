@@ -24,7 +24,7 @@ namespace Assignment1
                     foreach (var item in table.tableAttributes)
                     {
                         order.Add(item.name);
-                        Console.WriteLine("type = " + item.type);
+                        //Console.WriteLine("type = " + item.type);
                         switch (item.type)
                         {
                             case "int":
@@ -34,7 +34,7 @@ namespace Assignment1
                                 item.type = "String";
                                 break;
                         }
-                        Console.WriteLine("size = " + item.maxStringLength);
+                        //Console.WriteLine("size = " + item.maxStringLength);
                         atributes.Add(item.name, new TableAttribute(item.type, item.isPrimary, item.maxStringLength));
                     }
                     tableManager.createTable(table.name, order, atributes);
@@ -42,7 +42,7 @@ namespace Assignment1
             }
             else if (string.Compare(seperated_query[0].ToLower(), "insert", true) == 0)
             {
-                Console.WriteLine("Inserting");
+               // Console.WriteLine("Inserting");
                 SqlGrammar.Sql_Insertion Insertion = Insert(sql);
                 //public string table;
                 //public List<string> AttrNames;

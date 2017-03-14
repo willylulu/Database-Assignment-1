@@ -13,8 +13,12 @@ namespace Assignment1
         public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttribute> TableAttributes)
         {
             if (tables.ContainsKey(name)) return InstructionResult.TABLE_NAME_DUPLICATE;    //table name duplicated
-            else tables.Add(name,new Table(TableAttributesOrder, TableAttributes));
-            return InstructionResult.SUCCESS;   //Success
+            else
+            {
+                tables.Add(name, new Table(TableAttributesOrder, TableAttributes));
+                Console.WriteLine("Success");
+                return InstructionResult.SUCCESS;   //Success
+            }
         }
 
         public void insert(string name, Dictionary<string, dynamic> ele)
@@ -42,6 +46,10 @@ namespace Assignment1
                         break;
                 }
                 Console.WriteLine(errorString);
+            }
+            else
+            {
+                Console.WriteLine("Success");
             }
         }
 
