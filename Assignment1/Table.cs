@@ -16,6 +16,13 @@ namespace Assignment1
         TABLE_NAME_DUPLICATE,
     }
 
+    class nullEle
+    {
+        override public string ToString()
+        {
+            return "(null)";
+        }
+    }
 
     class Table
     {
@@ -45,15 +52,7 @@ namespace Assignment1
                     if(info.isPrimary) return InstructionResult.NULL_PRIMARY_KEY;   //primary key can not be null
                     else
                     {
-                        switch(info.type)
-                        {
-                            case TableAttribute.STRING_TYPE:
-                                tuple.Add(name, string.Empty);
-                                break;
-                            case TableAttribute.INT_TYPE:
-                                tuple.Add(name, 0);
-                                break;
-                        }
+                        tuple.Add(name, new nullEle());
                     }
                 }
                 else
