@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,9 @@ namespace Assignment1
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
 
+            Stopwatch sw = new Stopwatch();
+            sw.Reset();
+            sw = Stopwatch.StartNew();
             string text = System.IO.File.ReadAllText(@"../../sql_query.sql");
             //string text = System.IO.File.ReadAllText(@"../../sql_error3.sql");
             Parser.sql_parser(text,tableManager);
@@ -29,7 +33,9 @@ namespace Assignment1
             //    console.writeline(s);
             //    parser.sql_selector(s.trimstart());
             //}
-
+            sw.Stop();
+            long ms = sw.ElapsedMilliseconds;
+            Console.WriteLine("花費 {0} 毫秒", ms);
             tableManager.print_table_context();
             //TestCreateTable();
             //TestInsertion();

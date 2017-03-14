@@ -16,7 +16,7 @@ namespace Assignment1
             else
             {
                 tables.Add(name, new Table(TableAttributesOrder, TableAttributes));
-                Console.WriteLine("Success");
+                ParserTest.println("Success");
                 return InstructionResult.SUCCESS;   //Success
             }
         }
@@ -51,7 +51,7 @@ namespace Assignment1
                 }
                 else
                 {
-                    Console.WriteLine("Success");
+                    ParserTest.println("Success");
                 }
             }
             else
