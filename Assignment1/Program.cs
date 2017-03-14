@@ -26,7 +26,7 @@ namespace Assignment1
             foreach (string s in seperated_query)
             {
                 Console.WriteLine(s);
-                Parser.sql_selector(s.TrimStart(), tableManager);
+                Parser.sql_selector(s.TrimStart());
             }
 
             tableManager.print_table_context();
