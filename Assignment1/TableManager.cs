@@ -72,7 +72,7 @@ namespace Assignment1
                 {
 
                     //Print each tuple
-                    Console.WriteLine(ele.Value.ToArray());
+                    //Console.WriteLine(ele.Value.ToArray());
                     var eleattr = String.Join(", ", ele.Value.ToArray());
                     csv.AppendLine(eleattr);
                 }

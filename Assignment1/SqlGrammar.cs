@@ -257,7 +257,7 @@ namespace Assignment1
 
             public Sql_Insertion(string table, List<string> attrs, List<string> values)
             {
-                Console.WriteLine("~~~~~~~attr: " + attrs.Count + ", values: " + values.Count);
+                //Console.WriteLine("~~~~~~~attr: " + attrs.Count + ", values: " + values.Count);
                 table = table.ToLower();
                 this.table = table;
                 this.AttrNames = attrs.Select(t => (checkVariableNameValidOrThrowException(t.Trim()))? t.ToLower().Trim() : null).ToList<string>();

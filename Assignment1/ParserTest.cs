@@ -179,11 +179,10 @@ namespace Assignment1
             input = "CREATE tAbLe Primary_key_test(\n   personId int   , \n name varchar(20) PRiMArY KEY, \n   m_gender varchar(1)   )";
             Parser.CreateTable(input);
         }
-        public static void println(dynamic str)
+        public static bool debugFlag = false;
+        public static void println(string str)
         {
-            Console.WriteLine(str.ToString());
+            if(debugFlag) Console.WriteLine(str);
         }
-
-
     }
 }

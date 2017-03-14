@@ -10,71 +10,105 @@ namespace Assignment1
 {
     class Parser
     {
-        
-        public static void sql_selector(string sql, TableManager tableManager)
+
+        public static void sql_parser(string text,TableManager tableManager)
+        {
+            string[] seperated_query = text.Split(';');
+            KeyValuePair<string,dynamic>[] commands = new KeyValuePair<string, dynamic>[seperated_query.Length];
+            Parallel.For(0,seperated_query.Length,(i)=> {
+                Parser.println(seperated_query [i]+ " "+i);
+                commands[i] = Parser.sql_selector(seperated_query[i].TrimStart());
+            });
+            foreach(KeyValuePair<string, dynamic> com in commands)
+            {
+                switch (com.Key)
+                {
+                    case "create": Parser.transCreateTable(tableManager,com.Value); break;
+                    case "Inserting": Parser.transInserting(tableManager, com.Value); break;
+                    case "unKnown": Console.WriteLine("Unknown keywords"); break;
+                }
+            }
+            //foreach (string s in seperated_query)
+            //{
+            //    Console.WriteLine(s);
+            //    Parser.sql_selector(s.TrimStart(), tableManager);
+            //}
+        }
+
+        public static void transCreateTable(TableManager tableManager, SqlGrammar.Sql_Table table)
+        {
+            List<string> order = new List<string>();
+            if (table != null)
+            {
+                Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(table.tableAttributes.Count);
+                foreach (var item in table.tableAttributes)
+                {
+                    order.Add(item.name);
+                    Parser.println("type = " + item.type);
+                    switch (item.type)
+                    {
+                        case "int":
+                            item.type = "Int32";
+                            break;
+                        case "varchar":
+                            item.type = "String";
+                            break;
+                    }
+                    Parser.println("size = " + item.maxStringLength);
+                    atributes.Add(item.name, new TableAttribute(item.type, item.isPrimary, item.maxStringLength));
+                }
+                tableManager.createTable(table.name, order, atributes);
+            }
+        }
+
+        public static void transInserting(TableManager tableManager, SqlGrammar.Sql_Insertion Insertion)
+        {
+            Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
+            if (Insertion != null)
+            {
+                if (Insertion.AttrNames.Count == 0) //AttrNames equal null
+                {
+                    List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
+                    int i = 0;
+                    foreach (dynamic Attrvalue in Insertion.AttrValues)
+                    {
+                        tuple.Add(AttrOrder[i], Attrvalue);
+                        i++;
+                    }
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (dynamic Attrname in Insertion.AttrNames)
+                    {
+                        tuple.Add(Attrname, Insertion.AttrValues[i]);
+                        i++;
+                    }
+                }
+                tableManager.insert(Insertion.table, tuple);
+            }
+        }
+
+        public static KeyValuePair<string, dynamic> sql_selector(string sql)
         {
             string[] seperated_query = sql.Split();
             if (string.Compare(seperated_query[0].ToLower(), "create", true) == 0)
             {
                 SqlGrammar.Sql_Table table = CreateTable(sql);
-                List<string> order = new List<string>();
-                if (table != null)
-                {
-                    Dictionary<string, TableAttribute> atributes = new Dictionary<string, TableAttribute>(table.tableAttributes.Count);
-                    foreach (var item in table.tableAttributes)
-                    {
-                        order.Add(item.name);
-                        Console.WriteLine("type = " + item.type);
-                        switch (item.type)
-                        {
-                            case "int":
-                                item.type = "Int32";
-                                break;
-                            case "varchar":
-                                item.type = "String";
-                                break;
-                        }
-                        Console.WriteLine("size = " + item.maxStringLength);
-                        atributes.Add(item.name, new TableAttribute(item.type, item.isPrimary, item.maxStringLength));
-                    }
-                    tableManager.createTable(table.name, order, atributes);
-                }
+                return new KeyValuePair<string, dynamic>("create", table);
             }
             else if (string.Compare(seperated_query[0].ToLower(), "insert", true) == 0)
             {
-                Console.WriteLine("Inserting");
+                //Console.WriteLine("Inserting");
                 SqlGrammar.Sql_Insertion Insertion = Insert(sql);
+                return new KeyValuePair<string, dynamic>("Inserting", Insertion);
                 //public string table;
                 //public List<string> AttrNames;
                 //public List<dynamic> AttrValues;
-                Dictionary<string, dynamic> tuple = new Dictionary<string, dynamic>();
-                if (Insertion != null)
-                {
-                    if (Insertion.AttrNames.Count == 0) //AttrNames equal null
-                    {
-                        List<string> AttrOrder = tableManager.getTable(Insertion.table).getAttributesOrder();
-                        int i = 0;
-                        foreach (dynamic Attrvalue in Insertion.AttrValues)
-                        {
-                            tuple.Add(AttrOrder[i], Attrvalue);
-                            i++;
-                        }
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (dynamic Attrname in Insertion.AttrNames)
-                        {
-                            tuple.Add(Attrname, Insertion.AttrValues[i]);
-                            i++;
-                        }
-                    }
-                    tableManager.insert(Insertion.table, tuple);
-                }
             }
             else
             {
-                Console.WriteLine("Unknown keywords");
+                return new KeyValuePair<string, dynamic>("unKnown", null);
             }
         }
         public static SqlGrammar.Sql_Table CreateTable(string sql)

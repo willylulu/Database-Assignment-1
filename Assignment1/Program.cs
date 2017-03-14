@@ -21,16 +21,12 @@ namespace Assignment1
             //To determine which instruction, use  getInstruction(str str)
 
             string text = System.IO.File.ReadAllText(@"../../sql_query.sql");
-            string[] seperated_query = text.Split(';');
-            foreach (string s in seperated_query)
-            {
-                Console.WriteLine(s);
-                Parser.sql_selector(s.TrimStart(), tableManager);
-            }
+            Parser.sql_parser(text,tableManager);
 
             tableManager.print_table_context();
             //TestCreateTable();
             //TestInsertion();
+            Console.WriteLine("End");
             Console.ReadKey(true);
         }
     }
