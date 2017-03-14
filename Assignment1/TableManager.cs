@@ -23,7 +23,7 @@ namespace Assignment1
 
         public void insert(string name, Dictionary<string, dynamic> ele)
         {
-            if (tables.ContainsKey(name) == true)
+           if (tables.ContainsKey(name) == true)
             {
                 InstructionResult res = tables[name].insert(ele);
                 if (res != InstructionResult.SUCCESS)
