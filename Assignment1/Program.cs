@@ -24,9 +24,11 @@ namespace Assignment1
             Stopwatch sw = new Stopwatch();
             sw.Reset();
             sw = Stopwatch.StartNew();
-            string text = System.IO.File.ReadAllText(@"../../sql_query.sql");
+
+            string text = System.IO.File.ReadAllText(args.Length==0?@"../../sql_query.sql": args[0]);
             //string text = System.IO.File.ReadAllText(@"../../sql_error3.sql");
             Parser.sql_parser(text,tableManager);
+
             //string[] seperated_query = text.Split(';');
             //foreach (string s in seperated_query)
             //{
@@ -35,7 +37,7 @@ namespace Assignment1
             //}
             sw.Stop();
             long ms = sw.ElapsedMilliseconds;
-            Console.WriteLine("花費 {0} 毫秒", ms);
+            Console.WriteLine("Cost "+ms+" ms");
             tableManager.print_table_context();
             //TestCreateTable();
             //TestInsertion();
