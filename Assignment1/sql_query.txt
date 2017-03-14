@@ -1,54 +1,10 @@
-CreaTe tABle stUDent(stUDENTId int PRimaRY KEY,
- nAMe vARCHar(15),
- gENDEr vaRCHar(1), age int);
- CREATE tAbLe PerSon(
- personId int PRIMARY KEY, 
- name varchar(20) PRiMArY KEY, 
- m_gender varchar(1)   );
-   CREATE tAbLe department(
-   department_name varchar(20), 
-   type varchar(20), 
-   num_employees int ) ;
- CREATE tAbLe department
- ( department_name varchar(20) 
- type varchar(20), 
- num_employees int ) ;
- CREATE tAbLe department
- department_name varchar(20), 
- type varchar(20), 
- num_employees int ) ;
- CREATE tAbLe department
- (  department_name varchar(20), 
- type varchar(20), 
- num_employees int, ) ;
- CREATE tAbLe department
- (  department_name varchar(20), 
- type DATE, 
- num_employees int, ) ;
- string input = "";
-INSERT INTO Student 
- VALUES(10,   'John- Smith'   , 'M', 22);
-INsErT InTo sTUDEnt 
- ValUEs(112, 'cCcCc+  |+ccccc', 'F', 22);
-INSERT INTO Student (age, studentId, gender, name)
- vaLUES (20, 13, 'M', 'Fernando Sierra');
-INSERT 
- INTO 
- Student 
- (name, 
- age, 
- studentId, gender) 
- VAlues\n ('Ai>> Toshiko', 21
- , 12, 'F');
-INSERT INTO Student age, studentId, gender, name) 
- vaLUES (20, 13, 'M', 'Fernando Sierra');
-INSERT INTO Student (age, studentId gender, name) 
- vaLUES (20, 13, 'M', 'Fernando Sierra');
-INSERT 
- INTO 
- Student
- (name, 
- age, 
- studentId, gender,) 
- VAlues
- ('Ai>> Toshiko', 21\n, 12, 'F');
+create table MOCKDATA (
+	id INT,
+	height INT,
+	salary INT,
+	age INT,
+	First_Name VARCHAR(30),
+	Gender VARCHAR(30)
+);
+
+insert into MOCKDATA (id, height, salary, age, First_Name, Gender) values (4840, 101, 604945, 82, 'Ashley', 'Female');

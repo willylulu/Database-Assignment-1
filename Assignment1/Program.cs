@@ -24,6 +24,7 @@ namespace Assignment1
             string[] seperated_query = text.Split(';');
             foreach (string s in seperated_query)
             {
+                Console.WriteLine(s);
                 Parser.sql_selector(s.TrimStart(), tableManager);
             }
 

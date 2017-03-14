@@ -49,7 +49,7 @@ namespace Assignment1
         **********************/
         internal static Parser<string> CsvElement =
             (from comma in Parse.Char(',').Once().Token()
-             from content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
+             from content in QuotedText.Token().Or(Identifier)
              select content);
 
 
@@ -59,7 +59,7 @@ namespace Assignment1
         **********************/
         internal static Parser<List<string>> ParenthsisedElements =
            (from lparenthesis in Parse.Char('(').Once().Token()
-            from first_content in QuotedText.Token().Or(Parse.LetterOrDigit.Many().Text().Token())
+            from first_content in QuotedText.Token().Or(Identifier)
             from contents in CsvElement.Many()
             from rparenthesis in Parse.Char(')').Once().Token()
             select (new List<string> { first_content }.Concat(contents.ToList())).ToList());

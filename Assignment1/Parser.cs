@@ -10,19 +10,7 @@ namespace Assignment1
 {
     class Parser
     {
-        static void Main2(string[] args)
-        {
-            //To use Create Table , just call CreateTable(str sql)
-            //To use Insert Table , just call Insert(str sql)
-            //To determine which instruction, use  getInstruction(str str)
-
-            //ParserTest.TestCreateTable();
-            //ParserTest.TestCreateTableError();
-            //ParserTest.TestInsertion();
-            //ParserTest.TestInsertionError();
-
-            Console.ReadKey(true);
-        }
+        
         public static void sql_selector(string sql, TableManager tableManager)
         {
             string[] seperated_query = sql.Split();
