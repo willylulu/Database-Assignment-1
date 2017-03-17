@@ -7,6 +7,51 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+    enum operators
+    {
+        equal,not_equal,less,greater
+    }
+    enum operatorLink
+    {
+        OR,AND
+    }
+    class where
+    {
+        public string attribute;
+        public operators operation;
+        public dynamic value;
+        public operatorLink operationLink;
+        public where(string a, operators b, dynamic c, operatorLink d)
+        {
+            attribute = a; operation = b; value = c; operationLink = d;
+        }
+    }
+
+    class whereJoin
+    {
+        public KeyValuePair<string,string> attribut1;
+        public operators operation;
+        public KeyValuePair<string, string> attribut2;
+        public operatorLink operationLink;
+        public whereJoin(string a, string b, operators c, string d, string e, operatorLink f)
+        {
+            attribut1 = new KeyValuePair<string, string>(a, b);
+            attribut2 = new KeyValuePair<string, string>(d, e);
+            operation = c;
+            operationLink = f;
+        }
+    }
+
+    class tableSelect
+    {
+        public string name;
+        public List<where> wheres;
+        public tableSelect(string a, List<where> b)
+        {
+            name = a;
+            wheres = b;
+        }
+    }
 
     class TableManager
     {
@@ -59,6 +104,50 @@ namespace Assignment1
                 string errorString = "Error : Table is not exist";
                 Console.WriteLine(errorString);
             }
+        }
+
+        public List<List<dynamic>> select(string[] outputOrder,tableSelect[] tables,whereJoin[] whereJoins)
+        {
+            Dictionary<string, HashSet<Guid>> tableCandidates = new Dictionary<string, HashSet<Guid>>();
+            foreach(tableSelect ts in tables)
+            {
+                HashSet<Guid> temp = new HashSet<Guid>(getTable(ts.name).getAllIndex());
+                foreach(where w in ts.wheres)
+                {
+                    HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute,w.value,w.operation);
+                    if (w.operationLink == operatorLink.AND) temp = intersect(temp, rt);
+                    else if (w.operationLink == operatorLink.OR) temp = union(temp, rt);
+                }
+                tableCandidates.Add(ts.name,temp);
+            }
+            return null;
+        }
+
+        private HashSet<Guid> union(HashSet<Guid> a, HashSet<Guid> b)
+        {
+            HashSet<Guid> ans = new HashSet<Guid>();
+            foreach (Guid iter in a) ans.Add(iter);
+            foreach (Guid iter in b) ans.Add(iter);
+            return ans;
+        }
+
+        private HashSet<Guid> intersect(HashSet<Guid> a, HashSet<Guid> b)
+        {
+            HashSet<Guid> ans = new HashSet<Guid>();
+            HashSet<Guid> c,d;
+            if (a.Count < b.Count)
+            {
+                c = a;d = b;
+            }
+            else
+            {
+                c = b; d = a;
+            }
+            foreach(Guid iter in c)
+            {
+                if (d.Contains(iter)) ans.Add(iter);
+            }
+            return ans;
         }
 
         public Table getTable(string name)

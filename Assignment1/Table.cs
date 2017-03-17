@@ -96,6 +96,7 @@ namespace Assignment1
                 setAttribIndex(s,tuple[s],guid);
             }
 
+            dataKeys.Add(guid);
             data.Add(guid,row_data);
 
             return InstructionResult.SUCCESS;   //Success
@@ -126,8 +127,71 @@ namespace Assignment1
             return attribIndex[name][value];
         }
 
+        public HashSet<Guid> getAllIndex()
+        {
+            return dataKeys;
+        }
+
+        public HashSet<Guid> getAttribIndexWithOper(string name, dynamic value,operators oper)
+        {
+            HashSet<Guid> ans = null;
+            switch (oper)
+            {
+                case operators.equal:
+                    ans = attribIndex[name][value];
+                    break;
+                case operators.not_equal:
+                    for (int i = 0; i < TableAttributesOrder.Count; i++)
+                    {
+                        if (TableAttributesOrder[i] == name)
+                        {
+                            ans = new HashSet<Guid>();
+                            foreach (Guid key in dataKeys)
+                            {
+                                dynamic val = data[key][i];
+                                if (val != value) ans.Add(key);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case operators.less:
+                    for (int i = 0; i < TableAttributesOrder.Count; i++)
+                    {
+                        if (TableAttributesOrder[i] == name)
+                        {
+                            ans = new HashSet<Guid>();
+                            foreach (Guid key in dataKeys)
+                            {
+                                dynamic val = data[key][i];
+                                if (val < value) ans.Add(key);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case operators.greater:
+                    for (int i = 0; i < TableAttributesOrder.Count; i++)
+                    {
+                        if (TableAttributesOrder[i] == name)
+                        {
+                            ans = new HashSet<Guid>();
+                            foreach (Guid key in dataKeys)
+                            {
+                                dynamic val = data[key][i];
+                                if (val > value) ans.Add(key);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+            }
+            return ans;
+        }
+
         private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
         private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(Constants.MAX_ATTR_NUM);
+        private HashSet<Guid> dataKeys = new HashSet<Guid>();
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(Constants.DEFAULT_SPACE);
         private Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, HashSet<Guid>>>(Constants.MAX_ATTR_NUM);
     }
