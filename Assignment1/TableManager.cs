@@ -7,49 +7,73 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
-    enum operators
+    enum Operators
     {
         equal,not_equal,less,greater
     }
-    enum operatorLink
+    enum OperatorLink
     {
         OR,AND
     }
+    /*
+     * where attr1 = value1 and attr2 > value2 or attr3 < value3
+     * ----------------------------------------------------------
+     * image that => where (and attr1 == value1) (and attr2 > value2) (or attr3 < value3)
+     * where w1 = new where(attr1,Operators.equal,value1,OperatorLink.AND);
+     * where w2 = new where(attr2,Operators.greater,value2,OperatorLink.AND);
+     * where w3 = new where(attr3,Operators.less,value3,OperatorLink.OR);
+     */
     class where
     {
         public string attribute;
-        public operators operation;
+        public Operators operation;
         public dynamic value;
-        public operatorLink operationLink;
-        public where(string a, operators b, dynamic c, operatorLink d)
+        public OperatorLink operationLink;
+        public where(string attr, Operators operation, dynamic value, OperatorLink operatorLink)
         {
-            attribute = a; operation = b; value = c; operationLink = d;
+            this.attribute = attr; this.operation = operation; this.value = value; this.operationLink = operatorLink;
         }
     }
-
+    /*
+     * where table1.attr1 = table2.attr2 and table3.attr3 > table4.attr4 or table5.attr5 > table6.attr6
+     * -------------------------------------------------------------------
+     * image that => where (and table1.attr1 == table2.attr2) (and table3.attr3 > table4.attr4) (or table5.attr5 > table6.attr6) 
+     * whereJoin wJ1 = new whereJoin(table1,attr1,Operators.equal,table2,attr2,OperatorLink.AND);
+     * whereJoin wJ1 = new whereJoin(table3,attr3,Operators.greater,table4,attr4,OperatorLink.AND);
+     * whereJoin wJ1 = new whereJoin(table5,attr5,Operators.less,table6,attr6,OperatorLink.OR);
+     */
     class whereJoin
     {
         public KeyValuePair<string,string> attribut1;
-        public operators operation;
+        public Operators operation;
         public KeyValuePair<string, string> attribut2;
-        public operatorLink operationLink;
-        public whereJoin(string a, string b, operators c, string d, string e, operatorLink f)
+        public OperatorLink operationLink;
+        public whereJoin(string table1, string attr1, Operators operation, string table2, string attr2, OperatorLink operationLink)
         {
-            attribut1 = new KeyValuePair<string, string>(a, b);
-            attribut2 = new KeyValuePair<string, string>(d, e);
-            operation = c;
-            operationLink = f;
+            this.attribut1 = new KeyValuePair<string, string>(table1, attr1);
+            this.attribut2 = new KeyValuePair<string, string>(table2, attr2);
+            this.operation = operation;
+            this.operationLink = operationLink;
         }
     }
-
+    /* selece * from table1 as ta,table2 as tb where ta.attr1 = value1 AND tb.attr2 > value2 OR OR ta.attr3 < value3
+     * --------------------------------------------------------------------------------------
+     * where w1 = new where(attr1,Operators.equal,value1,OperatorLink.AND);
+     * where w2 = new where(attr2,Operators.greater,value2,OperatorLink.AND);
+     * where w3 = new where(attr3,Operators.less,value3,OperatorLink.OR);
+     * List<where> wheresForTable1 = new List<where>({w1,w3});
+     * List<where> wheresForTable2 = new List<where>({w2});
+     * tableSelect ts1 = new tableSelect(table1,wheresForTable1);
+     * tableSelect ts2 = new tableSelect(table2,wheresForTable2);
+     */
     class tableSelect
     {
         public string name;
         public List<where> wheres;
-        public tableSelect(string a, List<where> b)
+        public tableSelect(string tableName, List<where> wheres)
         {
-            name = a;
-            wheres = b;
+            this.name = tableName;
+            this.wheres = wheres;
         }
     }
 
@@ -114,9 +138,19 @@ namespace Assignment1
                 HashSet<Guid> temp = new HashSet<Guid>(getTable(ts.name).getAllIndex());
                 foreach(where w in ts.wheres)
                 {
-                    HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute,w.value,w.operation);
-                    if (w.operationLink == operatorLink.AND) temp = intersect(temp, rt);
-                    else if (w.operationLink == operatorLink.OR) temp = union(temp, rt);
+                    if(w.operationLink == OperatorLink.AND)
+                    {
+                        HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute, w.value, w.operation);
+                        temp = intersect(temp, rt);
+                    }
+                }
+                foreach (where w in ts.wheres)
+                {
+                    if (w.operationLink == OperatorLink.OR)
+                    {
+                        HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute, w.value, w.operation);
+                        temp = union(temp, rt);
+                    }
                 }
                 tableCandidates.Add(ts.name,temp);
             }

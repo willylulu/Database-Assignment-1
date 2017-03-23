@@ -132,15 +132,15 @@ namespace Assignment1
             return dataKeys;
         }
 
-        public HashSet<Guid> getAttribIndexWithOper(string name, dynamic value,operators oper)
+        public HashSet<Guid> getAttribIndexWithOper(string name, dynamic value,Operators oper)
         {
             HashSet<Guid> ans = null;
             switch (oper)
             {
-                case operators.equal:
+                case Operators.equal:
                     ans = attribIndex[name][value];
                     break;
-                case operators.not_equal:
+                case Operators.not_equal:
                     for (int i = 0; i < TableAttributesOrder.Count; i++)
                     {
                         if (TableAttributesOrder[i] == name)
@@ -155,7 +155,7 @@ namespace Assignment1
                         }
                     }
                     break;
-                case operators.less:
+                case Operators.less:
                     for (int i = 0; i < TableAttributesOrder.Count; i++)
                     {
                         if (TableAttributesOrder[i] == name)
@@ -170,7 +170,7 @@ namespace Assignment1
                         }
                     }
                     break;
-                case operators.greater:
+                case Operators.greater:
                     for (int i = 0; i < TableAttributesOrder.Count; i++)
                     {
                         if (TableAttributesOrder[i] == name)
