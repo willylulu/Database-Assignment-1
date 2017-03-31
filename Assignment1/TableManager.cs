@@ -15,6 +15,17 @@ namespace Assignment1
     {
         OR,AND
     }
+
+    class table_attribute_pair
+    {
+        public string tableName;
+        public string attributeName;
+        public table_attribute_pair(string table, string attr)
+        {
+            tableName = table;
+            attributeName = attr;
+        }
+    }
     /*
      * where attr1 = value1 and attr2 > value2 or attr3 < value3
      * ----------------------------------------------------------
@@ -25,58 +36,63 @@ namespace Assignment1
      */
     class where
     {
-        public string attribute;
-        public Operators operation;
-        public dynamic value;
-        public OperatorLink operationLink;
-        public where(string attr, Operators operation, dynamic value, OperatorLink operatorLink)
+        public Operators oper;
+        public KeyValuePair<string, string> tableAttrPair1;
+        public KeyValuePair<string, string> tableAttrPair2;
+        public OperatorLink operLink;
+
+        public HashSet<Dictionary<string, Guid>> elementSet;
+        public List<string> attrName; // store table name in elementSet
+
+        public where(HashSet<Dictionary<string, Guid>> elementSet, List<string> attrName)
         {
-            this.attribute = attr; this.operation = operation; this.value = value; this.operationLink = operatorLink;
+            this.elementSet = elementSet;
+            this.attrName = attrName;
         }
-    }
-    /*
-     * where table1.attr1 = table2.attr2 and table3.attr3 > table4.attr4 or table5.attr5 > table6.attr6
-     * -------------------------------------------------------------------
-     * image that => where (and table1.attr1 == table2.attr2) (and table3.attr3 > table4.attr4) (or table5.attr5 > table6.attr6) 
-     * whereJoin wJ1 = new whereJoin(table1,attr1,Operators.equal,table2,attr2,OperatorLink.AND);
-     * whereJoin wJ1 = new whereJoin(table3,attr3,Operators.greater,table4,attr4,OperatorLink.AND);
-     * whereJoin wJ1 = new whereJoin(table5,attr5,Operators.less,table6,attr6,OperatorLink.OR);
-     */
-    class whereJoin
-    {
-        public KeyValuePair<string,string> attribut1;
-        public Operators operation;
-        public KeyValuePair<string, string> attribut2;
-        public OperatorLink operationLink;
-        public whereJoin(string table1, string attr1, Operators operation, string table2, string attr2, OperatorLink operationLink)
+        public where( where preWhere)
         {
-            this.attribut1 = new KeyValuePair<string, string>(table1, attr1);
-            this.attribut2 = new KeyValuePair<string, string>(table2, attr2);
-            this.operation = operation;
-            this.operationLink = operationLink;
+            oper = preWhere.oper;
+            operLink = preWhere.operLink;
+            tableAttrPair1 = preWhere.tableAttrPair1;
+            tableAttrPair2 = preWhere.tableAttrPair2;
         }
-    }
-    /* selece * from table1 as ta,table2 as tb where ta.attr1 = value1 AND tb.attr2 > value2 OR OR ta.attr3 < value3
-     * --------------------------------------------------------------------------------------
-     * where w1 = new where(attr1,Operators.equal,value1,OperatorLink.AND);
-     * where w2 = new where(attr2,Operators.greater,value2,OperatorLink.AND);
-     * where w3 = new where(attr3,Operators.less,value3,OperatorLink.OR);
-     * List<where> wheresForTable1 = new List<where>({w1,w3});
-     * List<where> wheresForTable2 = new List<where>({w2});
-     * tableSelect ts1 = new tableSelect(table1,wheresForTable1);
-     * tableSelect ts2 = new tableSelect(table2,wheresForTable2);
-     */
-    class tableSelect
-    {
-        public string name;
-        public List<where> wheres;
-        public tableSelect(string tableName, List<where> wheres)
+        public void setElementSet(HashSet<Dictionary<string, Guid>> elementSet)
         {
-            this.name = tableName;
-            this.wheres = wheres;
+            this.elementSet = elementSet;
         }
+
+        public where(string table1, string attr1, string table2, string attr2, Operators op, OperatorLink opLink)
+        {
+            oper = op;
+            operLink = opLink;
+            tableAttrPair1 = new KeyValuePair<string, string>(table1, attr1);
+            tableAttrPair2 = new KeyValuePair<string, string>(table2, attr2);
+        }
+
     }
 
+    class where_set
+    {
+        public List<object> where_group;
+
+        public where_set(List<object> where_group)
+        {
+            this.where_group = where_group;
+        }
+    }
+    
+
+
+    class outputPair
+    {
+        string tableName;
+        string attr;
+        public outputPair(string tableName, string attr)
+        {
+            this.tableName = tableName;
+            this.attr = attr;
+        }
+    }
     class TableManager
     {
         public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttribute> TableAttributes)
@@ -130,58 +146,254 @@ namespace Assignment1
             }
         }
 
-        public List<List<dynamic>> select(string[] outputOrder,tableSelect[] tables,whereJoin[] whereJoins)
+        public where generateWhere( Dictionary<string, string> aliaName,where inWhere)
         {
-            Dictionary<string, HashSet<Guid>> tableCandidates = new Dictionary<string, HashSet<Guid>>();
-            foreach(tableSelect ts in tables)
+            where outWhere = new where(inWhere);
+            Table table1 = getTable(aliaName[outWhere.tableAttrPair1.Key]);
+            Table table2 = getTable(aliaName[outWhere.tableAttrPair2.Key]);
+            Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
+            Dictionary<Guid, List<dynamic>> attribIndex2 = table2.getTableData();
+            HashSet<Guid> dataKeys1 = table1.getAllIndex();
+            HashSet<Guid> dataKeys2 = table2.getAllIndex();
+            int index1;
+            int index2;
+            List<string> TableAttributesOrder1 = table1.getAttributesOrder();
+            index1 = TableAttributesOrder1.FindIndex(x => x == outWhere.tableAttrPair1.Value);
+            List<string> TableAttributesOrder2 = table2.getAttributesOrder();
+            index2 = TableAttributesOrder2.FindIndex(x => x == outWhere.tableAttrPair2.Value);
+
+            var ans =
+                from data1 in dataKeys1
+                from data2 in dataKeys2
+                where attribIndex1[data1][index1] == attribIndex2[data1][index2]
+                select new { d1 = data1, d2 = data2 };
+            foreach (var dataPair in ans)
             {
-                HashSet<Guid> temp = new HashSet<Guid>(getTable(ts.name).getAllIndex());
-                foreach(where w in ts.wheres)
+                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                aliasGidPair.Add(outWhere.tableAttrPair1.Key, dataPair.d1);
+                if (!aliasGidPair.ContainsKey(outWhere.tableAttrPair2.Key))
                 {
-                    if(w.operationLink == OperatorLink.AND)
+                    aliasGidPair.Add(outWhere.tableAttrPair2.Key, dataPair.d2);
+                }
+                outWhere.elementSet.Add(aliasGidPair);
+            }
+
+            return outWhere;
+        }
+        public where select(Dictionary<string, string> aliaName ,where_set[] tables, outputPair[] outputOrder)
+        {
+            Dictionary<string, string> aliaNameDic = aliaName;
+            for (int i = 0 ; i<tables.Length; i++)
+            {
+                
+                if(tables.Length == 1 && tables[i].where_group.Count == 1) //convert to tableSelect
+                {
+                    if (tables[i].where_group[0].GetType() == typeof(where))
                     {
-                        HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute, w.value, w.operation);
-                        temp = intersect(temp, rt);
+                        return generateWhere(aliaName, (where)tables[i].where_group[0]);
                     }
                 }
-                foreach (where w in ts.wheres)
+                else
                 {
-                    if (w.operationLink == OperatorLink.OR)
+                    for(int j = 0; j<tables[i].where_group.Count; j++)
                     {
-                        HashSet<Guid> rt = getTable(ts.name).getAttribIndexWithOper(w.attribute, w.value, w.operation);
-                        temp = union(temp, rt);
+                        if(tables[i].where_group[j].GetType() == typeof(where))
+                        {
+                            tables[i].where_group[j] = generateWhere(aliaName, (where)tables[i].where_group[j]);
+                        }else if(tables[i].where_group[j].GetType() == typeof(where_set))
+                        {
+                            where_set[] temp_set = new where_set[1];
+                            temp_set[0] = (where_set)tables[i].where_group[j];
+                            tables[i].where_group[j] = select(aliaName, temp_set, outputOrder);
+                        }
                     }
                 }
-                tableCandidates.Add(ts.name,temp);
             }
-            return null;
+            HashSet<Dictionary<string, Guid>> temp_result = new HashSet<Dictionary<string, Guid>>();
+            temp_result = ((where)tables[0].where_group[0]).elementSet;
+            List<string> temp_attr = ((where)tables[0].where_group[0]).attrName;
+            for (int i = 0; i < tables.Length; i++)
+            {
+                if( ((where)tables[i].where_group[0]).operLink == OperatorLink.AND)
+                {
+                    temp_result = union(aliaName, ((where)tables[i].where_group[0]).elementSet, ((where)tables[i].where_group[0]).attrName, temp_result , temp_attr);
+                    List<string> attrName = ((where)tables[i].where_group[0]).attrName;
+                    List<string> dupAttr = new List<string>();
+                    HashSet<string> attrSet = new HashSet<string>();
+                    foreach(string a in attrName)
+                    {
+                        attrSet.Add(a);
+                    }
+                    foreach (string b in temp_attr)
+                    {
+                        attrSet.Add(b);
+                    }
+                    temp_attr = new List<string>();
+                    foreach (string attr in attrSet)
+                    {
+                        temp_attr.Add(attr);
+                    }
+                }else if(((where)tables[i].where_group[0]).operLink == OperatorLink.OR)
+                {
+                    temp_result = intersect(((where)tables[i].where_group[0]).elementSet, ((where)tables[i].where_group[0]).attrName, temp_result, temp_attr);
+                    List<string> attrName = ((where)tables[i].where_group[0]).attrName;
+                    List<string> dupAttr = new List<string>();
+                    HashSet<string> attrSet = new HashSet<string>();
+                    foreach (string a in attrName)
+                    {
+                        attrSet.Add(a);
+                    }
+                    foreach (string b in temp_attr)
+                    {
+                        attrSet.Add(b);
+                    }
+                    temp_attr = new List<string>();
+                    foreach (string attr in attrSet)
+                    {
+                        temp_attr.Add(attr);
+                    }
+                }
+                 
+            }
+            return new where( temp_result, temp_attr);
         }
 
-        private HashSet<Guid> union(HashSet<Guid> a, HashSet<Guid> b)
+        class HashEqualityComparer : IEqualityComparer<Dictionary<string, Guid>>
         {
-            HashSet<Guid> ans = new HashSet<Guid>();
-            foreach (Guid iter in a) ans.Add(iter);
-            foreach (Guid iter in b) ans.Add(iter);
-            return ans;
+
+            public bool Equals(Dictionary<string, Guid> b1, Dictionary<string, Guid> b2)
+            {
+                foreach( KeyValuePair<string, Guid> kv in b1)
+                {
+                    if (!b2.ContainsKey(kv.Key))
+                    {
+                        return false;
+                    }else if (kv.Value != b2[kv.Key])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            public int GetHashCode(Dictionary<string, Guid> bx)
+            {
+                int hCode = 0;
+                foreach(KeyValuePair<string,Guid> kv in bx)
+                {
+                    hCode += kv.Value.GetHashCode();
+                }
+                return hCode;
+            }
+
         }
 
-        private HashSet<Guid> intersect(HashSet<Guid> a, HashSet<Guid> b)
+            private HashSet<Dictionary<string, Guid>> union(Dictionary<string, string> aliaName, HashSet<Dictionary<string, Guid>> elementSet1, List<string> tableAttrHashSet1,HashSet<Dictionary<string, Guid>> elementSet2, List<string> tableAttrHashSet2)
         {
-            HashSet<Guid> ans = new HashSet<Guid>();
-            HashSet<Guid> c,d;
-            if (a.Count < b.Count)
-            {
-                c = a;d = b;
+            
+            HashSet<string> dupAttr = new HashSet<string>();
+            var ans =
+                from d1 in tableAttrHashSet1
+                from d2 in tableAttrHashSet2
+                where d1 == d2
+                select d1;
+
+            foreach (string attr in ans){
+                dupAttr.Add(attr);
             }
-            else
+
+            HashSet<Dictionary<string, Guid>> temp_eleSet1 = new HashSet<Dictionary<string, Guid>> ();
+            foreach (Dictionary<string,Guid> data in elementSet1)
             {
-                c = b; d = a;
+                Dictionary<string, Guid> temp_dic = new Dictionary<string, Guid>(data);
+                foreach (string attr in tableAttrHashSet2)
+                {   
+                    if( !dupAttr.Contains(attr))
+                    {
+                        string table_name = aliaName[attr];
+                        foreach (Guid id in getTable(table_name).getAllIndex())
+                        {
+                            temp_dic.Add(attr, id);
+                        }
+                    }
+                }
+                temp_eleSet1.Add(temp_dic);
             }
-            foreach(Guid iter in c)
+
+            HashSet<Dictionary<string, Guid>> temp_eleSet2 = new HashSet<Dictionary<string, Guid>>();
+            foreach (Dictionary<string, Guid> data in elementSet2)
             {
-                if (d.Contains(iter)) ans.Add(iter);
+                Dictionary<string, Guid> temp_dic = new Dictionary<string, Guid>(data);
+                foreach (string attr in tableAttrHashSet1)
+                {
+                    if (!dupAttr.Contains(attr))
+                    {
+                        string table_name = aliaName[attr];
+                        foreach (Guid id in getTable(table_name).getAllIndex())
+                        {
+                            temp_dic.Add(attr, id);
+                        }
+                    }
+                }
+                temp_eleSet2.Add(temp_dic);
             }
-            return ans;
+
+            HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union(temp_eleSet2);
+
+            return result;
+        }
+
+        private Boolean checkIntersect( Dictionary<string, Guid> element1 , Dictionary<string, Guid> element2 , List<string> dupAttr)
+        {
+            foreach(string tableName in dupAttr)
+            {
+                if(element1[tableName] != element2[tableName])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private HashSet<Dictionary<string, Guid>> intersect(HashSet<Dictionary<string, Guid>> elementSet1, List<string> tableAttrHashSet1, HashSet<Dictionary<string, Guid>> elementSet2, List<string> tableAttrHashSet2)
+        {
+            HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
+
+            List<string> dupAttr = new List<string>();
+            var ans1 =
+                from d1 in tableAttrHashSet1
+                from d2 in tableAttrHashSet2
+                where d1 == d2
+                select d1;
+
+            foreach (string attr in ans1)
+            {
+                dupAttr.Add(attr);
+            }
+
+            var ans2 =
+                from d1 in elementSet1
+                from d2 in elementSet2
+                where checkIntersect(d1, d2, dupAttr)
+                select new { d1 = d1, d2 = d2 };
+            foreach (var data in ans2)
+            {
+                Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                foreach(var dd in data.d1)
+                {
+                    if (!temp_result.ContainsKey(dd.Key))
+                    {
+                        temp_result.Add(dd.Key,dd.Value);
+                    } 
+                }
+                foreach (var dd in data.d2)
+                {
+                    if (!temp_result.ContainsKey(dd.Key))
+                    {
+                        temp_result.Add(dd.Key, dd.Value);
+                    }
+                }
+            }
+
+            return result;
         }
 
         public Table getTable(string name)
@@ -211,7 +423,6 @@ namespace Assignment1
                 {
 
                     //Print each tuple
-                    //Console.WriteLine(ele.Value.ToArray());
                     var eleattr = String.Join(", ", ele.Value.ToArray());
                     csv.AppendLine(eleattr);
                 }
@@ -226,5 +437,24 @@ namespace Assignment1
 
         }
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
+        }
+}
+
+class ProductComparer : IEqualityComparer< Dictionary<string, Guid> >
+{
+    // Products are equal if their names and product numbers are equal. 
+    public bool Equals(Dictionary<string, Guid>  x, Dictionary<string, Guid> y)
+    {
+
+        return x.SequenceEqual(y);
     }
+
+    // If Equals() returns true for a pair of objects, 
+    // GetHashCode must return the same value for these objects. 
+
+    public int GetHashCode(Dictionary<string, Guid> x)
+    {
+        return x.Count.GetHashCode();
+    }
+
 }

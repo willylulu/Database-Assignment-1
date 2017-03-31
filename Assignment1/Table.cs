@@ -45,6 +45,7 @@ namespace Assignment1
             }
         }
 
+        
 
         public InstructionResult insert(Dictionary<string,dynamic> tuple)
         {
@@ -127,6 +128,11 @@ namespace Assignment1
             return attribIndex[name][value];
         }
 
+        public Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> getAllAttribIndex()
+        {
+            return attribIndex;
+        }
+
         public HashSet<Guid> getAllIndex()
         {
             return dataKeys;
@@ -138,7 +144,10 @@ namespace Assignment1
             switch (oper)
             {
                 case Operators.equal:
-                    ans = attribIndex[name][value];
+                    if (attribIndex[name][value] != null)
+                    {
+                        ans = attribIndex[name][value];
+                    }
                     break;
                 case Operators.not_equal:
                     for (int i = 0; i < TableAttributesOrder.Count; i++)
@@ -189,6 +198,10 @@ namespace Assignment1
             return ans;
         }
 
+        public Dictionary<string, TableAttribute> getTableAttributes()
+        {
+            return TableAttributes;
+        }
         private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
         private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(Constants.MAX_ATTR_NUM);
         private HashSet<Guid> dataKeys = new HashSet<Guid>();
