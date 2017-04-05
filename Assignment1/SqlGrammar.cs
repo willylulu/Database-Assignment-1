@@ -74,7 +74,7 @@ namespace Assignment1
              select instruction_1 + " " + instruction_2
 
              ).Token();
-
+        
         /**********************
         * Parse a string of "primary" and "key" (non case-sensitive)
         * Return: string
@@ -103,6 +103,10 @@ namespace Assignment1
              select new Sql_TableAttribute(name, type, maxLength, isPrimary, (endComma==Sql_TableAttribute.LAST_ONE))
              ).Token();
 
+
+
+
+
         /**********************
         * Parse a Sql_Table
         * Return: Sql_Table
@@ -129,6 +133,62 @@ namespace Assignment1
              from values in ParenthsisedElements
              select new Sql_Insertion(name, attributes, values)
              ).Token();
+
+        /**********************
+         * 04/01
+         * Select
+         * *******************/
+        public static Parser<SqlObjects.Sql_Select> Select =
+            (from keyword in Parse.IgnoreCase("select").Once()
+             from attrs in Select_Attr.Many()
+             from sqlFrom in From
+             from sqlWhere in Where
+             select new SqlObjects.Sql_Select(attrs.ToList(), sqlFrom, sqlWhere)
+             ).Token();
+
+        public static Parser<SqlObjects.Sql_Select_Attr> Select_Attr =
+            (from table in Identifier.XOr(Parse.Return(""))
+             from dot in Parse.Char('.').Once().Text().XOr(Parse.Return(""))
+             from attr in Identifier.XOr(Parse.Char('*').Once().Text()).XOr(Parse.Return(""))
+             select new SqlObjects.Sql_Select_Attr(table, attr, dot.Equals("."))
+            ).Token();
+
+        public static Parser<SqlObjects.Sql_From> From =
+            (from keyword in Parse.IgnoreCase("from").Once()
+             from tables in Select_Table.Many()
+             select new SqlObjects.Sql_From(tables.ToList())
+            ).Token();
+
+        public static Parser<SqlObjects.Sql_Select_Table> Select_Table =
+            (from table in Identifier
+             from alias_as in Parse.IgnoreCase("as").Text().XOr(Parse.Return(""))
+             from alias_val in Identifier.XOr(Parse.Return(""))
+             select new SqlObjects.Sql_Select_Table(table, alias_as.ToLower().Equals("as"), alias_val)
+            ).Token();
+        public static Parser<SqlObjects.Sql_Where> Where =
+            (from keyword in Parse.IgnoreCase("where").Once()
+             from listOfConditions in ListOfConditions
+             select new SqlObjects.Sql_Where(String.Concat(keyword), listOfConditions)
+            ).Token();
+
+        public static Parser<String> Condition_Conjunction =
+            (from conjunction in Parse.IgnoreCase("and").Text().XOr(Parse.IgnoreCase("or").Text())
+             select conjunction
+            ).Token();
+
+        public static Parser<SqlObjects.Sql_Condition> Condition =
+            (from leftOperand in Identifier
+             from operation in Parse.Chars("><=").Many().Text().Token().Or(Parse.Return(SqlObjects.Sql_Condition.NULL_OPERATION))
+             from rightOperand in Identifier
+             select new SqlObjects.Sql_Condition(leftOperand, rightOperand, operation)
+            ).Token();
+
+        public static Parser<SqlObjects.Sql_ListOfConditions> ListOfConditions = 
+            (from firstCondition in Condition
+             from conjuction in Condition_Conjunction
+             from secondCondition in Condition
+             select new ListOfConditions()
+            )
 
 
         /**********************
@@ -166,6 +226,7 @@ namespace Assignment1
 
             public Sql_TableAttribute(string name, string type, string maxStringLength, string PrimaryStr, bool isLastOne)
             {
+                
                 name = name.ToLower();
                 type = type.ToLower();
                 maxStringLength = maxStringLength.ToLower();
