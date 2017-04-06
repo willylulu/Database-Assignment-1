@@ -172,7 +172,7 @@ namespace Assignment1
             }
         }
 
-        public where generateWhere( Dictionary<string, string> aliaName,where inWhere)
+        public where generateWhere( Dictionary<string, string> aliaName, where inWhere)
         {
             where outWhere = new where(inWhere);
             Table table1 = getTable(aliaName[outWhere.tableAttrPair1.Key]);
