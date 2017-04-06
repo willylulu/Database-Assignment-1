@@ -16,6 +16,10 @@ namespace Assignment1
         OR,AND
     }
 
+    enum OperatorsType
+    {
+        attr2attr, attr2constant, constant2constant
+    }
     class table_attribute_pair
     {
         public string tableName;
@@ -37,8 +41,11 @@ namespace Assignment1
     class where
     {
         public Operators oper;
+        public OperatorsType operType;
         public KeyValuePair<string, string> tableAttrPair1;
         public KeyValuePair<string, string> tableAttrPair2;
+        public dynamic con1;
+        public dynamic con2;
         public OperatorLink operLink;
 
         public HashSet<Dictionary<string, Guid>> elementSet;
@@ -61,12 +68,31 @@ namespace Assignment1
             this.elementSet = elementSet;
         }
 
-        public where(string table1, string attr1, string table2, string attr2, Operators op, OperatorLink opLink)
+        public where(string table1, string attr1, string table2, string attr2, Operators op, OperatorLink opLink,OperatorsType opType)
         {
+            operType = opType;
             oper = op;
             operLink = opLink;
             tableAttrPair1 = new KeyValuePair<string, string>(table1, attr1);
             tableAttrPair2 = new KeyValuePair<string, string>(table2, attr2);
+        }
+
+        public where(dynamic con1, dynamic con2 , Operators op, OperatorLink opLink, OperatorsType opType)
+        {
+            this.con1 = con1;
+            this.con2 = con2;
+            oper = op;
+            operLink = opLink;
+            operType = opType;
+        }
+
+        public where(string table1, string attr1, dynamic con1, Operators op, OperatorLink opLink, OperatorsType opType)
+        {
+            tableAttrPair1 = new KeyValuePair<string, string>(table1, attr1);
+            this.con1 = con1;
+            oper = op;
+            operLink = opLink;
+            operType = opType;
         }
 
     }
