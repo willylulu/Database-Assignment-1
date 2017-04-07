@@ -143,6 +143,28 @@ namespace Assignment1
                 return null;
             }
         }
+        public static SqlObjects.Sql_Select Select(string sql)
+        {
+                println(sql);
+                var selection = SqlGrammar.Select.Parse(sql);
+                println(selection + "\n");
+                return selection;
+           /* 
+            string error_prefix = "[Select ERROR] - ";
+            try
+            {
+                println(sql);
+                var selection = SqlGrammar.Select.Parse(sql);
+                println(selection + "\n");
+                return selection;
+            }catch(Exception e)
+            {
+                Console.WriteLine(error_prefix + e.Message + "\n" + e.StackTrace);
+                return null;
+            }
+            return null;
+            */
+        }
         public static SqlGrammar.Sql_Insertion Insert(string sql)
         {
             string error_prefix = "[INSERTION ERROR] - ";
@@ -186,7 +208,7 @@ namespace Assignment1
         }
         private static void println(dynamic str)
         {
-            //Console.WriteLine(str.ToString());
+            Console.WriteLine(str.ToString());
         }
 
     }

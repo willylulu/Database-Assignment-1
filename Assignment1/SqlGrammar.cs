@@ -147,10 +147,12 @@ namespace Assignment1
              ).Token();
 
         public static Parser<SqlObjects.Sql_Select_Attr> Select_Attr =
-            (from table in Identifier.XOr(Parse.Return(""))
-             from dot in Parse.Char('.').Once().Text().XOr(Parse.Return(""))
-             from attr in Identifier.XOr(Parse.Char('*').Once().Text()).XOr(Parse.Return(""))
-             select new SqlObjects.Sql_Select_Attr(table, attr, dot.Equals("."))
+            (from breakPoint in Parse.Not(Parse.IgnoreCase("from"))
+             from breakPoint_2 in Parse.Not(Parse.Char(';'))
+             from table in Identifier.XOr(Parse.Return(""))
+             from attr in Parse.Char('.').Once().Text().Then(attr=> Identifier.XOr(Parse.Char('*').Once().Text())).XOr(Parse.Return(""))
+             from comma in Parse.Char(',').Once().Text().XOr(Parse.Return(""))
+             select new SqlObjects.Sql_Select_Attr(table, attr, (attr.Length > 0))
             ).Token();
 
         public static Parser<SqlObjects.Sql_From> From =
@@ -160,11 +162,14 @@ namespace Assignment1
             ).Token();
 
         public static Parser<SqlObjects.Sql_Select_Table> Select_Table =
-            (from table in Identifier
-             from alias_as in Parse.IgnoreCase("as").Text().XOr(Parse.Return(""))
-             from alias_val in Identifier.XOr(Parse.Return(""))
-             select new SqlObjects.Sql_Select_Table(table, alias_as.ToLower().Equals("as"), alias_val)
+            (from breakPoint in Parse.Not(Parse.IgnoreCase("where"))
+             from breakPoint_2 in Parse.Not(Parse.Char(';'))
+             from table in Identifier
+             from alias_val in Parse.IgnoreCase("as").Text().Then(alias_val => Identifier).XOr(Parse.Return(""))
+             from comma in Parse.Char(',').Once().Text().XOr(Parse.Return(""))
+             select new SqlObjects.Sql_Select_Table(table, alias_val.Length > 0, alias_val)
             ).Token();
+
         public static Parser<SqlObjects.Sql_Where> Where =
             (from keyword in Parse.IgnoreCase("where").Once()
              from listOfConditions in ListOfConditions
@@ -177,18 +182,18 @@ namespace Assignment1
             ).Token();
 
         public static Parser<SqlObjects.Sql_Condition> Condition =
-            (from leftOperand in Identifier
+            (from leftOperand in Identifier.XOr(QuotedText)
              from operation in Parse.Chars("><=").Many().Text().Token().Or(Parse.Return(SqlObjects.Sql_Condition.NULL_OPERATION))
-             from rightOperand in Identifier
-             select new SqlObjects.Sql_Condition(leftOperand, rightOperand, operation)
+             from rightOperand in Identifier.XOr(QuotedText)
+             select new SqlObjects.Sql_Condition(leftOperand,  operation, rightOperand)
             ).Token();
 
-        public static Parser<SqlObjects.Sql_ListOfConditions> ListOfConditions = 
+        public static Parser<SqlObjects.Sql_ListOfConditions> ListOfConditions =
             (from firstCondition in Condition
-             from conjuction in Condition_Conjunction
-             from secondCondition in Condition
-             select new ListOfConditions()
-            )
+             from conjuction in Condition_Conjunction.XOr(Parse.Return(""))
+             from secondCondition in Condition.XOr(Parse.Return(new SqlObjects.Sql_Condition("", "", "")))
+             select new SqlObjects.Sql_ListOfConditions(firstCondition, conjuction, secondCondition)
+            ).Token();
 
 
         /**********************

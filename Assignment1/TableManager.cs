@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
-    enum Operators
+    public enum Operators
     {
         equal,not_equal,less,greater
     }
-    enum OperatorLink
+    public enum OperatorLink
     {
         OR,AND
     }
 
-    enum OperatorsType
+    public enum OperatorsType
     {
         attr2attr, attr2constant, constant2constant
     }

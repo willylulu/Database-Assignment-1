@@ -8,6 +8,20 @@ namespace Assignment1
 {
     class ParserTest
     {
+        static void Main(string[] args)
+        {
+            TestSelect();
+
+            Console.ReadKey(true);
+        }
+        public static void TestSelect()
+        {
+
+            string input = "";
+            input = "Select T1.attr, T2.hello, xxx from table as T1, table2 as T2 where attr = 'asdf' and xxx = 123;";
+            Parser.Select(input);
+
+        }
         public static void TestInsertionError()
         {
             // only consider '
