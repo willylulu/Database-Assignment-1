@@ -1,8 +1,10 @@
-﻿using System;
+﻿using LinqKit;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,17 +13,59 @@ namespace Assignment1
     class Program
     {
 
+        static Boolean isSame(Guid id1, Guid id2, Dictionary<Guid, dynamic> G1, Dictionary<Guid, dynamic> G2)
+        {
+            if (G1[id1] == G2[id2])
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
         static void Main(string[] args)
         {
-            List<Object> arr = new List<object>(10);
-            var aa = new where("t1", "a1", "t2", "a2", Operators.equal, OperatorLink.AND);
-            arr.Add(12);
-            arr[0] = aa;
-            arr.Add(aa);
-            Console.WriteLine(arr[0].GetType());
-            Console.WriteLine(arr[1].GetType());
-            Console.WriteLine(arr[1].GetType() == typeof(where));
+            HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
 
+            Dictionary<string, Guid> D1 = new Dictionary<string, Guid>();
+            Dictionary<Guid, dynamic> G1 = new Dictionary<Guid, dynamic>();
+            Dictionary<Guid, dynamic> G2 = new Dictionary<Guid, dynamic>();
+
+            
+            Guid id = Guid.NewGuid();
+            G1.Add(id, 123);
+            D1.Add("A1", id);
+            id = Guid.NewGuid();
+            G2.Add(id, 123);
+            D1.Add("A2", id);
+
+            Dictionary<string, Guid> D2 = new Dictionary<string, Guid>();
+            
+            id = Guid.NewGuid();
+            G1.Add(id, 123);
+            D2.Add("A1", id);
+            id = Guid.NewGuid();
+            G2.Add(id, 124);
+            D2.Add("A2", id);
+
+            elementSet.Add(D1);
+            elementSet.Add(D2);
+
+            var predicate = PredicateBuilder.New<Dictionary<string, Guid>>();
+            
+            predicate = predicate.Or(X => isSame(X["A1"],X["A2"],G1,G2) );
+            
+
+            var ans = elementSet.Where(predicate);
+            
+            foreach(var data in ans)
+            {
+                foreach(KeyValuePair<string, Guid> dd in data)
+                {
+                    Console.WriteLine(dd);
+                }
+            }
+                
             Console.ReadKey(true);
         }
         /*static void Main(string[] args)

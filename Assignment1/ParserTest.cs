@@ -8,12 +8,12 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Main(string[] args)
+       /* static void Main(string[] args)
         {
             TestSelect();
 
             Console.ReadKey(true);
-        }
+        }*/
         public static void TestSelect()
         {
 
