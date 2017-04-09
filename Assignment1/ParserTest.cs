@@ -66,7 +66,7 @@ namespace Assignment1
             //Test Where T1.attr
             input = @"Select T1.attr, T2.hello, xxx 
                       from TaBle as T1, table2 as T2 
-                      where T1.attr <> T2.hello and '123' <> T2.hello;";
+                      where T1.attr <> T2.hello and 'HHHH' <> T2.hello;";
             Parser.Select(input);
 
             input = @"SELECT Book.*

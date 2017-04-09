@@ -40,25 +40,31 @@ namespace Assignment1.SqlObjects
 
     public class Sql_Operand
     {
-        public String content;
+        public dynamic content;
         public OperandType type;
-        public Sql_Select_Attr attr_IfTypeisAttr;   //if type id attr, the object would have a Select_attr
 
         public Sql_Operand(String content, OperandType type)
         {
-            this.content = content;
             this.type = type;
-            if (this.type == OperandType.attr)
+            if (type == OperandType.num)
+                this.content = Int32.Parse(content);
+            else if (type == OperandType.str)
+                this.content = content;
+            else if (type == OperandType.attr)
             {
                 content = content.ToLower();
                 int dotIndex = content.IndexOf(".");
                 if (dotIndex == -1)
-                    attr_IfTypeisAttr = new Sql_Select_Attr(content, "", false, "", false);
+                {
+                    this.content = new Sql_Select_Attr(content, "", false, "", false);
+                }
                 else
+                {
                     //T.ATTR length=6, dotIndex=1
-                    attr_IfTypeisAttr = new Sql_Select_Attr(content.Substring(0, dotIndex),
-                                                            content.Substring(dotIndex + 1, content.Length - dotIndex - 1 ),
+                    this.content = new Sql_Select_Attr(content.Substring(0, dotIndex),
+                                                            content.Substring(dotIndex + 1, content.Length - dotIndex - 1),
                                                             true, "", false);
+                }
             }
         }
 
@@ -80,10 +86,7 @@ namespace Assignment1.SqlObjects
 
         public override string ToString()
         {
-            if (type.Equals(OperandType.attr))
-                return attr_IfTypeisAttr.ToString();
-            
-            return content;
+            return content.ToString();
         }
 
     }
@@ -124,28 +127,28 @@ namespace Assignment1.SqlObjects
             bool hasError = false;
             String errorAlias = "";
 
-            if (leftOpd != null && leftOpd.type == OperandType.attr && leftOpd.attr_IfTypeisAttr.tableAlias != null)
+            if (leftOpd != null && leftOpd.type == OperandType.attr && leftOpd.content.tableAlias != null)
             {
                 hasError = true;
-                errorAlias = leftOpd.attr_IfTypeisAttr.tableAlias;
+                errorAlias = leftOpd.content.tableAlias;
                 foreach (Sql_Select_Table table in tables)
-                    if (table.alias.Equals(leftOpd.attr_IfTypeisAttr.tableAlias)
-                        && leftOpd.attr_IfTypeisAttr.tableAlias != null)
+                    if (table.alias.Equals(leftOpd.content.tableAlias)
+                        && leftOpd.content.tableAlias != null)
                     {
-                        leftOpd.attr_IfTypeisAttr.setTable(table);
+                        leftOpd.content.setTable(table);
                         hasError = false;
                         break;
                     }
             }
 
-            if (rightOpd != null && rightOpd.type == OperandType.attr && rightOpd.attr_IfTypeisAttr.tableAlias != null) {
+            if (rightOpd != null && rightOpd.type == OperandType.attr && rightOpd.content.tableAlias != null) {
                 hasError = true;
-                errorAlias = rightOpd.attr_IfTypeisAttr.tableAlias;
+                errorAlias = rightOpd.content.tableAlias;
                 foreach (Sql_Select_Table table in tables)
-                    if (table.alias.Equals(rightOpd.attr_IfTypeisAttr.tableAlias)
-                        && rightOpd.attr_IfTypeisAttr.tableAlias != null)
+                    if (table.alias.Equals(rightOpd.content.tableAlias)
+                        && rightOpd.content.tableAlias != null)
                     {
-                        rightOpd.attr_IfTypeisAttr.setTable(table);
+                        rightOpd.content.setTable(table);
                         hasError = false;
                         break;
                     }
@@ -158,7 +161,7 @@ namespace Assignment1.SqlObjects
             if (leftOpd == null)
                 return "";
             else if (rightOpd == null)
-                return leftOpd.content;
+                return leftOpd.content.ToString();
             
 
             return  leftOpd.ToString() + " " + op + " " + rightOpd.ToString();
