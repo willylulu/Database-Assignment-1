@@ -8,12 +8,12 @@ namespace Assignment1
 {
     class ParserTest
     {
-       /* static void Main(string[] args)
+        static void Main3(string[] args)
         {
             TestSelect();
 
             Console.ReadKey(true);
-        }*/
+        }
         public static void TestSelect()
         {
 
@@ -26,15 +26,20 @@ namespace Assignment1
             Parser.Select(input);
 
 
-
             //Test * and 2 condition
             input = "Select * from Person where person_id = 1 and xxx = 1;";
             Parser.Select(input);
 
-            //Where with 2 conditions, testing AND
+            //Where with 2 conditions, testing AND <  >
             input = @"Select E.Eid, O.Birth, O.Cid, O.history 
                       from Employee as E, Company as O 
                       where attr > 'asdf' and xxx < 123;";
+            Parser.Select(input);
+
+            //Where with 2 conditions, testing <> OR, testing const2const, const2attr
+            input = @"Select T1.attr, T2.hello, xxx 
+                      from table as T1, table2 as T2 
+                      where 123 <> 'asdf' and '123' <> attr;";
             Parser.Select(input);
 
             //Where with 1 condition with 1 opd: where 1
@@ -43,20 +48,24 @@ namespace Assignment1
                       where 1;";
             Parser.Select(input);
 
-            //Where with 2 conditions, testing <> OR
-            input = @"Select T1.attr, T2.hello, xxx 
-                      from table as T1, table2 as T2 
-                      where attr <> 'asdf' and xxx <> 123;";
-            Parser.Select(input);
-
             //Only select & from
             input = "SElEcT person_id, name from Employee  ; where 1 = 1";
+            Parser.Select(input);
+
+            //Aggregation Test, also test where attr
+            input = "SElEcT SUM(person_id) from Employee where person_id;";
             Parser.Select(input);
 
             //Only select & from
             input = "SElEcT SUM(person_id) from Employee  ;";
             Parser.Select(input);
 
+
+            //Test Where T1.attr
+            input = @"Select T1.attr, T2.hello, xxx 
+                      from table as T1, table2 as T2 
+                      where T1.attr <> 'asdf' and '123' <> T2.hello;";
+            Parser.Select(input);
 
             /*
             */

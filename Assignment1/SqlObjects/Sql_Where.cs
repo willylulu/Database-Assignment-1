@@ -132,27 +132,6 @@ namespace Assignment1.SqlObjects
             else
                 throw new DbException.InvalidKeyword("Unkown : " + op);
         }
-        public static OperandType getOperandType(String opd)
-        {
-            
-            Regex stringTypeRgx = new Regex(@"^'[^']*'$");
-            int num_tmp = 0;
-            //
-            if (stringTypeRgx.IsMatch(opd))
-                return OperandType.str;
-            else if (Int32.TryParse(opd, out num_tmp))
-                return OperandType.num;
-            else if (SqlGrammar.checkVariableNameValidOrThrowException(opd))
-                return OperandType.attr;
-            else
-                throw new DbException.InvalidKeyword("Wrong condition clause.");
-        }
-        public static void swapTwo(dynamic a, dynamic b)
-        {
-            var tmp = a;
-            a = b;
-            b = tmp;
-        }
         public void setOperandAttrTableIfAvaliable(Sql_Select_Table[] tables)
         {
            if(leftOpd != null && leftOpd.type == OperandType.attr)
@@ -177,6 +156,27 @@ namespace Assignment1.SqlObjects
             
 
             return  leftOpd.content + " " + op + " " + rightOpd.content;
+        }
+        private static void swapTwo(dynamic a, dynamic b)
+        {
+            var tmp = a;
+            a = b;
+            b = tmp;
+        }
+        private static OperandType getOperandType(String opd)
+        {
+            
+            Regex stringTypeRgx = new Regex(@"^'[^']*'$");
+            int num_tmp = 0;
+            //
+            if (stringTypeRgx.IsMatch(opd))
+                return OperandType.str;
+            else if (Int32.TryParse(opd, out num_tmp))
+                return OperandType.num;
+            else if (SqlGrammar.checkVariableNameValidOrThrowException(opd))
+                return OperandType.attr;
+            else
+                throw new DbException.InvalidKeyword("Wrong condition clause.");
         }
 
     }

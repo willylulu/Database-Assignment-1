@@ -33,7 +33,6 @@ namespace Assignment1.SqlObjects
         public List<Sql_Select_Table> tables;
         public Sql_From(List<Sql_Select_Table> tables)
         {
-            //
             this.tables = tables;
         }
         public override string ToString()

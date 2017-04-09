@@ -14,8 +14,9 @@ namespace Assignment1.SqlObjects
         private List<Sql_Select_Attr> attrs;
         private Sql_From from;   
         private Sql_Where where;  
-        private Sql_Select_Table[] tables;          //tables from from
-        private Sql_ListOfConditions conditions;    //conditions from where
+
+        public Sql_Select_Table[] Tables;          //tables from from
+        public Sql_ListOfConditions Conditions;    //conditions from where
 
         public Sql_Select(List<Sql_Select_Attr>attrs, Sql_From from, Sql_Where where)
         {
@@ -25,38 +26,11 @@ namespace Assignment1.SqlObjects
 
             //find the table that match's attr's tableAlias 
             //by using attr.setTable(Table)
-            this.tables = this.from.tables.ToArray();
+            this.Tables = this.from.tables.ToArray();
             setAttrsSelect();
 
             if(!this.where.isEmpty)     //if no where clause, dont do
-                setConditionSelect(this.tables);
-        }
-
-        public void setAttrsSelect()
-        {
-            foreach (Sql_Select_Attr attr in attrs)
-                attr.setTable(getMatchedTable(attr));
-
-        }
-        public void setConditionSelect(Sql_Select_Table[] tables)
-        {
-            this.conditions = this.where.listOfConditions;
-            this.conditions.setAttrsTable(tables);
-        }
-
-        public Sql_Select_Table getMatchedTable(Sql_Select_Attr attr)
-        {
-            foreach (Sql_Select_Table table in tables)
-            {
-                ////
-                if (table.alias.Equals(attr.tableAlias) && attr.tableAlias != null)
-                {
-                    ////
-                    return table;
-                }
-            }
-            return null;
-
+                setConditionSelect(this.Tables);
         }
 
         public override string ToString()
@@ -75,7 +49,24 @@ namespace Assignment1.SqlObjects
             output += "\n\n";
             return output;
         }
+        private void setAttrsSelect()
+        {
+            foreach (Sql_Select_Attr attr in attrs)
+                attr.setTable(getMatchedTable(attr));
 
+        }
+        private void setConditionSelect(Sql_Select_Table[] tables)
+        {
+            this.Conditions = this.where.listOfConditions;
+            this.Conditions.setAttrsTable(tables);
+        }
+        private Sql_Select_Table getMatchedTable(Sql_Select_Attr attr)
+        {
+            foreach (Sql_Select_Table table in Tables)
+                if (table.alias.Equals(attr.tableAlias) && attr.tableAlias != null)
+                    return table;
+            return null;
+        }
     }
 
 
@@ -88,22 +79,18 @@ namespace Assignment1.SqlObjects
 
         public Aggregation aggregation;
         public Boolean hasAggregation;
+        
         public Sql_Select_Attr(String val1, String val2, Boolean hasTable, String aggregation, Boolean hasAggregation)
         {
+            this.hasTable = hasTable;
             this.hasAggregation = hasAggregation;
             if (this.hasAggregation)
-            {
-                if (aggregation.ToLower().Equals(Aggregation.count.ToString()))
-                    this.aggregation = Aggregation.count;
-                else if (aggregation.ToLower().Equals(Aggregation.sum.ToString()))
-                    this.aggregation = Aggregation.sum;
-                else
-                    throw new DbException.UnkownKeyword("Unkown aggregation function: " + aggregation);
-            }
-            if (hasTable)
+                this.aggregation = getMatchedAggregatioinOrRaiseException(aggregation);
+
+            if (hasTable)       //have parsed a table from attr
             {
                 //if has Table, ex:  val.val2
-                this.name = val2.Replace(".", "");  //replace the first dot
+                this.name = val2;  //replace the first dot
                 this.tableAlias = val1;
             }
             else
@@ -124,6 +111,18 @@ namespace Assignment1.SqlObjects
                                           (hasTable) ? "in " + tableAlias : "", 
                                           (hasTable) ? " ("+table.name+")" : "");
             return output;
+        }
+        
+        private Aggregation getMatchedAggregatioinOrRaiseException(String str)
+        {
+            str = str.ToLower();
+            Console.WriteLine(str);
+            if (str.Equals(Aggregation.count.ToString()))
+                return Aggregation.count;
+            else if (str.Equals(Aggregation.sum.ToString()))
+                return Aggregation.sum;
+            else
+                throw new DbException.UnkownKeyword("Unkown aggregation function: " + aggregation);
         }
     }
 
