@@ -347,10 +347,7 @@ namespace Assignment1
             //check the tables we need
             HashSet<string> tableDistinct = new HashSet<string>();
             List<string> tableList = new List<string>();
-
-            //the final tuple pairs 
-            HashSet<Dictionary<string, Guid>> exData = new HashSet<Dictionary<string, Guid>>();
-
+            HashSet<Dictionary<string, Guid>> exData = null;
             //find the table we need
             for (int i = 0; i < outputOrder.Length; i++)
             {
@@ -365,6 +362,8 @@ namespace Assignment1
             //if no where use crossProduct add in exData
             if (data.Count == 0 && total.Count == 0)
             {
+                //the final tuple pairs 
+                exData = new HashSet<Dictionary<string, Guid>>();
                 crossProductRecur(exData, new Dictionary<string, Guid>(), tableList, 0, tableList.Count);
             }
             else
@@ -375,11 +374,19 @@ namespace Assignment1
                 {
                     if (!total.Contains(s)) tableNoWhere.Add(s);
                 }
-
-                //need to use data cross product table which doesn't use where filter
-                foreach (Dictionary<string, Guid> d in data)
+                if(tableNoWhere.Count != 0)
                 {
-                    crossProductRecur(exData, d, tableNoWhere, 0, tableNoWhere.Count);
+                    //need to use data cross product table which doesn't use where filter
+                    foreach (Dictionary<string, Guid> d in data)
+                    {
+                        //the final tuple pairs 
+                        exData = new HashSet<Dictionary<string, Guid>>();
+                        crossProductRecur(exData, d, tableNoWhere, 0, tableNoWhere.Count);
+                    }
+                }
+                else
+                {
+                    exData = data;
                 }
             }
 
