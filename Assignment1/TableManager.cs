@@ -51,12 +51,25 @@ namespace Assignment1
         public OperatorsType operType;
         public KeyValuePair<string, string> tableAttrPair1;
         public KeyValuePair<string, string> tableAttrPair2;
-        public dynamic con1;
-        public dynamic con2;
+        public dynamic con1 = null;
+        public dynamic con2 = null;
         public OperatorLink operLink;
 
         public HashSet<Dictionary<string, Guid>> elementSet;
         public List<string> attrName; // store table name in elementSet
+
+        public where(string table1, string attr1,OperatorsType OperatorsType)
+        {
+            this.tableAttrPair1 = new KeyValuePair<string, string>(table1, attr1);
+            con1 = null;
+            this.operType = OperatorsType;
+        }
+
+        public where(dynamic con1, OperatorsType OperatorsType)
+        {
+            this.con1 = con1;
+            this.operType = OperatorsType;
+        }
 
         public where(HashSet<Dictionary<string, Guid>> elementSet, List<string> attrName)
         {
@@ -233,7 +246,15 @@ namespace Assignment1
                 }
                 else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
                 {
-                    // to be done
+                    Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
+                    if( condition.leftOpd.type == OperandType.attr)
+                    {
+                        tables[0] = new where(condition.leftOpd.content.tableAlias,condition.leftOpd.content.name,OperatorsType.onlyOne);
+                    }else
+                    {
+                        tables[0] = new where(condition.leftOpd.content,OperatorsType.onlyOne);
+                    }
+                    
                 }
             }
             if (sqlSelect.where.listOfConditions.conditionNum == 2)
@@ -278,6 +299,35 @@ namespace Assignment1
 
         }
 
+        public dynamic onlyoneOper(Dictionary<string, string> aliaName, where table )
+        {
+            if(table.con1 != null)
+            {
+                return (bool)table.con1;
+            }
+            else
+            {
+                HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
+                Table table1 = getTable(aliaName[table.tableAttrPair1.Key]);
+                Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
+                HashSet<Guid> dataKeys1 = table1.getAllIndex();
+                int index1;
+                List<string> TableAttributesOrder1 = table1.getAttributesOrder();
+                index1 = TableAttributesOrder1.FindIndex(x => x == table.tableAttrPair1.Value);
+
+                var ans =
+                   from data1 in dataKeys1
+                   where attribIndex1[data1][index1] != null
+                   select new { d1 = data1 };
+                foreach (var dataPair in ans)
+                {
+                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                    elementSet.Add(aliasGidPair);
+                }
+                return elementSet;
+            }
+        }
         public HashSet<Dictionary<string, Guid>> attr2attrOper(Dictionary<string, string> aliaName,where table)
         {
             //Build a hashset to store ans
@@ -592,6 +642,25 @@ namespace Assignment1
                         {
                             return;
                         }
+                    case OperatorsType.onlyOne:
+                        if ( onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
+                        {
+                            printSelect(outputOrder, onlyoneOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
+
+                        }
+                        else
+                        {
+                            if (onlyoneOper(aliaName, tables[0]))
+                            {
+                                printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                                return;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        break;
                 }
             }
             //check where is attr or not
@@ -630,6 +699,25 @@ namespace Assignment1
                     case OperatorsType.constant2constant:
                         data[i] = (con2conOper(aliaName, tables[i]));
                         break;
+                    case OperatorsType.onlyOne:
+                        if (onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
+                        {
+                            printSelect(outputOrder, onlyoneOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
+                            return;
+                        }
+                        else
+                        {
+                            if (onlyoneOper(aliaName, tables[0]))
+                            {
+                                printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                                return;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        break;
                 }
                 
             }
@@ -637,13 +725,29 @@ namespace Assignment1
             // 2 conditions are const2const
             if( data[0].GetType() == typeof(Boolean) && data[1].GetType() == typeof(Boolean))
             {
-                if( (bool)data[0] && (bool)data[1])
+                if (tables[1].operLink == OperatorLink.AND)
                 {
-                    return;
-                }
+                    if ((bool)data[0] && (bool)data[1])
+                    {
+                        printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }   
                 else
                 {
-                    //output
+                    if ((bool)data[0] || (bool)data[1])
+                    {
+                        printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }else if(data[0].GetType() != typeof(Boolean) && data[1].GetType() != typeof(Boolean)) 
             {
@@ -657,33 +761,35 @@ namespace Assignment1
                 {
                     selectAns = union(aliaName, data[0], left, data[1], right);
                 }
+
+                printSelect(outputOrder, selectAns, total);
+
             }
             else if (data[0].GetType() == typeof(Boolean) && data[1].GetType() != typeof(Boolean))
             {
                 //first condition = con2con
                 //second condition != const2const
 
-                if ((bool)data[1] == false )
+                if (tables[1].operLink == OperatorLink.AND && (bool)data[1] == false)
                 {
                     return;
-                }
-                else if ((bool)data[1] == true)
+                }else
                 {
-                    //output
+                    printSelect(outputOrder, data[1], total);
                 }
             }
-            else if (data[0].GetType() == typeof(Boolean) && data[1].GetType() != typeof(Boolean))
+            else if (data[0].GetType() != typeof(Boolean) && data[1].GetType() == typeof(Boolean))
             {
                 //first condition != con2con
                 //second condition = const2const
 
-                if ((bool)data[0] == false)
+                if (tables[1].operLink == OperatorLink.AND && (bool)data[0] == false)
                 {
                     return;
                 }
-                else if ((bool)data[0] == true)
+                else
                 {
-                    //output
+                    printSelect(outputOrder, data[0], total);
                 }
             }
 
