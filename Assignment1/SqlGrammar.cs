@@ -137,23 +137,48 @@ namespace Assignment1
         /**********************
          * 04/01
          * Select
+         * 
+         * 04/08
+         * -> add ; termination V
+         * -> add * handling    V
+         * -> add conditino const to const, const to vairable  V
          * *******************/
         public static Parser<SqlObjects.Sql_Select> Select =
             (from keyword in Parse.IgnoreCase("select").Once()
              from attrs in Select_Attr.Many()
              from sqlFrom in From
-             from sqlWhere in Where
+             from sqlWhere in NoneWhere.XOr(Where)
+             //from sqlWhere in Parse.Not(Parse.IgnoreCase(';').Token()).Then(sqlwhere => Where)    //use 'Not ;' to handle case like select * from table;
              select new SqlObjects.Sql_Select(attrs.ToList(), sqlFrom, sqlWhere)
              ).Token();
 
+        public static Parser<SqlObjects.Sql_Where> NoneWhere =
+            (from end in Parse.Char(';').Once()
+             select new SqlObjects.Sql_Where("", null)
+            ).Token();
+
         public static Parser<SqlObjects.Sql_Select_Attr> Select_Attr =
             (from breakPoint in Parse.Not(Parse.IgnoreCase("from"))
-             from breakPoint_2 in Parse.Not(Parse.Char(';'))
-             from table in Identifier.XOr(Parse.Return(""))
-             from attr in Parse.Char('.').Once().Text().Then(attr=> Identifier.XOr(Parse.Char('*').Once().Text())).XOr(Parse.Return(""))
-             from comma in Parse.Char(',').Once().Text().XOr(Parse.Return(""))
-             select new SqlObjects.Sql_Select_Attr(table, attr, (attr.Length > 0))
+             from breakPoint_2 in Parse.Not(Parse.IgnoreCase(';')).Token()
+              
+             from aggregation in Aggregation.XOr(Parse.Return(""))
+
+             from left_P in Parse.Char('(').Once().Token().Text().XOr(Parse.Return("")).Token()
+             from table in Identifier.XOr(Parse.Char('*').Once().Text()).XOr(Parse.Return("")).Token()
+             from attr in Parse.Char('.').Once().Text().Then(attr=> Identifier.XOr(Parse.Char('*').Once().Text())).XOr(Parse.Return("")).Token()
+
+             from right_P in Parse.Char(')').Once().Token().Text().XOr(Parse.Return("")).Token()
+             from comma in Parse.Char(',').Once().Text().XOr(Parse.Return("")).Token()
+             select new SqlObjects.Sql_Select_Attr(table, attr, (attr.Length > 0), aggregation, (left_P+right_P).Equals("()"))
             ).Token();
+
+        public static Parser<String> Aggregation =
+            (from agg_1 in Parse.IgnoreCase("sum").Text().XOr(Parse.Return(""))
+             from agg_2 in Parse.IgnoreCase("count").Text().XOr(Parse.Return(""))
+             select agg_1 + agg_2
+            ).Token();
+
+
 
         public static Parser<SqlObjects.Sql_From> From =
             (from keyword in Parse.IgnoreCase("from").Once()
@@ -163,7 +188,8 @@ namespace Assignment1
 
         public static Parser<SqlObjects.Sql_Select_Table> Select_Table =
             (from breakPoint in Parse.Not(Parse.IgnoreCase("where"))
-             from breakPoint_2 in Parse.Not(Parse.Char(';'))
+             from breakPoint_2 in Parse.Not(Parse.IgnoreCase(';').Once()).Token()
+
              from table in Identifier
              from alias_val in Parse.IgnoreCase("as").Text().Then(alias_val => Identifier).XOr(Parse.Return(""))
              from comma in Parse.Char(',').Once().Text().XOr(Parse.Return(""))
@@ -184,7 +210,7 @@ namespace Assignment1
         public static Parser<SqlObjects.Sql_Condition> Condition =
             (from leftOperand in Identifier.XOr(QuotedText)
              from operation in Parse.Chars("><=").Many().Text().Token().Or(Parse.Return(SqlObjects.Sql_Condition.NULL_OPERATION))
-             from rightOperand in Identifier.XOr(QuotedText)
+             from rightOperand in Identifier.XOr(QuotedText).XOr(Parse.Return(""))
              select new SqlObjects.Sql_Condition(leftOperand,  operation, rightOperand)
             ).Token();
 

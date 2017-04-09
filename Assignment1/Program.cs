@@ -11,9 +11,9 @@ namespace Assignment1
     class Program
     {
 
-        static void Main(string[] args)
+        static void Main3(string[] args)
         {
-            List<Object> arr = new List<object>(10);
+            /*List<Object> arr = new List<object>(10);
             var aa = new where("t1", "a1", "t2", "a2", Operators.equal, OperatorLink.AND);
             arr.Add(12);
             arr[0] = aa;
@@ -22,7 +22,7 @@ namespace Assignment1
             Console.WriteLine(arr[1].GetType());
             Console.WriteLine(arr[1].GetType() == typeof(where));
 
-            Console.ReadKey(true);
+            Console.ReadKey(true);*/
         }
         /*static void Main(string[] args)
         {

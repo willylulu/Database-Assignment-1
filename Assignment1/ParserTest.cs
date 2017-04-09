@@ -18,10 +18,70 @@ namespace Assignment1
         {
 
             string input = "";
-            input = "Select T1.attr, T2.hello, xxx from table as T1, table2 as T2 where attr = 'asdf' and xxx = 123;";
+            //input = "Select T1.attr, T2.hello, xxx from table as T1, table2 as T2 where attr = 'asdf' and xxx = 123;";
+            //Parser.Select(input);
+
+            //Test * and 1 condition
+            input = "Select * from Person as P where person_id = 'asdf';";
             Parser.Select(input);
 
+
+
+            //Test * and 2 condition
+            input = "Select * from Person where person_id = 1 and xxx = 1;";
+            Parser.Select(input);
+
+            //Where with 2 conditions, testing AND
+            input = @"Select E.Eid, O.Birth, O.Cid, O.history 
+                      from Employee as E, Company as O 
+                      where attr > 'asdf' and xxx < 123;";
+            Parser.Select(input);
+
+            //Where with 1 condition with 1 opd: where 1
+            input = @"Select T1.attr, T2.hello, xxx 
+                      from table as T1, table2 as T2 
+                      where 1;";
+            Parser.Select(input);
+
+            //Where with 2 conditions, testing <> OR
+            input = @"Select T1.attr, T2.hello, xxx 
+                      from table as T1, table2 as T2 
+                      where attr <> 'asdf' and xxx <> 123;";
+            Parser.Select(input);
+
+            //Only select & from
+            input = "SElEcT person_id, name from Employee  ; where 1 = 1";
+            Parser.Select(input);
+
+            //Only select & from
+            input = "SElEcT SUM(person_id) from Employee  ;";
+            Parser.Select(input);
+
+
+            /*
+            */
+
+
+            //Attribute prefixes and table alias
+
+            //Aggregation
+
+
+            //Attr with Table full name prefix
         }
+
+        public static void TestSelectError()
+        {
+            string input = "";
+
+            //No Such table alias in select
+            input = "Select T3.attr, T2.hello, xxx from table as T1, table2 as T2 where attr = 'asdf' and xxx = 123;";
+            Parser.Select(input);
+        }
+
+
+
+
         public static void TestInsertionError()
         {
             // only consider '

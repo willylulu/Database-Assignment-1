@@ -145,11 +145,6 @@ namespace Assignment1
         }
         public static SqlObjects.Sql_Select Select(string sql)
         {
-                println(sql);
-                var selection = SqlGrammar.Select.Parse(sql);
-                println(selection + "\n");
-                return selection;
-           /* 
             string error_prefix = "[Select ERROR] - ";
             try
             {
@@ -163,7 +158,6 @@ namespace Assignment1
                 return null;
             }
             return null;
-            */
         }
         public static SqlGrammar.Sql_Insertion Insert(string sql)
         {
