@@ -145,14 +145,20 @@ namespace Assignment1
         }
         public static SqlObjects.Sql_Select Select(string sql)
         {
-            string error_prefix = "[Select ERROR] - ";
+            string error_prefix = "[SELECTION ERROR] - ";
             try
             {
                 println(sql);
                 var selection = SqlGrammar.Select.Parse(sql);
                 println(selection + "\n");
                 return selection;
-            }catch(Exception e)
+            }
+            catch(DbException.InvalidKeyword e)
+            {
+                Console.WriteLine(error_prefix + e.Message + "\n");
+                return null;
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(error_prefix + e.Message + "\n" + e.StackTrace);
                 return null;

@@ -50,6 +50,7 @@ namespace Assignment1.SqlObjects
             this.type = type;
             if (this.type == OperandType.attr)
             {
+                content = content.ToLower();
                 int dotIndex = content.IndexOf(".");
                 if (dotIndex == -1)
                     attr_IfTypeisAttr = new Sql_Select_Attr(content, "", false, "", false);
@@ -77,6 +78,13 @@ namespace Assignment1.SqlObjects
 
         }
 
+        public override string ToString()
+        {
+            if (type.Equals(OperandType.attr))
+                return attr_IfTypeisAttr.ToString();
+            
+            return content;
+        }
 
     }
 
@@ -111,20 +119,39 @@ namespace Assignment1.SqlObjects
             this.op = getOperatorsOrThrowException(op, leftOpd_str, rightOpd_str);
 
         }
-        public void setOperandAttrTableIfAvaliable(Sql_Select_Table[] tables)
+        public void setOperandAttrTableIfAvaliableOrRaiseException(Sql_Select_Table[] tables)
         {
-           if(leftOpd != null && leftOpd.type == OperandType.attr)
+            bool hasError = false;
+            String errorAlias = "";
+
+            if (leftOpd != null && leftOpd.type == OperandType.attr && leftOpd.attr_IfTypeisAttr.tableAlias != null)
+            {
+                hasError = true;
+                errorAlias = leftOpd.attr_IfTypeisAttr.tableAlias;
                 foreach (Sql_Select_Table table in tables)
-                    if (table.alias.Equals(leftOpd.attr_IfTypeisAttr.tableAlias) 
+                    if (table.alias.Equals(leftOpd.attr_IfTypeisAttr.tableAlias)
                         && leftOpd.attr_IfTypeisAttr.tableAlias != null)
+                    {
                         leftOpd.attr_IfTypeisAttr.setTable(table);
+                        hasError = false;
+                        break;
+                    }
+            }
 
-           if(rightOpd != null && rightOpd.type == OperandType.attr)
+            if (rightOpd != null && rightOpd.type == OperandType.attr && rightOpd.attr_IfTypeisAttr.tableAlias != null) {
+                hasError = true;
+                errorAlias = rightOpd.attr_IfTypeisAttr.tableAlias;
                 foreach (Sql_Select_Table table in tables)
-                    if (table.alias.Equals(rightOpd.attr_IfTypeisAttr.tableAlias) 
+                    if (table.alias.Equals(rightOpd.attr_IfTypeisAttr.tableAlias)
                         && rightOpd.attr_IfTypeisAttr.tableAlias != null)
+                    {
                         rightOpd.attr_IfTypeisAttr.setTable(table);
-
+                        hasError = false;
+                        break;
+                    }
+            }
+            if(hasError)
+                throw new DbException.InvalidKeyword("Invalid key error - table alias " + errorAlias + " doesn't exist");
         }
         public override string ToString()
         {
@@ -134,7 +161,7 @@ namespace Assignment1.SqlObjects
                 return leftOpd.content;
             
 
-            return  leftOpd.content + " " + op + " " + rightOpd.content;
+            return  leftOpd.ToString() + " " + op + " " + rightOpd.ToString();
         }
         private static void swapTwo(dynamic a, dynamic b)
         {
@@ -234,9 +261,9 @@ namespace Assignment1.SqlObjects
 
         public void setAttrsTable(Sql_Select_Table[] tables)
         {
-            firstCondition.setOperandAttrTableIfAvaliable(tables);
+            firstCondition.setOperandAttrTableIfAvaliableOrRaiseException(tables);
             if (conditionNum == 2)
-                secondCondition.setOperandAttrTableIfAvaliable(tables); 
+                secondCondition.setOperandAttrTableIfAvaliableOrRaiseException(tables); 
             
 
         }

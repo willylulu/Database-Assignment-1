@@ -147,6 +147,12 @@ namespace Assignment1
          * -> add ; termination V
          * -> add * handling    V
          * -> add conditino const to const, const to vairable  V
+         * 
+         * 04/08
+         * -> where T1.attr
+         * -> aggregation
+         * -> only select from
+         * -> ToLower()
          * *******************/
         public static Parser<SqlObjects.Sql_Select> Select =
             (from keyword in Parse.IgnoreCase("select").Once()
@@ -157,6 +163,7 @@ namespace Assignment1
              select new SqlObjects.Sql_Select(attrs.ToList(), sqlFrom, sqlWhere)
              ).Token();
 
+        //when there is no where clause
         public static Parser<SqlObjects.Sql_Where> NoneWhere =
             (from end in Parse.Char(';').Once()
              select new SqlObjects.Sql_Where("", null)
@@ -174,13 +181,13 @@ namespace Assignment1
 
              from right_P in Parse.Char(')').Once().Token().Text().XOr(Parse.Return("")).Token()
              from comma in Parse.Char(',').Once().Text().XOr(Parse.Return("")).Token()
-             select new SqlObjects.Sql_Select_Attr(table, attr, (attr.Length > 0), aggregation, (left_P+right_P).Equals("()"))
+             select new SqlObjects.Sql_Select_Attr(table.ToLower(), attr.ToLower(), (attr.Length > 0), aggregation.ToLower(), (left_P+right_P).Equals("()"))
             ).Token();
 
         public static Parser<String> Aggregation =
             (from agg_1 in Parse.IgnoreCase("sum").Text().XOr(Parse.Return(""))
              from agg_2 in Parse.IgnoreCase("count").Text().XOr(Parse.Return(""))
-             select agg_1 + agg_2
+             select agg_1.ToLower() + agg_2.ToLower()
             ).Token();
 
 
@@ -198,25 +205,25 @@ namespace Assignment1
              from table in Identifier
              from alias_val in Parse.IgnoreCase("as").Text().Then(alias_val => Identifier).XOr(Parse.Return(""))
              from comma in Parse.Char(',').Once().Text().XOr(Parse.Return(""))
-             select new SqlObjects.Sql_Select_Table(table, alias_val.Length > 0, alias_val)
+             select new SqlObjects.Sql_Select_Table(table.ToLower(), alias_val.Length > 0, alias_val.ToLower())
             ).Token();
 
         public static Parser<SqlObjects.Sql_Where> Where =
             (from keyword in Parse.IgnoreCase("where").Once()
              from listOfConditions in ListOfConditions
-             select new SqlObjects.Sql_Where(String.Concat(keyword), listOfConditions)
+             select new SqlObjects.Sql_Where(String.Concat(keyword).ToLower(), listOfConditions)
             ).Token();
 
         public static Parser<String> Condition_Conjunction =
             (from conjunction in Parse.IgnoreCase("and").Text().XOr(Parse.IgnoreCase("or").Text())
-             select conjunction
+             select conjunction.ToString()
             ).Token();
 
         public static Parser<SqlObjects.Sql_Condition> Condition =
             (from leftOperand in IdentifierIncludeDot.XOr(QuotedText)
              from operation in Parse.Chars("><=").Many().Text().Token().Or(Parse.Return(SqlObjects.Sql_Condition.NULL_OPERATION))
              from rightOperand in IdentifierIncludeDot.XOr(QuotedText).XOr(Parse.Return(""))
-             select new SqlObjects.Sql_Condition(leftOperand,  operation, rightOperand)
+             select new SqlObjects.Sql_Condition(leftOperand,  operation, rightOperand)       //no need to lower cause there are auotedText
             ).Token();
 
         public static Parser<SqlObjects.Sql_ListOfConditions> ListOfConditions =
@@ -241,6 +248,7 @@ namespace Assignment1
                 throw new DbException.InvalidKeyword("Invalid Keyword Error: '" + str + "' is invalid variable name");
             return true;
         }
+
 
 
         public class Sql_Item

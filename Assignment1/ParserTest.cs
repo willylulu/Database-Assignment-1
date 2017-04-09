@@ -11,6 +11,7 @@ namespace Assignment1
         static void Main(string[] args)
         {
             TestSelect();
+            //TestSelectError();
 
             Console.ReadKey(true);
         }
@@ -49,11 +50,12 @@ namespace Assignment1
             Parser.Select(input);
 
             //Only select & from
-            input = "SElEcT person_id, name from Employee  ; where 1 = 1";
+            input = @"SELECT bookId, title, pages, authorId, editorial
+                        FROM BoOk;";
             Parser.Select(input);
 
             //Aggregation Test, also test where attr
-            input = "SElEcT Count(person_id) from Employee where person_id;";
+            input = "SElEcT Count(*) from Employee where person_id;";
             Parser.Select(input);
 
             //Only select & from
@@ -63,10 +65,14 @@ namespace Assignment1
 
             //Test Where T1.attr
             input = @"Select T1.attr, T2.hello, xxx 
-                      from table as T1, table2 as T2 
-                      where T1.attr <> 'asdf' and '123' <> T2.hello;";
+                      from TaBle as T1, table2 as T2 
+                      where T1.attr <> T2.hello and '123' <> T2.hello;";
             Parser.Select(input);
 
+            input = @"SELECT Book.*
+                    FROM Book, Author
+                    WHERE Book.authorId = Author.name;";
+            Parser.Select(input);
             /*
             */
 
@@ -85,6 +91,15 @@ namespace Assignment1
 
             //No Such table alias in select
             input = "Select T3.attr, T2.hello, xxx from table as T1, table2 as T2 where attr = 'asdf' and xxx = 123;";
+            Parser.Select(input);
+
+
+            //table as 
+            input = @"select attr, name from employee as where attr = 1;";
+            Parser.Select(input);
+
+            // where a  = 
+            input = @"select attr, name from employee as E  where attr = ;";
             Parser.Select(input);
         }
 
