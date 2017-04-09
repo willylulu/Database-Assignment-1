@@ -23,7 +23,7 @@ namespace Assignment1
                 return false;
             }
         }
-        static void Main(string[] args)
+        static void Main3(string[] args)
         {
             HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
 

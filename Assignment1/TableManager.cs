@@ -9,7 +9,7 @@ namespace Assignment1
 {
     public enum Operators
     {
-        equal,not_equal,less,greater
+        equal,not_equal,less,greater, none//add by fong 
     }
     public enum OperatorLink
     {
@@ -18,7 +18,11 @@ namespace Assignment1
 
     public enum OperatorsType
     {
-        attr2attr, attr2constant, constant2constant
+        attr2attr, attr2constant, constant2constant, onlyOne
+    }
+    public enum Aggregation
+    {
+        count, sum
     }
     class table_attribute_pair
     {

@@ -72,7 +72,9 @@
     <Compile Include="Parser.cs" />
     <Compile Include="ParserTest.cs" />
     <Compile Include="SqlGrammar.cs" />
+    <Compile Include="SqlObjects\Sql_From.cs" />
     <Compile Include="SqlObjects\Sql_Select.cs" />
+    <Compile Include="SqlObjects\Sql_Where.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
