@@ -11,9 +11,9 @@ namespace Assignment1.SqlObjects
 
     public class Sql_Select
     {
-        private List<Sql_Select_Attr> attrs;
-        private Sql_From from;   
-        private Sql_Where where;  
+        public List<Sql_Select_Attr> attrs;
+        public Sql_From from;
+        public Sql_Where where;  
 
         public Sql_Select_Table[] Tables;          //tables from from
         public Sql_ListOfConditions Conditions;    //conditions from where
