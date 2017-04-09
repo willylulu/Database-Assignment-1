@@ -11,9 +11,9 @@ namespace Assignment1.SqlObjects
 
     public class Sql_Select
     {
-        private List<Sql_Select_Attr> attrs;
-        private Sql_From from;   
-        private Sql_Where where;  
+        public List<Sql_Select_Attr> attrs;
+        public Sql_From from;
+        public Sql_Where where;  
 
         public Sql_Select_Table[] Tables;          //tables from from
         public Sql_ListOfConditions Conditions;    //conditions from where
@@ -33,13 +33,34 @@ namespace Assignment1.SqlObjects
                 setConditionSelect(this.Tables);
         }
 
+        private void setAttrsSelect()
+        {
+            foreach (Sql_Select_Attr attr in attrs)
+                attr.setTable(getMatchedTableOrRaiseException(attr));
+        }
+        private void setConditionSelect(Sql_Select_Table[] tables)
+        {
+            this.Conditions = this.where.listOfConditions;
+            this.Conditions.setAttrsTable(tables);
+        }
+        private Sql_Select_Table getMatchedTableOrRaiseException(Sql_Select_Attr attr)
+        {
+            if (attr.tableAlias == null)
+                return null;
+            foreach (Sql_Select_Table table in Tables)
+                if (table.alias.Equals(attr.tableAlias) && attr.tableAlias != null)
+                    return table;
+
+            throw new DbException.InvalidKeyword("Invalid key error - table alias " + attr.tableAlias + " doesn't exist");
+            
+        }
         public override string ToString()
         {
             String output = "";
             output += "[Select] \n";
             foreach(Sql_Select_Attr attr in attrs)
             {
-                output += attr.ToString() ;
+                output += attr.ToString() +"\n";
             }
             output += from.ToString() ;
 
@@ -48,24 +69,6 @@ namespace Assignment1.SqlObjects
 
             output += "\n\n";
             return output;
-        }
-        private void setAttrsSelect()
-        {
-            foreach (Sql_Select_Attr attr in attrs)
-                attr.setTable(getMatchedTable(attr));
-
-        }
-        private void setConditionSelect(Sql_Select_Table[] tables)
-        {
-            this.Conditions = this.where.listOfConditions;
-            this.Conditions.setAttrsTable(tables);
-        }
-        private Sql_Select_Table getMatchedTable(Sql_Select_Attr attr)
-        {
-            foreach (Sql_Select_Table table in Tables)
-                if (table.alias.Equals(attr.tableAlias) && attr.tableAlias != null)
-                    return table;
-            return null;
         }
     }
 
@@ -82,6 +85,7 @@ namespace Assignment1.SqlObjects
         
         public Sql_Select_Attr(String val1, String val2, Boolean hasTable, String aggregation, Boolean hasAggregation)
         {
+
             this.hasTable = hasTable;
             this.hasAggregation = hasAggregation;
             if (this.hasAggregation)
@@ -106,7 +110,7 @@ namespace Assignment1.SqlObjects
 
         public override string ToString()
         {
-            String output = String.Format("    (Attr) {0}  {1}{2}\n",
+            String output = String.Format("    (Attr) {0}  {1}{2}",
                                           (hasAggregation)? aggregation+"("+name+")" : name, 
                                           (hasTable) ? "in " + tableAlias : "", 
                                           (hasTable) ? " ("+table.name+")" : "");

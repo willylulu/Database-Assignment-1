@@ -13,7 +13,7 @@ namespace Assignment1.SqlObjects
         public String alias;
         public Sql_Select_Table(String name, Boolean hasAlias, String alias)
         {
-            //
+            
             this.name = name;
             
             this.hasAlias = hasAlias;
