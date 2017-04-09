@@ -8,7 +8,7 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Main3(string[] args)
+        static void Main(string[] args)
         {
             TestSelect();
 
@@ -53,7 +53,7 @@ namespace Assignment1
             Parser.Select(input);
 
             //Aggregation Test, also test where attr
-            input = "SElEcT SUM(person_id) from Employee where person_id;";
+            input = "SElEcT Count(person_id) from Employee where person_id;";
             Parser.Select(input);
 
             //Only select & from

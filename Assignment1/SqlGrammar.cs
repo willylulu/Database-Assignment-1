@@ -21,6 +21,11 @@ namespace Assignment1
             from rest in Parse.LetterOrDigit.XOr(Parse.Char('_')).Many()
             select new string(first.Concat(rest).ToArray())).Token();
 
+        public static readonly Parser<string> IdentifierIncludeDot =
+           (from first in Parse.LetterOrDigit.Once().XOr(Parse.Chars("._").Once())
+            //can parse A-Z a-z 0-9 _ 
+            from rest in Parse.LetterOrDigit.XOr(Parse.Chars("._")).Many()
+            select new string(first.Concat(rest).ToArray())).Token();
         /**********************
         * Parse the string (including any character except ')') between the  ()
         * Return: string
@@ -208,9 +213,9 @@ namespace Assignment1
             ).Token();
 
         public static Parser<SqlObjects.Sql_Condition> Condition =
-            (from leftOperand in Identifier.XOr(QuotedText)
+            (from leftOperand in IdentifierIncludeDot.XOr(QuotedText)
              from operation in Parse.Chars("><=").Many().Text().Token().Or(Parse.Return(SqlObjects.Sql_Condition.NULL_OPERATION))
-             from rightOperand in Identifier.XOr(QuotedText).XOr(Parse.Return(""))
+             from rightOperand in IdentifierIncludeDot.XOr(QuotedText).XOr(Parse.Return(""))
              select new SqlObjects.Sql_Condition(leftOperand,  operation, rightOperand)
             ).Token();
 

@@ -92,8 +92,6 @@ namespace Assignment1.SqlObjects
         {
             if (leftOpd_str.Equals("") && op.Equals("") && rightOpd_str.Equals(""))
                 return;
-            //
-            
 
             OperandType leftType = getOperandType(leftOpd_str);
             this.leftOpd = new Sql_Operand(leftOpd_str, leftType);
@@ -104,33 +102,14 @@ namespace Assignment1.SqlObjects
                 this.opType = OperatorsType.onlyOne;
                 return;
             }
+
             OperandType rightType = getOperandType(rightOpd_str);
             this.rightOpd = new Sql_Operand(rightOpd_str, rightType);
 
-            if (leftType.Equals(rightType) && leftType.Equals(OperandType.attr))
-                opType = OperatorsType.attr2attr;
-            else if (!leftType.Equals(OperandType.attr) && !rightType.Equals(OperandType.attr))
-                opType = OperatorsType.constant2constant;
-            else if (leftType.Equals(OperandType.attr))
-                opType = OperatorsType.attr2constant;
-            else if (!leftType.Equals(OperandType.attr))
-            {
-                swapTwo(leftOpd, rightOpd);
-                opType = OperatorsType.attr2constant;
-            }
+            this.opType = getOperatorsType(leftType, rightType);
 
-            if (op.Equals("="))
-                this.op = Operators.equal;
-            else if (op.Equals(">"))
-                this.op = Operators.greater;
-            else if (op.Equals("<"))
-                this.op = Operators.less;
-            else if (op.Equals("<>"))
-                this.op = Operators.not_equal;
-            else if (op.Equals(NULL_OPERATION) && !leftOpd_str.Equals("") && leftOpd_str.Equals(""))
-                this.op = Operators.none;
-            else
-                throw new DbException.InvalidKeyword("Unkown : " + op);
+            this.op = getOperatorsOrThrowException(op, leftOpd_str, rightOpd_str);
+
         }
         public void setOperandAttrTableIfAvaliable(Sql_Select_Table[] tables)
         {
@@ -168,6 +147,10 @@ namespace Assignment1.SqlObjects
             
             Regex stringTypeRgx = new Regex(@"^'[^']*'$");
             int num_tmp = 0;
+            int dot_index = opd.IndexOf('.');
+            if(dot_index != -1 && dot_index != 0 && dot_index != opd.Length-1)      //attr with Table
+                return OperandType.attr;
+
             //
             if (stringTypeRgx.IsMatch(opd))
                 return OperandType.str;
@@ -179,6 +162,41 @@ namespace Assignment1.SqlObjects
                 throw new DbException.InvalidKeyword("Wrong condition clause.");
         }
 
+        private Operators getOperatorsOrThrowException(String str, String leftOpd_str, String rightOpd_str)
+        {
+            if (str.Equals("="))
+                return Operators.equal;
+            else if (str.Equals(">"))
+                return Operators.greater;
+            else if (str.Equals("<"))
+                return Operators.less;
+            else if (str.Equals("<>"))
+                return Operators.not_equal;
+            else if (str.Equals(NULL_OPERATION) && !leftOpd_str.Equals("") && rightOpd.Equals(""))
+                return Operators.none;
+            else
+                throw new DbException.InvalidKeyword("Unkown : " + op);
+
+        }
+
+        private OperatorsType getOperatorsType(OperandType leftType, OperandType rightType)
+        {
+            if (leftType.Equals(rightType) && leftType.Equals(OperandType.attr))
+                return OperatorsType.attr2attr;
+            else if (!leftType.Equals(OperandType.attr) && !rightType.Equals(OperandType.attr))
+                return OperatorsType.constant2constant;
+            else if (leftType.Equals(OperandType.attr))
+                return OperatorsType.attr2constant;
+            else if (!leftType.Equals(OperandType.attr))
+            {
+                swapTwo(this.leftOpd, this.rightOpd);
+                return OperatorsType.attr2constant;
+            }
+            else
+                //???????
+                return OperatorsType.attr2constant;
+
+        }
     }
 
     public class Sql_ListOfConditions
