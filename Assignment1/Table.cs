@@ -138,69 +138,19 @@ namespace Assignment1
             return dataKeys;
         }
 
-        public HashSet<Guid> getAttribIndexWithOper(string name, dynamic value,Operators oper)
-        {
-            HashSet<Guid> ans = null;
-            switch (oper)
-            {
-                case Operators.equal:
-                    if (attribIndex[name][value] != null)
-                    {
-                        ans = attribIndex[name][value];
-                    }
-                    break;
-                case Operators.not_equal:
-                    for (int i = 0; i < TableAttributesOrder.Count; i++)
-                    {
-                        if (TableAttributesOrder[i] == name)
-                        {
-                            ans = new HashSet<Guid>();
-                            foreach (Guid key in dataKeys)
-                            {
-                                dynamic val = data[key][i];
-                                if (val != value) ans.Add(key);
-                            }
-                            break;
-                        }
-                    }
-                    break;
-                case Operators.less:
-                    for (int i = 0; i < TableAttributesOrder.Count; i++)
-                    {
-                        if (TableAttributesOrder[i] == name)
-                        {
-                            ans = new HashSet<Guid>();
-                            foreach (Guid key in dataKeys)
-                            {
-                                dynamic val = data[key][i];
-                                if (val < value) ans.Add(key);
-                            }
-                            break;
-                        }
-                    }
-                    break;
-                case Operators.greater:
-                    for (int i = 0; i < TableAttributesOrder.Count; i++)
-                    {
-                        if (TableAttributesOrder[i] == name)
-                        {
-                            ans = new HashSet<Guid>();
-                            foreach (Guid key in dataKeys)
-                            {
-                                dynamic val = data[key][i];
-                                if (val > value) ans.Add(key);
-                            }
-                            break;
-                        }
-                    }
-                    break;
-            }
-            return ans;
-        }
-
         public Dictionary<string, TableAttribute> getTableAttributes()
         {
             return TableAttributes;
+        }
+
+        public dynamic getTableOnlyOneData(Guid address, string attribute)
+        {
+            int index = TableAttributesOrder.IndexOf(attribute);
+            if (index == -1) return new nullEle();
+            else
+            {
+                return data[address][index];
+            }
         }
         private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
         private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(Constants.MAX_ATTR_NUM);

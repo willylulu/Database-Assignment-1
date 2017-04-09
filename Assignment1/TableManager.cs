@@ -336,70 +336,116 @@ namespace Assignment1
 
         public void printSelect(outputPair[] outputOrder , HashSet<Dictionary<string, Guid>> data, HashSet<string> total)
         {
-            
-            foreach(outputPair opair in outputOrder)
-            {
-                if (!total.Contains(opair.aliName))
-                {
+            //the final output format
+            List<string> attribute = new List<string>();
+            List<List<dynamic>> ans = new List<List<dynamic>>();
 
+            //check the tables we need
+            HashSet<string> tableDistinct = new HashSet<string>();
+            List<string> tableList = new List<string>();
+
+            //the final tuple pairs 
+            HashSet<Dictionary<string, Guid>> exData = new HashSet<Dictionary<string, Guid>>();
+
+            //find the table we need
+            for (int i = 0; i < outputOrder.Length; i++)
+            {
+                attribute.Add(outputOrder[i].attr);
+                if (!tableDistinct.Contains(outputOrder[i].aliName))
+                    {
+                        tableDistinct.Add(outputOrder[i].aliName);
+                        tableList.Add(outputOrder[i].aliName);
+                    }
+            }
+
+            //if no where use crossProduct add in exData
+            if (data.Count == 0 && total.Count == 0)
+            {
+                crossProductRecur(exData, new Dictionary<string, Guid>(), tableList, 0, tableList.Count);
+            }
+            else
+            {
+                //the table doesn't use where filter
+                List<string> tableNoWhere = new List<string>();
+                foreach (string s in tableList)
+                {
+                    if (!total.Contains(s)) tableNoWhere.Add(s);
+                }
+
+                //need to use data cross product table which doesn't use where filter
+                foreach (Dictionary<string, Guid> d in data)
+                {
+                    crossProductRecur(exData, d, tableNoWhere, 0, tableNoWhere.Count);
+                }
+            }
+
+            //retrive data and add in list
+            foreach (Dictionary<string, Guid> tuple in exData)
+            {
+                List<dynamic> tmp = new List<dynamic>();
+                foreach (outputPair op in outputOrder)
+                {
+                    Table targetTable = getTable(op.aliName);
+                    dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.aliName);
+                    tmp.Add(tt);
+                }
+                ans.Add(tmp);
+            }
+
+            //final output
+            string attributeOutput = "";
+            foreach (string s in attribute)
+            {
+                attributeOutput += s.PadRight(20, ' ');
+            }
+            Console.WriteLine(attributeOutput);
+            foreach (List<dynamic> s in ans)
+            {
+                string dataOutput = "";
+                foreach (dynamic d in s)
+                {
+                    dataOutput += d.toString().PadRight(20, ' ');
+                }
+                Console.WriteLine(dataOutput);
+            }
+        }
+
+        private void crossProductRecur(HashSet<Dictionary<string, Guid>> data, Dictionary<string, Guid> dictionary, List<string> tableList, int v, int count)
+        {
+            if (v == count)
+            {
+                data.Add(dictionary);
+                return;
+            }
+            else
+            {
+                HashSet<Guid> tmp = getTable(tableList[v]).getAllIndex();
+                foreach(Guid t in tmp)
+                {
+                    dictionary.Add(tableList[v], t);
+                    crossProductRecur(data, dictionary, tableList, v+1, count);
                 }
             }
         }
+
         public bool con2conOper(Dictionary<string, string> aliaName, where table)
         {
             switch (table.oper){
                 case Operators.equal:
                     return table.con1 == table.con2;
-                    break;
 
                 case Operators.greater:
                     return table.con1 > table.con2;
-                    break;
 
                 case Operators.less:
                     return table.con1 < table.con2;
-                    break;
 
                 case Operators.not_equal:
                     return table.con1 != table.con2;
-                    break;
             }
             return false;
         }
-        public where generateWhere( Dictionary<string, string> aliaName, where inWhere)
-        {
-            where outWhere = new where(inWhere);
-            Table table1 = getTable(aliaName[outWhere.tableAttrPair1.Key]);
-            Table table2 = getTable(aliaName[outWhere.tableAttrPair2.Key]);
-            Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
-            Dictionary<Guid, List<dynamic>> attribIndex2 = table2.getTableData();
-            HashSet<Guid> dataKeys1 = table1.getAllIndex();
-            HashSet<Guid> dataKeys2 = table2.getAllIndex();
-            int index1;
-            int index2;
-            List<string> TableAttributesOrder1 = table1.getAttributesOrder();
-            index1 = TableAttributesOrder1.FindIndex(x => x == outWhere.tableAttrPair1.Value);
-            List<string> TableAttributesOrder2 = table2.getAttributesOrder();
-            index2 = TableAttributesOrder2.FindIndex(x => x == outWhere.tableAttrPair2.Value);
-
-            var ans =
-                from data1 in dataKeys1
-                from data2 in dataKeys2
-                where attribIndex1[data1][index1] == attribIndex2[data1][index2]
-                select new { d1 = data1, d2 = data2 };
-            foreach (var dataPair in ans)
-            {
-                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                aliasGidPair.Add(outWhere.tableAttrPair1.Key, dataPair.d1);
-                if (!aliasGidPair.ContainsKey(outWhere.tableAttrPair2.Key))
-                {
-                    aliasGidPair.Add(outWhere.tableAttrPair2.Key, dataPair.d2);
-                }
-                outWhere.elementSet.Add(aliasGidPair);
-            }
-
-            return outWhere;
-        }
+        
         public void select(Dictionary<string, string> aliaName , where[] tables, outputPair[] outputOrder)
         {
             Dictionary<string, string> aliaNameDic = aliaName;
@@ -419,11 +465,9 @@ namespace Assignment1
                     case OperatorsType.attr2attr:
                         printSelect(outputOrder, attr2attrOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
                         return;
-                        break;
                     case OperatorsType.attr2constant:
                         printSelect(outputOrder, attr2conOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
                         return;
-                        break;
                     case OperatorsType.constant2constant:
                         if(con2conOper(aliaName, tables[0]))
                         {
@@ -434,7 +478,6 @@ namespace Assignment1
                         {
                             return;
                         }
-                        break;
                 }
             }
             //check where is attr or not
