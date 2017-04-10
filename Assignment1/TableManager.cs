@@ -344,7 +344,7 @@ namespace Assignment1
                                                 OperatorsType.attr2attr);
 
                     }
-                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2constant)
+                    else if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.attr2constant)
                     {
 
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
@@ -355,7 +355,7 @@ namespace Assignment1
                                                  (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
                                                 OperatorsType.attr2constant);
                     }
-                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
+                    else if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.constant2constant)
                     {
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
                         tables[1] = new where(condition.leftOpd.getOperand(),
@@ -364,7 +364,7 @@ namespace Assignment1
                                                 (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
                                                 OperatorsType.constant2constant);
                     }
-                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
+                    else if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.onlyOne)
                     {
                         // to be done
                     }
