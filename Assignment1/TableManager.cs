@@ -335,7 +335,7 @@ namespace Assignment1
                     if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.attr2attr)
                     {
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                        tables[0] = new where(condition.leftOpd.content.tableAlias,
+                        tables[1] = new where(condition.leftOpd.content.tableAlias,
                                                 condition.leftOpd.content.name,
                                                 condition.rightOpd.content.tableAlias,
                                                 condition.rightOpd.content.name,
@@ -348,7 +348,7 @@ namespace Assignment1
                     {
 
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                        tables[0] = new where(condition.leftOpd.content.tableAlias,
+                        tables[1] = new where(condition.leftOpd.content.tableAlias,
                                                 condition.leftOpd.content.name,
                                                 condition.rightOpd.getOperand(),
                                                 condition.op,
@@ -358,7 +358,7 @@ namespace Assignment1
                     else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
                     {
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                        tables[0] = new where(condition.leftOpd.getOperand(),
+                        tables[1] = new where(condition.leftOpd.getOperand(),
                                                 condition.rightOpd.getOperand(),
                                                 condition.op,
                                                 (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
@@ -434,7 +434,7 @@ namespace Assignment1
                 var ans =
                     from data1 in dataKeys1
                     from data2 in dataKeys2
-                    where attribIndex1[data1][index1] == attribIndex2[data1][index2]
+                    where attribIndex1[data1][index1] == attribIndex2[data2][index2]
                     select new { d1 = data1, d2 = data2 };
                 foreach (var dataPair in ans)
                 {
@@ -636,23 +636,25 @@ namespace Assignment1
             }
 
             //retrive data and add in list
-            
-            foreach (Dictionary<string, Guid> tuple in exData)
-            {
-                List<dynamic> tmp = new List<dynamic>();
-                foreach (outputPair op in outputOrder)
-                {
-                    //Console.WriteLine(op.tableName);
-                    Table targetTable = getTable(op.tableName);
-                    dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.attr);
-                    tmp.Add(tt);
-                }
-                ans.Add(tmp);
-            }
 
+            if (exData != null)
+            {
+                foreach (Dictionary<string, Guid> tuple in exData)
+                {
+                    List<dynamic> tmp = new List<dynamic>();
+                    foreach (outputPair op in outputOrder)
+                    {
+                        //Console.WriteLine(op.tableName);
+                        Table targetTable = getTable(op.tableName);
+                        dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.attr);
+                        tmp.Add(tt);
+                    }
+                    ans.Add(tmp);
+                }
+            }
             //final output
 
-            System.IO.StreamWriter file = new System.IO.StreamWriter("./output.csv");
+            System.IO.StreamWriter file = new System.IO.StreamWriter("../../output.csv");
 
             string attributeOutput = "";
             foreach (string s in attribute)
@@ -715,7 +717,7 @@ namespace Assignment1
         
         public void select(Dictionary<string, string> aliaName , where[] tables, outputPair[] outputOrder)
         {
-            Dictionary<string, string> aliaNameDic = aliaName;
+            //Dictionary<string, string> aliaNameDic = aliaName;
 
             HashSet<Dictionary<string, Guid>> selectAns = new HashSet<Dictionary<string, Guid>>();
 
@@ -768,6 +770,7 @@ namespace Assignment1
             }
             //check where is attr or not
             bool isAttr1 = tables[0].operType != OperatorsType.constant2constant;
+            Console.WriteLine(tables[1].GetType());
             bool isAttr2 = tables[1].operType != OperatorsType.constant2constant;
 
             HashSet<string> left = new HashSet<string>();
@@ -788,19 +791,21 @@ namespace Assignment1
                 total.Add(tables[1].tableAttrPair2.Key);
             }
 
-            List<dynamic> data = new List<dynamic>(2);
+            List<dynamic> data = new List<dynamic>();
+            Console.WriteLine("table size = " + tables.Length);
             for(int i = 0; i<tables.Length; i++)
             {
                 switch (tables[i].operType)
                 {
                     case OperatorsType.attr2attr:
-                        data[i] = (attr2attrOper(aliaName, tables[i]));
+                        data.Add(attr2attrOper(aliaName, tables[i]));
                         break;
                     case OperatorsType.attr2constant:
-                        data[i] = (attr2conOper(aliaName, tables[i]));
+                        Console.WriteLine(i);
+                        data.Add(attr2conOper(aliaName, tables[i]));
                         break;
                     case OperatorsType.constant2constant:
-                        data[i] = (con2conOper(aliaName, tables[i]));
+                        data.Add(con2conOper(aliaName, tables[i]));
                         break;
                     case OperatorsType.onlyOne:
                         if (onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
@@ -977,9 +982,11 @@ namespace Assignment1
                 temp_eleSet2.Add(temp_dic);
             }
 
-            HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union(temp_eleSet2);
+            //HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union((HashSet<Dictionary<string, Guid>>)temp_eleSet2);
 
-            return result;
+            temp_eleSet1.UnionWith(temp_eleSet2);
+            return temp_eleSet1;
+            //return result;
         }
 
         private Boolean checkIntersect( Dictionary<string, Guid> element1 , Dictionary<string, Guid> element2 , List<string> dupAttr)
