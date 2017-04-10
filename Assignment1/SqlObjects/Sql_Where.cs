@@ -78,7 +78,7 @@ namespace Assignment1.SqlObjects
             if (type.Equals(OperandType.str))
                 return content.Replace(",", "");
             else if (type.Equals(OperandType.num))
-                return Int32.Parse(content);
+                return content;
             else
                 return content;
 
