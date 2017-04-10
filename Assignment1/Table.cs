@@ -146,7 +146,10 @@ namespace Assignment1
         public dynamic getTableOnlyOneData(Guid address, string attribute)
         {
             int index = TableAttributesOrder.IndexOf(attribute);
-            if (index == -1) return new nullEle();
+            if (index == -1)
+            {
+                return new nullEle();
+            }
             else
             {
                 return data[address][index];

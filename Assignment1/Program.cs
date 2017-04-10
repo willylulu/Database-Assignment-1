@@ -154,7 +154,6 @@ namespace Assignment1
             sw.Reset();
             sw = Stopwatch.StartNew();
 
-            string sql_path;
             string text = "";
             text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
             Parser.sql_parser(text, tableManager);
@@ -168,7 +167,7 @@ namespace Assignment1
             text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
             Parser.sql_parser(text, tableManager);
 
-            tableManager.print_table_context();
+            //tableManager.print_table_context();
 
             text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
             Parser.sql_parser(text, tableManager);

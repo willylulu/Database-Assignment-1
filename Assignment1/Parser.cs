@@ -220,7 +220,7 @@ namespace Assignment1
         }
         private static void println(dynamic str)
         {
-            Console.WriteLine(str.ToString());
+            //Console.WriteLine(str.ToString());
         }
 
     }

@@ -624,34 +624,34 @@ namespace Assignment1
                 List<dynamic> tmp = new List<dynamic>();
                 foreach (outputPair op in outputOrder)
                 {
-                    Console.WriteLine(op.tableName);
+                    //Console.WriteLine(op.tableName);
                     Table targetTable = getTable(op.tableName);
-                    dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.aliName);
+                    dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.attr);
                     tmp.Add(tt);
                 }
                 ans.Add(tmp);
             }
 
             //final output
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter("./output.csv");
+
             string attributeOutput = "";
             foreach (string s in attribute)
             {
-                attributeOutput += s.PadRight(20, ' ');
+                attributeOutput += s + ",";
             }
-            Console.WriteLine(attributeOutput);
+            file.WriteLine(attributeOutput);
             foreach (List<dynamic> s in ans)
             {
                 string dataOutput = "";
                 foreach (dynamic d in s)
                 {
-                    if( d.GetType() != typeof(nullEle))
-                    {
-                        dataOutput += d.toString().PadRight(20, ' ');
-                    }
-                    
+                    dataOutput += d.ToString()+",";
                 }
-                Console.WriteLine(dataOutput);
+                file.WriteLine(dataOutput);
             }
+            file.Close();
         }
 
         private void crossProductRecur(HashSet<Dictionary<string, Guid>> data, Dictionary<string, Guid> dictionary, List<string> tableList, int v, int count)
