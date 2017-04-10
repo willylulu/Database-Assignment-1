@@ -123,12 +123,18 @@ namespace Assignment1
         public string aliName;
         public string attr;
         public bool hasTable;
-        public outputPair(string aliName,string tableName, string attr, bool hasTable)
+
+        public Aggregation aggregation;
+        public Boolean hasAggregation;
+
+        public outputPair(string aliName,string tableName, string attr, bool hasTable, Aggregation aggregation, Boolean hasAggregation)
         {
             this.aliName = aliName;
             this.tableName = tableName;
             this.attr = attr;
             this.hasTable = hasTable;
+            this.aggregation = aggregation;
+            this.hasAggregation = hasAggregation;
         }
     }
     class TableManager
@@ -184,13 +190,15 @@ namespace Assignment1
             }
         }
 
-        public string attrToTable( string attrName)
+        public string attrToTable( string attrName, SqlObjects.Sql_Select sqlSelect)
         {
-            foreach(KeyValuePair<string, Table> tablepair in tables)
+            foreach(SqlObjects.Sql_Select_Table table in sqlSelect.from.tables)
             {
-                if( tablepair.Value.hasAttr(attrName) == true)
+
+                Table exTable = getTable(table.hasAlias ? table.alias : table.name);
+                if( exTable.hasAttr(attrName) == true)
                 {
-                    return tablepair.Key;
+                    return table.hasAlias ? table.alias : table.name;
                 }
             }
             return null;
@@ -220,22 +228,59 @@ namespace Assignment1
                
             }
 
-
+            List<outputPair> outputOrderList = new List<outputPair>();
             outputPair[] outputOrder = new outputPair[sqlSelect.attrs.Count];
             for (int i = 0; i < sqlSelect.attrs.Count; i++)
             {
-                if (sqlSelect.attrs[i].hasTable)
+                if( sqlSelect.attrs[i].name.CompareTo("*") == 0 && sqlSelect.attrs[i].hasAggregation == false)
                 {
-                    outputOrder[i] = new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].table.name, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable);
-                }
-                else
-                {
-                    if (attrToTable(sqlSelect.attrs[i].name) != null)
+                    if(sqlSelect.attrs[i].hasTable == false)
                     {
-                        sqlSelect.attrs[i].tableAlias = attrToTable(sqlSelect.attrs[i].name);
-                        outputOrder[i] = new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable);
+                        foreach(SqlObjects.Sql_Select_Table table in sqlSelect.from.tables)
+                        {
+                            List<string> order = getTable(table.name).getAttributesOrder();
+                        
+                            foreach( string att in order)
+                            {
+                            
+                                outputOrderList.Add(new outputPair((table.hasAlias ? table.alias:table.name), table.name, att, false, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        List<string> order = getTable(sqlSelect.attrs[i].table.name).getAttributesOrder();
+
+                        foreach (string att in order)
+                        {
+                            outputOrderList.Add(new outputPair((sqlSelect.attrs[i].table.hasAlias ? sqlSelect.attrs[i].table.alias : sqlSelect.attrs[i].table.name), sqlSelect.attrs[i].table.name, att, true, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                        }
+                    }
+
+                }else
+                {
+                    if (sqlSelect.attrs[i].hasTable)
+                    {
+                        outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].table.name, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                    }
+                    else
+                    {
+                        if(sqlSelect.attrs[i].name == "*" && sqlSelect.attrs[i].hasAggregation)
+                        {
+                            outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, false, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                            outputOrder = outputOrderList.ToArray();
+                            continue;
+                        }
+                        else if (attrToTable(sqlSelect.attrs[i].name, sqlSelect) != null)
+                        {
+                            sqlSelect.attrs[i].tableAlias = attrToTable(sqlSelect.attrs[i].name, sqlSelect);
+                            outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                        }
                     }
                 }
+                outputOrder = outputOrderList.ToArray();
+
+
             }
             if ( !sqlSelect.where.isEmpty )
             {
@@ -248,7 +293,7 @@ namespace Assignment1
                     {
                         if( leftOp.content.hasTable == false)
                         {
-                            leftOp.content.tableAlias = attrToTable(leftOp.content.name);
+                            leftOp.content.tableAlias = attrToTable(leftOp.content.name, sqlSelect);
                         }
                     }
 
@@ -258,7 +303,7 @@ namespace Assignment1
                     {
                         if (rightOp.content.hasTable == false)
                         {
-                            rightOp.content.tableAlias = attrToTable(rightOp.content.name);
+                            rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
                         }
                     }
 
@@ -318,7 +363,7 @@ namespace Assignment1
                     {
                         if (leftOp.content.hasTable == false)
                         {
-                            leftOp.content.tableAlias = attrToTable(leftOp.content.name);
+                            leftOp.content.tableAlias = attrToTable(leftOp.content.name, sqlSelect);
                         }
                     }
 
@@ -328,7 +373,7 @@ namespace Assignment1
                     {
                         if (rightOp.content.hasTable == false)
                         {
-                            rightOp.content.tableAlias = attrToTable(rightOp.content.name);
+                            rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
                         }
                     }
 
@@ -368,8 +413,9 @@ namespace Assignment1
                     {
                         // to be done
                     }
+                   
                 }
-                select(aliaName, tables, outputOrder);
+                 select(aliaName, tables, outputOrder);
             }
             else
             {
@@ -510,7 +556,7 @@ namespace Assignment1
             //Build a hashset to store ans
             HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
 
-            // Get 2 Tables
+             // Get 2 Tables
             Table table1 = getTable(aliaName[table.tableAttrPair1.Key]);
             // Get TableDatas from 2 tables
             Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
@@ -577,14 +623,137 @@ namespace Assignment1
 
         }
 
+        public bool checkAggr(outputPair[] outputOrder)
+        {
+            bool hasAggr = false;
+            bool hasNonAggr = false;
+            foreach (outputPair op in outputOrder)
+            {
+                if( op.hasAggregation)
+                {
+                    hasAggr = true;
+                }
+                if(!op.hasAggregation)
+                {
+                    hasNonAggr = true;
+                }
+            }
+
+            if( hasNonAggr && hasAggr)
+            {
+                Console.WriteLine("error");
+                return false;
+            }else if( hasAggr)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void printAggr( outputPair[] outputOrder, HashSet<Dictionary<string, Guid>> data, HashSet<string> total )
+        {
+            List<KeyValuePair<string, int>> AggrOut = new List<KeyValuePair<string, int>>();
+            foreach(outputPair op in outputOrder)
+            {
+                if( op.hasTable == false && op.attr == "*")
+                {
+                    AggrOut.Add(new KeyValuePair<string, int>("Count(*)", allstarCount));
+                    continue;
+                }
+                string tablename = op.aliName;
+                int ans = 0;
+                Table table = getTable(aliaName[tablename]);
+                Dictionary<Guid, List<dynamic>> tabledata = table.getTableData();
+                int index = 0;
+                foreach (string at in table.getAttributesOrder())
+                {
+                    if( at == op.attr)
+                    {
+                        index = table.getAttributesOrder().IndexOf(at);
+                        break;
+                    }
+                }
+                switch (op.aggregation)
+                {
+                    case Aggregation.count:
+                        if(total.Contains(tablename))
+                        {
+                            foreach(Dictionary<string, Guid> dic in data)
+                            {
+                                if( tabledata[dic[tablename]][index] != null )
+                                {
+                                    ans++;
+                                }
+                            }
+                            AggrOut.Add( new KeyValuePair<string, int>( "Count(" + op.attr + ")" , (op.attr !="*"? (int)ans: tabledata.Count )) );
+
+                        }
+                        else
+                        {
+                            foreach ( Guid id in table.getAllIndex() )
+                            {
+                                if (tabledata[id][index] != null)
+                                {
+                                    ans++;
+                                }
+                            }
+                            AggrOut.Add(new KeyValuePair<string, int>("Count(" + op.attr + ")", (op.attr != "*" ? (int)ans : tabledata.Count)));
+
+                        }
+                        break;
+                    case Aggregation.sum:
+                        if (total.Contains(tablename))
+                        {
+                            foreach (Dictionary<string, Guid> dic in data)
+                            {
+                                if (tabledata[dic[tablename]][index] != null)
+                                {
+                                    ans += tabledata[dic[tablename]][index];
+                                }
+                            }
+                            AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
+
+                        }
+                        else
+                        {
+                            foreach (Guid id in table.getAllIndex())
+                            {
+                                if (tabledata[id][index] != null)
+                                {
+                                    ans += tabledata[id][index];
+                                }
+                            }
+                            AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
+
+                        }
+                        break;
+                }
+            }
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter("../../output.csv");
+            string attrOut = "";
+            string valueOut = "";
+            foreach (KeyValuePair<string, int> d in AggrOut)
+            {
+                attrOut += d.Key.ToString() + ",";
+                valueOut += d.Value.ToString() + ",";
+
+            }
+
+            file.WriteLine(attrOut);
+            file.WriteLine(valueOut);
+            file.Close();
+
+
+        }
         public void printSelect(outputPair[] outputOrder , HashSet<Dictionary<string, Guid>> data, HashSet<string> total)
         {
-            /*Console.WriteLine(total);
-            Console.WriteLine(data.Count);
-            foreach(Dictionary<string, Guid> dic in data)
-            {
-                Console.WriteLine(dic.Count);
-            }*/
+           
+            
+
             //the final output format
             List<string> attribute = new List<string>();
             List<List<dynamic>> ans = new List<List<dynamic>>();
@@ -637,9 +806,16 @@ namespace Assignment1
             }
 
             //retrive data and add in list
-
+            
             if (exData != null)
             {
+                allstarCount = exData.Count;
+                if (checkAggr(outputOrder))
+                {
+                    printAggr(outputOrder, data, total);
+                    return;
+                }
+
                 foreach (Dictionary<string, Guid> tuple in exData)
                 {
                     List<dynamic> tmp = new List<dynamic>();
@@ -663,6 +839,8 @@ namespace Assignment1
                 attributeOutput += s + ",";
             }
             file.WriteLine(attributeOutput);
+           
+
             foreach (List<dynamic> s in ans)
             {
                 string dataOutput = "";
@@ -771,7 +949,6 @@ namespace Assignment1
             }
             //check where is attr or not
             bool isAttr1 = tables[0].operType != OperatorsType.constant2constant;
-            Console.WriteLine(tables[1].GetType());
             bool isAttr2 = tables[1].operType != OperatorsType.constant2constant;
 
             HashSet<string> left = new HashSet<string>();
@@ -994,14 +1171,12 @@ namespace Assignment1
         {
             foreach(string tableName in dupAttr)
             {
-                Console.WriteLine(element1.ContainsKey(tableName));
-                Console.WriteLine(element2.ContainsKey(tableName));
-
                 if(element1[tableName] != element2[tableName])
                 {
                     return false;
                 }
             }
+            Console.WriteLine(true);
             return true;
         }
         private HashSet<Dictionary<string, Guid>> intersect(HashSet<Dictionary<string, Guid>> elementSet1, HashSet<string> tableAttrHashSet1, HashSet<Dictionary<string, Guid>> elementSet2, HashSet<string> tableAttrHashSet2)
@@ -1042,6 +1217,7 @@ namespace Assignment1
                         temp_result.Add(dd.Key, dd.Value);
                     }
                 }
+                result.Add(temp_result);
             }
 
             return result;
@@ -1089,6 +1265,7 @@ namespace Assignment1
         }
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
+        public int allstarCount;
     }
 }
 
