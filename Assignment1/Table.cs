@@ -152,6 +152,18 @@ namespace Assignment1
                 return data[address][index];
             }
         }
+
+        public bool hasAttr( string attrName)
+        {
+            foreach(string tableAttr in TableAttributesOrder)
+            {
+                if( attrName.CompareTo(tableAttr) == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
         private Dictionary<string,TableAttribute> TableAttributes= new Dictionary<string,TableAttribute>(Constants.MAX_ATTR_NUM);
         private HashSet<Guid> dataKeys = new HashSet<Guid>();

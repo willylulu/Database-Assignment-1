@@ -107,7 +107,7 @@ namespace Assignment1
             else if (string.Compare(seperated_query[0].ToLower(), "select", true) == 0)
             {
                 //Console.WriteLine("Inserting");
-                SqlObjects.Sql_Select selection = Parser.Select(sql);
+                SqlObjects.Sql_Select selection = Parser.Select(sql + ";");
                 return new KeyValuePair<string, dynamic>("select", selection);
                 //public string table;
                 //public List<string> AttrNames;

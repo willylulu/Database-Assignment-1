@@ -184,9 +184,22 @@ namespace Assignment1
             }
         }
 
+        public string attrToTable( string attrName)
+        {
+            foreach(KeyValuePair<string, Table> tablepair in tables)
+            {
+                if( tablepair.Value.hasAttr(attrName) == true)
+                {
+                    return tablepair.Key;
+                }
+            }
+            return null;
+            
+            //need to handle error
+        }
         public void parseToSelect(SqlObjects.Sql_Select sqlSelect)
         {
-            Dictionary<string, string> aliaName = new Dictionary<string, string>();
+            this.aliaName = new Dictionary<string, string>();
             /*
              * Add alia/tablename pair in DIC
              */
@@ -205,96 +218,150 @@ namespace Assignment1
                 }
                 else
                 {
-                    outputOrder[i] = new outputPair(sqlSelect.attrs[i].tableAlias, null, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable);
-                }
-            }
-
-            where[] tables = new where[sqlSelect.where.listOfConditions.conditionNum];
-            if (sqlSelect.where.listOfConditions.conditionNum >= 1)
-            {
-                if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2attr)
-                {
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
-                    tables[0] = new where(condition.leftOpd.content.tableAlias,
-                                            condition.leftOpd.content.name,
-                                            condition.rightOpd.content.tableAlias,
-                                            condition.rightOpd.content.name,
-                                            condition.op,
-                                            OperatorLink.AND,
-                                            OperatorsType.attr2attr);
-
-                }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2constant)
-                {
-
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
-                    tables[0] = new where(condition.leftOpd.content.tableAlias,
-                                            condition.leftOpd.content.name,
-                                            condition.rightOpd.getOperand(),
-                                            condition.op,
-                                            OperatorLink.AND,
-                                            OperatorsType.attr2attr);
-                }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
-                {
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
-                    tables[0] = new where(condition.leftOpd.getOperand(),
-                                            condition.rightOpd.getOperand(),
-                                            condition.op,
-                                            OperatorLink.AND,
-                                            OperatorsType.attr2attr);
-                }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
-                {
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
-                    if( condition.leftOpd.type == OperandType.attr)
+                    if (attrToTable(sqlSelect.attrs[i].name) != null)
                     {
-                        tables[0] = new where(condition.leftOpd.content.tableAlias,condition.leftOpd.content.name,OperatorsType.onlyOne);
-                    }else
-                    {
-                        tables[0] = new where(condition.leftOpd.content,OperatorsType.onlyOne);
+                        sqlSelect.attrs[i].tableAlias = attrToTable(sqlSelect.attrs[i].name);
+                        outputOrder[i] = new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable);
                     }
-                    
                 }
             }
-            if (sqlSelect.where.listOfConditions.conditionNum == 2)
+            if ( !sqlSelect.where.isEmpty )
             {
-                if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.attr2attr)
+                where[] tables = new where[sqlSelect.where.listOfConditions.conditionNum];
+                if (sqlSelect.where.listOfConditions.conditionNum >= 1)
                 {
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                    tables[0] = new where(condition.leftOpd.content.tableAlias,
-                                            condition.leftOpd.content.name,
-                                            condition.rightOpd.content.tableAlias,
-                                            condition.rightOpd.content.name,
-                                            condition.op,
-                                            (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
-                                            OperatorsType.attr2attr);
+                    SqlObjects.Sql_Operand leftOp = sqlSelect.where.listOfConditions.firstCondition.leftOpd;
 
-                }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2constant)
-                {
+                    if (leftOp.type == OperandType.attr )
+                    {
+                        if( leftOp.content.hasTable == false)
+                        {
+                            leftOp.content.tableAlias = attrToTable(leftOp.content.name);
+                        }
+                    }
 
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                    tables[0] = new where(condition.leftOpd.content.tableAlias,
-                                            condition.leftOpd.content.name,
-                                            condition.rightOpd.getOperand(),
-                                            condition.op,
-                                             (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
-                                            OperatorsType.attr2attr);
+                    SqlObjects.Sql_Operand rightOp = sqlSelect.where.listOfConditions.firstCondition.rightOpd;
+
+                    if (rightOp.type == OperandType.attr)
+                    {
+                        if (rightOp.content.hasTable == false)
+                        {
+                            rightOp.content.tableAlias = attrToTable(rightOp.content.name);
+                        }
+                    }
+
+                    if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2attr)
+                    {
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
+                       tables[0] = new where(condition.leftOpd.content.tableAlias,
+                                                condition.leftOpd.content.name,
+                                                condition.rightOpd.content.tableAlias,
+                                                condition.rightOpd.content.name,
+                                                condition.op,
+                                                OperatorLink.AND,
+                                                OperatorsType.attr2attr);
+
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2constant)
+                    {
+
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
+                         Console.WriteLine("Name = " + condition.leftOpd.content.tableAlias);
+                        
+                        tables[0] = new where(condition.leftOpd.content.tableAlias,
+                                                condition.leftOpd.content.name,
+                                                condition.rightOpd.getOperand(),
+                                                condition.op,
+                                                OperatorLink.AND,
+                                                OperatorsType.attr2constant);
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
+                    {
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
+                        tables[0] = new where(condition.leftOpd.getOperand(),
+                                                condition.rightOpd.getOperand(),
+                                                condition.op,
+                                                OperatorLink.AND,
+                                                OperatorsType.constant2constant);
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
+                    {
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
+                        if (condition.leftOpd.type == OperandType.attr)
+                        {
+                            tables[0] = new where(condition.leftOpd.content.tableAlias, condition.leftOpd.content.name, OperatorsType.onlyOne);
+                        }
+                        else
+                        {
+                            tables[0] = new where(condition.leftOpd.content, OperatorsType.onlyOne);
+                        }
+
+                    }
                 }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
+                if (sqlSelect.where.listOfConditions.conditionNum == 2)
                 {
-                    Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
-                    tables[0] = new where(condition.leftOpd.getOperand(),
-                                            condition.rightOpd.getOperand(),
-                                            condition.op,
-                                            (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
-                                            OperatorsType.attr2attr);
+                    SqlObjects.Sql_Operand leftOp = sqlSelect.where.listOfConditions.secondCondition.leftOpd;
+
+                    if (leftOp.type == OperandType.attr)
+                    {
+                        if (leftOp.content.hasTable == false)
+                        {
+                            leftOp.content.tableAlias = attrToTable(leftOp.content.name);
+                        }
+                    }
+
+                    SqlObjects.Sql_Operand rightOp = sqlSelect.where.listOfConditions.secondCondition.rightOpd;
+
+                    if (rightOp.type == OperandType.attr)
+                    {
+                        if (rightOp.content.hasTable == false)
+                        {
+                            rightOp.content.tableAlias = attrToTable(rightOp.content.name);
+                        }
+                    }
+
+                    if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.attr2attr)
+                    {
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
+                        tables[0] = new where(condition.leftOpd.content.tableAlias,
+                                                condition.leftOpd.content.name,
+                                                condition.rightOpd.content.tableAlias,
+                                                condition.rightOpd.content.name,
+                                                condition.op,
+                                                (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
+                                                OperatorsType.attr2attr);
+
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2constant)
+                    {
+
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
+                        tables[0] = new where(condition.leftOpd.content.tableAlias,
+                                                condition.leftOpd.content.name,
+                                                condition.rightOpd.getOperand(),
+                                                condition.op,
+                                                 (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
+                                                OperatorsType.attr2constant);
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.constant2constant)
+                    {
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
+                        tables[0] = new where(condition.leftOpd.getOperand(),
+                                                condition.rightOpd.getOperand(),
+                                                condition.op,
+                                                (String.Compare(sqlSelect.where.listOfConditions.conjunction.ToLower(), "and", true) == 0 ? OperatorLink.AND : OperatorLink.OR),
+                                                OperatorsType.constant2constant);
+                    }
+                    else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
+                    {
+                        // to be done
+                    }
                 }
-                else if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.onlyOne)
-                {
-                    // to be done
-                }
+                select(aliaName, tables, outputOrder);
+            }
+            else
+            {
+                select(aliaName, new where[0], outputOrder);
             }
 
         }
@@ -551,12 +618,14 @@ namespace Assignment1
             }
 
             //retrive data and add in list
+            
             foreach (Dictionary<string, Guid> tuple in exData)
             {
                 List<dynamic> tmp = new List<dynamic>();
                 foreach (outputPair op in outputOrder)
                 {
-                    Table targetTable = getTable(op.aliName);
+                    Console.WriteLine(op.tableName);
+                    Table targetTable = getTable(op.tableName);
                     dynamic tt = targetTable.getTableOnlyOneData(tuple[op.aliName], op.aliName);
                     tmp.Add(tt);
                 }
@@ -575,7 +644,11 @@ namespace Assignment1
                 string dataOutput = "";
                 foreach (dynamic d in s)
                 {
-                    dataOutput += d.toString().PadRight(20, ' ');
+                    if( d.GetType() != typeof(nullEle))
+                    {
+                        dataOutput += d.toString().PadRight(20, ' ');
+                    }
+                    
                 }
                 Console.WriteLine(dataOutput);
             }
@@ -590,7 +663,7 @@ namespace Assignment1
             }
             else
             {
-                HashSet<Guid> tmp = getTable(tableList[v]).getAllIndex();
+                HashSet<Guid> tmp = getTable(aliaName[tableList[v]]).getAllIndex();
                 foreach(Guid t in tmp)
                 {
                     dictionary.Add(tableList[v], t);
@@ -981,7 +1054,8 @@ namespace Assignment1
 
         }
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
-        }
+        public Dictionary<string, string> aliaName;
+    }
 }
 
 class ProductComparer : IEqualityComparer< Dictionary<string, Guid> >

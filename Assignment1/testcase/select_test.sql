@@ -1,3 +1,2 @@
-SELECT title
-FROM Book
-WHERE bookId = 1;
+SELECT bookId, title, pages, authorId, editorial
+FROM Book;

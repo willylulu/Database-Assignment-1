@@ -155,20 +155,22 @@ namespace Assignment1
             sw = Stopwatch.StartNew();
 
             string sql_path;
-            string text;
-            text = System.IO.File.ReadAllText("../../testcase/createTables.sql");
+            string text = "";
+            text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
             Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText("../../testcase/author.sql");
+            text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
             Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText("../../testcase/book.sql");
+            text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
             Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText("../../testcase/student.sql");
+            text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
             Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText("../../testcase/select_test.sql");
+            tableManager.print_table_context();
+
+            text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
             Parser.sql_parser(text, tableManager);
 
            /* do
