@@ -1,2 +1,3 @@
-SELECT bookId, title, pages, authorId, editorial
-FROM Book;
+SELECT title, a.name
+FROM Book, Author AS a
+WHERE Book.pages > 200 
