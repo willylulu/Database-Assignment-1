@@ -24,6 +24,9 @@ namespace Assignment1
                 {
                     case "create": Parser.transCreateTable(tableManager,com.Value); break;
                     case "Inserting": Parser.transInserting(tableManager, com.Value); break;
+                    case "select":
+                        tableManager.parseToSelect(com.Value);
+                        break;
                     case "unKnown": Console.WriteLine("Unknown keywords"); break;
                 }
             }
@@ -97,6 +100,15 @@ namespace Assignment1
                 //Console.WriteLine("Inserting");
                 SqlGrammar.Sql_Insertion Insertion = Insert(sql);
                 return new KeyValuePair<string, dynamic>("Inserting", Insertion);
+                //public string table;
+                //public List<string> AttrNames;
+                //public List<dynamic> AttrValues;
+            }
+            else if (string.Compare(seperated_query[0].ToLower(), "select", true) == 0)
+            {
+                //Console.WriteLine("Inserting");
+                SqlObjects.Sql_Select selection = Parser.Select(sql);
+                return new KeyValuePair<string, dynamic>("select", selection);
                 //public string table;
                 //public List<string> AttrNames;
                 //public List<dynamic> AttrValues;

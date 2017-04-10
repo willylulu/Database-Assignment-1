@@ -139,7 +139,7 @@ namespace Assignment1
             tableManager.print_table_context();
             Console.ReadKey(true);
         }*/
-        static void Main2(string[] args)
+        static void Main(string[] args)
         {
             TableManager tableManager = new TableManager();
             //TestCase -- open for updating
@@ -154,9 +154,33 @@ namespace Assignment1
             sw.Reset();
             sw = Stopwatch.StartNew();
 
-            string text = System.IO.File.ReadAllText(args.Length==0?@"../../sql_query.sql": args[0]);
+            string sql_path;
+            string text;
+            text = System.IO.File.ReadAllText("../../testcase/createTables.sql");
+            Parser.sql_parser(text, tableManager);
+
+            text = System.IO.File.ReadAllText("../../testcase/author.sql");
+            Parser.sql_parser(text, tableManager);
+
+            text = System.IO.File.ReadAllText("../../testcase/book.sql");
+            Parser.sql_parser(text, tableManager);
+
+            text = System.IO.File.ReadAllText("../../testcase/student.sql");
+            Parser.sql_parser(text, tableManager);
+
+            text = System.IO.File.ReadAllText("../../testcase/select_test.sql");
+            Parser.sql_parser(text, tableManager);
+
+           /* do
+            {
+                sql_path = Console.ReadLine();
+                text = System.IO.File.ReadAllText(sql_path);
+                Parser.sql_parser(text, tableManager);
+            } while (sql_path != null);*/
+
+            //text = System.IO.File.ReadAllText(args.Length==0? "../../testcase/createTables.sql" : args[0]);
             //string text = System.IO.File.ReadAllText(@"../../sql_error3.sql");
-            Parser.sql_parser(text,tableManager);
+            
 
             //string[] seperated_query = text.Split(';');
             //foreach (string s in seperated_query)
