@@ -993,6 +993,9 @@ namespace Assignment1
         {
             foreach(string tableName in dupAttr)
             {
+                Console.WriteLine(element1.ContainsKey(tableName));
+                Console.WriteLine(element2.ContainsKey(tableName));
+
                 if(element1[tableName] != element2[tableName])
                 {
                     return false;
