@@ -622,10 +622,10 @@ namespace Assignment1
                 if(tableNoWhere.Count != 0)
                 {
                     //need to use data cross product table which doesn't use where filter
+                    exData = new HashSet<Dictionary<string, Guid>>();
                     foreach (Dictionary<string, Guid> d in data)
                     {
                         //the final tuple pairs 
-                        exData = new HashSet<Dictionary<string, Guid>>();
                         crossProductRecur(exData, d, tableNoWhere, 0, tableNoWhere.Count);
                     }
                 }
