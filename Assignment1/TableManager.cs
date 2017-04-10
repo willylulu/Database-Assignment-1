@@ -619,10 +619,11 @@ namespace Assignment1
                 {
                     if (!total.Contains(s)) tableNoWhere.Add(s);
                 }
-                if(tableNoWhere.Count != 0)
+                exData = new HashSet<Dictionary<string, Guid>>();
+                if (tableNoWhere.Count != 0)
                 {
                     //need to use data cross product table which doesn't use where filter
-                    exData = new HashSet<Dictionary<string, Guid>>();
+                   
                     foreach (Dictionary<string, Guid> d in data)
                     {
                         //the final tuple pairs 
