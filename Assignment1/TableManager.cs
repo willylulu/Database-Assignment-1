@@ -205,7 +205,19 @@ namespace Assignment1
              */
             foreach (SqlObjects.Sql_Select_Table table in sqlSelect.from.tables)
             {
-                aliaName.Add(((table.hasAlias) ? table.alias : table.name), table.name);
+                if( (table.hasAlias))
+                {
+                    if (!aliaName.ContainsKey(table.alias))
+                    {
+                        aliaName.Add(table.alias, table.name);
+                    } 
+                }
+                        
+                if (!aliaName.ContainsKey(table.name))
+                {
+                    aliaName.Add(table.name, table.name);
+                }
+               
             }
 
 
@@ -567,6 +579,12 @@ namespace Assignment1
 
         public void printSelect(outputPair[] outputOrder , HashSet<Dictionary<string, Guid>> data, HashSet<string> total)
         {
+            /*Console.WriteLine(total);
+            Console.WriteLine(data.Count);
+            foreach(Dictionary<string, Guid> dic in data)
+            {
+                Console.WriteLine(dic.Count);
+            }*/
             //the final output format
             List<string> attribute = new List<string>();
             List<List<dynamic>> ans = new List<List<dynamic>>();
@@ -664,15 +682,15 @@ namespace Assignment1
             else
             {
                 HashSet<Guid> tmp = getTable(aliaName[tableList[v]]).getAllIndex();
-                foreach(Guid t in tmp)
+                foreach (Guid t in tmp)
                 {
                     Dictionary<string, Guid> tmp2 = new Dictionary<string, Guid>();
                     tmp2.Add(tableList[v], t);
-                    foreach(KeyValuePair< string,Guid> p in dictionary)
+                    foreach (KeyValuePair<string, Guid> p in dictionary)
                     {
                         tmp2.Add(p.Key, p.Value);
                     }
-                    crossProductRecur(data, tmp2, tableList, v+1, count);
+                    crossProductRecur(data, tmp2, tableList, v + 1, count);
                 }
             }
         }
@@ -715,10 +733,10 @@ namespace Assignment1
                         printSelect(outputOrder, attr2attrOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
                         return;
                     case OperatorsType.attr2constant:
-                        printSelect(outputOrder, attr2conOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
+                        printSelect(outputOrder, attr2conOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key});
                         return;
                     case OperatorsType.constant2constant:
-                        if(con2conOper(aliaName, tables[0]))
+                        if (con2conOper(aliaName, tables[0]))
                         {
                             printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
                             return;
