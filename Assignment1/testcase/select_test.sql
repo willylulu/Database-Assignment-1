@@ -1,3 +1,3 @@
-SELECT title, a.name
-FROM Book, Author AS a
-WHERE Book.pages > 200 
+SELECT a.name
+FROM Author AS a
+WHERE a.authorId > 3 AND a.authorId < 36;
