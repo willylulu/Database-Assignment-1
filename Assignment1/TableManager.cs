@@ -593,8 +593,13 @@ namespace Assignment1
                 HashSet<Guid> tmp = getTable(tableList[v]).getAllIndex();
                 foreach(Guid t in tmp)
                 {
-                    dictionary.Add(tableList[v], t);
-                    crossProductRecur(data, dictionary, tableList, v+1, count);
+                    Dictionary<string, Guid> tmp2 = new Dictionary<string, Guid>();
+                    tmp2.Add(tableList[v], t);
+                    foreach(KeyValuePair< string,Guid> p in dictionary)
+                    {
+                        tmp2.Add(p.Key, p.Value);
+                    }
+                    crossProductRecur(data, tmp2, tableList, v+1, count);
                 }
             }
         }
