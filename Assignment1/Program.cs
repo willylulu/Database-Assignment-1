@@ -152,7 +152,6 @@ namespace Assignment1
 
             Stopwatch sw = new Stopwatch();
             sw.Reset();
-            sw = Stopwatch.StartNew();
 
             string text = "";
             text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
@@ -168,6 +167,7 @@ namespace Assignment1
             Parser.sql_parser(text, tableManager);
 
             //tableManager.print_table_context();
+            sw = Stopwatch.StartNew();
 
             text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
             Parser.sql_parser(text, tableManager);
