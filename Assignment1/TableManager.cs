@@ -297,16 +297,19 @@ namespace Assignment1
                             leftOp.content.tableAlias = attrToTable(leftOp.content.name, sqlSelect);
                         }
                     }
-
                     SqlObjects.Sql_Operand rightOp = sqlSelect.where.listOfConditions.firstCondition.rightOpd;
 
-                    if (rightOp.type == OperandType.attr)
+                    if (sqlSelect.where.listOfConditions.firstCondition.opType != OperatorsType.onlyOne)
                     {
-                        if (rightOp.content.hasTable == false)
-                        {
-                            rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
-                        }
+                        if (rightOp.type == OperandType.attr)
+                                            {
+                                                if (rightOp.content.hasTable == false)
+                                                {
+                                                    rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
+                                                }
+                                            }
                     }
+                        
 
                     if (sqlSelect.where.listOfConditions.firstCondition.opType == OperatorsType.attr2attr)
                     {
@@ -369,15 +372,16 @@ namespace Assignment1
                     }
 
                     SqlObjects.Sql_Operand rightOp = sqlSelect.where.listOfConditions.secondCondition.rightOpd;
-
-                    if (rightOp.type == OperandType.attr)
+                    if (sqlSelect.where.listOfConditions.firstCondition.opType != OperatorsType.onlyOne)
                     {
-                        if (rightOp.content.hasTable == false)
+                        if (rightOp.type == OperandType.attr)
                         {
-                            rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
+                            if (rightOp.content.hasTable == false)
+                            {
+                                rightOp.content.tableAlias = attrToTable(rightOp.content.name, sqlSelect);
+                            }
                         }
                     }
-
                     if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.attr2attr)
                     {
                         Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
@@ -412,7 +416,15 @@ namespace Assignment1
                     }
                     else if (sqlSelect.where.listOfConditions.secondCondition.opType == OperatorsType.onlyOne)
                     {
-                        // to be done
+                        Sql_Condition condition = sqlSelect.where.listOfConditions.secondCondition;
+                        if (condition.leftOpd.type == OperandType.attr)
+                        {
+                            tables[1] = new where(condition.leftOpd.content.tableAlias, condition.leftOpd.content.name, OperatorsType.onlyOne);
+                        }
+                        else
+                        {
+                            tables[1] = new where(condition.leftOpd.content, OperatorsType.onlyOne);
+                        }
                     }
                    
                 }
@@ -429,29 +441,11 @@ namespace Assignment1
         {
             if(table.con1 != null)
             {
-                return (bool)table.con1;
+                return table.con1 != 0;
             }
             else
             {
-                HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
-                Table table1 = getTable(aliaName[table.tableAttrPair1.Key]);
-                Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
-                HashSet<Guid> dataKeys1 = table1.getAllIndex();
-                int index1;
-                List<string> TableAttributesOrder1 = table1.getAttributesOrder();
-                index1 = TableAttributesOrder1.FindIndex(x => x == table.tableAttrPair1.Value);
-
-                var ans =
-                   from data1 in dataKeys1
-                   where attribIndex1[data1][index1] != null
-                   select new { d1 = data1 };
-                foreach (var dataPair in ans)
-                {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    elementSet.Add(aliasGidPair);
-                }
-                return elementSet;
+                return true;
             }
         }
         public HashSet<Dictionary<string, Guid>> attr2attrOper(Dictionary<string, string> aliaName,where table)
@@ -1018,7 +1012,7 @@ namespace Assignment1
                         if ( onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
                         {
                             printSelect(outputOrder, onlyoneOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
-
+                            return;
                         }
                         else
                         {
