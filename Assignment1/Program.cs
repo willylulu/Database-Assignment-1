@@ -139,7 +139,7 @@ namespace Assignment1
             tableManager.print_table_context();
             Console.ReadKey(true);
         }*/
-        static void Main87(string[] args)
+        static void Main(string[] args)
         {
             TableManager tableManager = new TableManager();
             //TestCase -- open for updating

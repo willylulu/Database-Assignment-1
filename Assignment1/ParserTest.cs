@@ -8,7 +8,7 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Main(string[] args)
+        static void Main87(string[] args)
         {
             //TestSelect();
             //TestSelectError();
