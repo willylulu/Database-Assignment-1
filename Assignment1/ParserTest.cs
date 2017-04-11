@@ -8,12 +8,13 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Mai7n(string[] args)
+        static void Main87(string[] args)
         {
             //TestSelect();
             //TestSelectError();
             string input = "";
-            input = @"SELECT bookId, title, pages, authorId, editorial FROM Book;";
+           // input = @"SELECT bookId, title, pages, authorId, editorial FROM Book;";
+            input = @"SELECT * FROM Book as a House as a;";
             Parser.Select(input);
             Console.ReadKey(true);
         }

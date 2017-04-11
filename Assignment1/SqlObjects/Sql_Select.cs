@@ -18,6 +18,8 @@ namespace Assignment1.SqlObjects
         public Sql_Select_Table[] Tables;          //tables from from
         public Sql_ListOfConditions Conditions;    //conditions from where
 
+        public String errorMsg = "";
+
         public Sql_Select(List<Sql_Select_Attr>attrs, Sql_From from, Sql_Where where)
         {
             this.attrs = attrs;
@@ -31,6 +33,9 @@ namespace Assignment1.SqlObjects
 
             if(!this.where.isEmpty)     //if no where clause, dont do
                 setConditionSelect(this.Tables);
+
+            if(testHasDuplicateAlias())
+                throw new DbException.InvalidKeyword(errorMsg);
         }
 
         private void setAttrsSelect()
@@ -53,6 +58,25 @@ namespace Assignment1.SqlObjects
 
             throw new DbException.InvalidKeyword("Invalid key error - table alias " + attr.tableAlias + " doesn't exist");
             
+        }
+        private bool testHasDuplicateAlias()
+        {
+            foreach (Sql_Select_Table table in Tables)
+            {
+                foreach(Sql_Select_Table table_compare in Tables)
+                {
+                    if (table_compare == table)
+                        continue;
+                    if (table.alias.Equals(table_compare.alias))
+                    {
+                        errorMsg = "Invalid key error - there are duplicated table aliases: "
+                                                            + table.alias;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
         public override string ToString()
         {
