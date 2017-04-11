@@ -15,8 +15,10 @@ namespace Assignment1
             string[] seperated_query = text.Split(';');
             KeyValuePair<string,dynamic>[] commands = new KeyValuePair<string, dynamic>[seperated_query.Length];
             Parallel.For(0,seperated_query.Length,(i)=> {
-                Parser.println(seperated_query [i]+ " "+i);
-                commands[i] = Parser.sql_selector(seperated_query[i].TrimStart());
+                if (seperated_query[i] != string.Empty)
+                {
+                    commands[i] = Parser.sql_selector(seperated_query[i].TrimStart());
+                }
             });
             foreach(KeyValuePair<string, dynamic> com in commands)
             {
