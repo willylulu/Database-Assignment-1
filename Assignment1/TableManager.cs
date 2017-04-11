@@ -372,7 +372,7 @@ namespace Assignment1
                     }
 
                     SqlObjects.Sql_Operand rightOp = sqlSelect.where.listOfConditions.secondCondition.rightOpd;
-                    if (sqlSelect.where.listOfConditions.firstCondition.opType != OperatorsType.onlyOne)
+                    if (sqlSelect.where.listOfConditions.secondCondition.opType != OperatorsType.onlyOne)
                     {
                         if (rightOp.type == OperandType.attr)
                         {
@@ -1108,17 +1108,15 @@ namespace Assignment1
                         }
                         break;
                     case OperatorsType.onlyOne:
-                        if (onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
+                        if (onlyoneOper(aliaName, tables[i]).GetType() != typeof(bool))
                         {
-                            printSelect(outputOrder, onlyoneOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
-                            return;
+                            data.Add( onlyoneOper(aliaName, tables[i]));
                         }
                         else
                         {
-                            if (onlyoneOper(aliaName, tables[0]))
+                            if (onlyoneOper(aliaName, tables[i]))
                             {
-                                printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
-                                return;
+                                data.Add(onlyoneOper(aliaName, tables[i]));
                             }
                             else
                             {
