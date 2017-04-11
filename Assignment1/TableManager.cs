@@ -697,6 +697,11 @@ namespace Assignment1
             {
                 
                 string tablename = op.aliName;
+                if (!op.hasAggregation)
+                {
+                    Console.WriteLine("Error: mix Aggeration wiht non-Aggr");
+                    return;
+                }
                 int ans = 0;
                 Table table = getTable(aliaName[tablename]);
                 Dictionary<Guid, List<dynamic>> tabledata = table.getTableData();
