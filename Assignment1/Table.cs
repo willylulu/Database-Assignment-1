@@ -45,8 +45,6 @@ namespace Assignment1
             }
         }
 
-        
-
         public InstructionResult insert(Dictionary<string,dynamic> tuple)
         {
             //retrive each attribute in table

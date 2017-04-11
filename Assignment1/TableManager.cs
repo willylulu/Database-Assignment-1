@@ -194,10 +194,11 @@ namespace Assignment1
         {
             foreach(SqlObjects.Sql_Select_Table table in sqlSelect.from.tables)
             {
+                Table exTable = getTable(table.name);
 
-                Table exTable = getTable(table.hasAlias ? table.alias : table.name);
                 if( exTable.hasAttr(attrName) == true)
                 {
+                    Console.WriteLine(table.hasAlias ? table.alias : table.name);
                     return table.hasAlias ? table.alias : table.name;
                 }
             }
@@ -241,8 +242,7 @@ namespace Assignment1
                             List<string> order = getTable(table.name).getAttributesOrder();
                         
                             foreach( string att in order)
-                            {
-                            
+                            {           
                                 outputOrderList.Add(new outputPair((table.hasAlias ? table.alias:table.name), table.name, att, false, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
                             }
                         }
@@ -265,23 +265,24 @@ namespace Assignment1
                     }
                     else
                     {
-                        if(sqlSelect.attrs[i].name == "*" && sqlSelect.attrs[i].hasAggregation)
+                        if (sqlSelect.attrs[i].name == "*" && sqlSelect.attrs[i].hasAggregation )
                         {
-                            outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, false, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
-                            outputOrder = outputOrderList.ToArray();
-                            continue;
-                        }
+                            //outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, aliaName[sqlSelect.attrs[i].tableAlias], sqlSelect.attrs[i].name, false, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                            //outputOrder = outputOrderList.ToArray();
+                            isAllstarCount = true;
+                        }        
                         else if (attrToTable(sqlSelect.attrs[i].name, sqlSelect) != null)
                         {
                             sqlSelect.attrs[i].tableAlias = attrToTable(sqlSelect.attrs[i].name, sqlSelect);
-                            outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].tableAlias, sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
+                            outputOrderList.Add(new outputPair(sqlSelect.attrs[i].tableAlias, aliaName[sqlSelect.attrs[i].tableAlias], sqlSelect.attrs[i].name, sqlSelect.attrs[i].hasTable, sqlSelect.attrs[i].aggregation, sqlSelect.attrs[i].hasAggregation));
                         }
                     }
                 }
-                outputOrder = outputOrderList.ToArray();
+                
 
 
             }
+            outputOrder = outputOrderList.ToArray();
             if ( !sqlSelect.where.isEmpty )
             {
                 where[] tables = new where[sqlSelect.where.listOfConditions.conditionNum];
@@ -551,6 +552,17 @@ namespace Assignment1
 
         }
 
+        public bool stringEqualCheck(string s1, string s2)
+        {
+            //Console.WriteLine("s1 = " + s1 + " s2 = " + s2.Trim(new Char[] { '\'', '"' }));
+            if (string.Compare(s1, s2.Trim(new Char[] { '\'', '"' }), true) == 0)
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+             }
         public HashSet<Dictionary<string, Guid>> attr2conOper(Dictionary<string, string> aliaName, where table)
         {
             //Build a hashset to store ans
@@ -566,12 +578,24 @@ namespace Assignment1
             int index1;
             List<string> TableAttributesOrder1 = table1.getAttributesOrder();
             index1 = TableAttributesOrder1.FindIndex(x => x == table.tableAttrPair1.Value);
-            
-            if (table.oper == Operators.equal)
+            if (table.oper == Operators.equal && table.con1.GetType() == typeof(int))
             {
                 var ans =
                     from data1 in dataKeys1
                     where attribIndex1[data1][index1] == table.con1
+                    select new { d1 = data1 };
+                foreach (var dataPair in ans)
+                {
+                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                    elementSet.Add(aliasGidPair);
+                }
+            }else if (table.oper == Operators.equal && table.con1.GetType() == typeof(string))
+            {
+
+                var ans =
+                    from data1 in dataKeys1
+                    where stringEqualCheck(attribIndex1[data1][index1], table.con1)
                     select new { d1 = data1 };
                 foreach (var dataPair in ans)
                 {
@@ -606,12 +630,25 @@ namespace Assignment1
                     elementSet.Add(aliasGidPair);
                 }
             }
-            else
+            else if(table.oper == Operators.not_equal && table.con1.GetType() == typeof(int))
             {
                 var ans =
                     from data1 in dataKeys1
                     where attribIndex1[data1][index1] != table.con1
                     select new { d1 = data1};
+                foreach (var dataPair in ans)
+                {
+                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                    elementSet.Add(aliasGidPair);
+                }
+            }
+            else
+            {
+                var ans =
+                    from data1 in dataKeys1
+                    where !stringEqualCheck(attribIndex1[data1][index1], table.con1)
+                    select new { d1 = data1 };
                 foreach (var dataPair in ans)
                 {
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
@@ -656,13 +693,15 @@ namespace Assignment1
         public void printAggr( outputPair[] outputOrder, HashSet<Dictionary<string, Guid>> data, HashSet<string> total )
         {
             List<KeyValuePair<string, int>> AggrOut = new List<KeyValuePair<string, int>>();
-            foreach(outputPair op in outputOrder)
+
+            if (isAllstarCount)
             {
-                if( op.hasTable == false && op.attr == "*")
-                {
-                    AggrOut.Add(new KeyValuePair<string, int>("Count(*)", allstarCount));
-                    continue;
-                }
+                AggrOut.Add(new KeyValuePair<string, int>("Count(*)", allstarCount));
+            }
+
+            foreach (outputPair op in outputOrder)
+            {
+                
                 string tablename = op.aliName;
                 int ans = 0;
                 Table table = getTable(aliaName[tablename]);
@@ -705,29 +744,37 @@ namespace Assignment1
                         }
                         break;
                     case Aggregation.sum:
-                        if (total.Contains(tablename))
+                        try
                         {
-                            foreach (Dictionary<string, Guid> dic in data)
-                            {
-                                if (tabledata[dic[tablename]][index] != null)
-                                {
-                                    ans += tabledata[dic[tablename]][index];
-                                }
-                            }
-                            AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
 
-                        }
-                        else
+                            if (total.Contains(tablename))
+                            {
+                                foreach (Dictionary<string, Guid> dic in data)
+                                {
+                                    if (tabledata[dic[tablename]][index] != null)
+                                    {
+                                        ans += tabledata[dic[tablename]][index];
+                                    }
+                                }
+                                AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
+
+                            }
+                            else
+                            {
+                                foreach (Guid id in table.getAllIndex())
+                                {
+                                    if (tabledata[id][index] != null)
+                                    {
+                                        ans += tabledata[id][index];
+                                    }
+                                }
+                                AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
+
+                            }
+                        }catch(Exception e)
                         {
-                            foreach (Guid id in table.getAllIndex())
-                            {
-                                if (tabledata[id][index] != null)
-                                {
-                                    ans += tabledata[id][index];
-                                }
-                            }
-                            AggrOut.Add(new KeyValuePair<string, int>("Sum(" + op.attr + ")", (int)ans));
-
+                            Console.WriteLine("Aggregation Sum with wrong type");
+                            return;
                         }
                         break;
                 }
@@ -810,7 +857,7 @@ namespace Assignment1
             if (exData != null)
             {
                 allstarCount = exData.Count;
-                if (checkAggr(outputOrder))
+                if (checkAggr(outputOrder) || isAllstarCount)
                 {
                     printAggr(outputOrder, data, total);
                     return;
@@ -880,7 +927,15 @@ namespace Assignment1
         {
             switch (table.oper){
                 case Operators.equal:
-                    return table.con1 == table.con2;
+                    if( table.con1.GetType() == typeof(int))
+                    {
+                        return table.con1 == table.con2;
+                    }
+                    else
+                    {
+                        return (string.Compare(table.con1, table.con2, true) == 0 ? true: false);
+                    }
+                    break;
 
                 case Operators.greater:
                     return table.con1 > table.con2;
@@ -889,7 +944,15 @@ namespace Assignment1
                     return table.con1 < table.con2;
 
                 case Operators.not_equal:
-                    return table.con1 != table.con2;
+                    if (table.con1.GetType() == typeof(int))
+                    {
+                        return table.con1 != table.con2;
+                    }
+                    else
+                    {
+                        return (string.Compare(table.con1, table.con2, true) != 0 ? true : false);
+                    }
+                    break;
             }
             return false;
         }
@@ -911,15 +974,40 @@ namespace Assignment1
                 switch (tables[0].operType)
                 {
                     case OperatorsType.attr2attr:
-                        printSelect(outputOrder, attr2attrOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
+                        try
+                        {
+                            printSelect(outputOrder, attr2attrOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key, tables[0].tableAttrPair2.Key });
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error Compare type error");
+                            return;
+                        }
+
                         return;
                     case OperatorsType.attr2constant:
-                        printSelect(outputOrder, attr2conOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key});
+                        try
+                        {
+                            printSelect(outputOrder, attr2conOper(aliaName, tables[0]), new HashSet<string> { tables[0].tableAttrPair1.Key });
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error Compare type error");
+                            return;
+                        }
                         return;
                     case OperatorsType.constant2constant:
                         if (con2conOper(aliaName, tables[0]))
                         {
-                            printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                            try
+                            {
+                                printSelect(outputOrder, new HashSet<Dictionary<string, Guid>>(), new HashSet<string>());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Error Compare type error");
+                                return;
+                            }
                             return;
                         }
                         else
@@ -955,18 +1043,30 @@ namespace Assignment1
             HashSet<string> right = new HashSet<string>();
             HashSet<string> total = new HashSet<string>();
             if (isAttr1)
-            {  
-                left.Add(tables[0].tableAttrPair1.Key);
-                left.Add(tables[0].tableAttrPair2.Key);
-                total.Add(tables[0].tableAttrPair1.Key);
-                total.Add(tables[0].tableAttrPair2.Key);
+            {  if(tables[0].tableAttrPair1.Key != null)
+                {
+                    left.Add(tables[0].tableAttrPair1.Key);
+                    total.Add(tables[0].tableAttrPair1.Key);
+                }
+                if( tables[0].tableAttrPair2.Key != null)
+                {
+                    left.Add(tables[0].tableAttrPair2.Key);
+                    total.Add(tables[0].tableAttrPair2.Key);
+                }
+                
             }
             if (isAttr2)
-            {              
-                right.Add(tables[1].tableAttrPair1.Key);
-                right.Add(tables[1].tableAttrPair2.Key);
-                total.Add(tables[1].tableAttrPair1.Key);
-                total.Add(tables[1].tableAttrPair2.Key);
+            {
+                if (tables[1].tableAttrPair1.Key != null)
+                {
+                    right.Add(tables[1].tableAttrPair1.Key);
+                    total.Add(tables[1].tableAttrPair1.Key);
+                }
+                if (tables[1].tableAttrPair2.Key != null)
+                {
+                    right.Add(tables[1].tableAttrPair2.Key);
+                    total.Add(tables[1].tableAttrPair2.Key);
+                }
             }
 
             List<dynamic> data = new List<dynamic>();
@@ -976,14 +1076,37 @@ namespace Assignment1
                 switch (tables[i].operType)
                 {
                     case OperatorsType.attr2attr:
-                        data.Add(attr2attrOper(aliaName, tables[i]));
+                        try
+                        {
+                            data.Add(attr2attrOper(aliaName, tables[i]));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error Compare type error");
+                            return;
+                        }
                         break;
                     case OperatorsType.attr2constant:
-                        Console.WriteLine(i);
-                        data.Add(attr2conOper(aliaName, tables[i]));
+                        try
+                        {
+                            data.Add(attr2conOper(aliaName, tables[i]));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error Compare type error");
+                            return;
+                        }
                         break;
                     case OperatorsType.constant2constant:
-                        data.Add(con2conOper(aliaName, tables[i]));
+                        try
+                        {
+                            data.Add(con2conOper(aliaName, tables[i]));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error Compare type error");
+                            return;
+                        }
                         break;
                     case OperatorsType.onlyOne:
                         if (onlyoneOper(aliaName, tables[0]).GetType() != typeof(bool))
@@ -1086,26 +1209,26 @@ namespace Assignment1
 
             public bool Equals(Dictionary<string, Guid> b1, Dictionary<string, Guid> b2)
             {
-                foreach( KeyValuePair<string, Guid> kv in b1)
+                
+                foreach ( KeyValuePair<string, Guid> kv in b1)
                 {
                     if (!b2.ContainsKey(kv.Key))
                     {
                         return false;
-                    }else if (kv.Value != b2[kv.Key])
+                    }
+                    if (kv.Value != b2[kv.Key])
                     {
                         return false;
                     }
+                   
+
                 }
                 return true;
             }
             public int GetHashCode(Dictionary<string, Guid> bx)
             {
-                int hCode = 0;
-                foreach(KeyValuePair<string,Guid> kv in bx)
-                {
-                    hCode += kv.Value.GetHashCode();
-                }
-                return hCode;
+                int hCode = bx.Count;
+                return hCode.GetHashCode();
             }
 
         }
@@ -1161,9 +1284,16 @@ namespace Assignment1
             }
 
             //HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union((HashSet<Dictionary<string, Guid>>)temp_eleSet2);
+            HashEqualityComparer tempCom = new HashEqualityComparer();
+            HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
 
-            temp_eleSet1.UnionWith(temp_eleSet2);
-            return temp_eleSet1;
+            var union = temp_eleSet1.Union(temp_eleSet2,tempCom);
+
+            foreach( var aa in union)
+            {
+                result.Add(aa);
+            }
+            return result;
             //return result;
         }
 
@@ -1176,8 +1306,7 @@ namespace Assignment1
                     return false;
                 }
             }
-            Console.WriteLine(true);
-            return true;
+             return true;
         }
         private HashSet<Dictionary<string, Guid>> intersect(HashSet<Dictionary<string, Guid>> elementSet1, HashSet<string> tableAttrHashSet1, HashSet<Dictionary<string, Guid>> elementSet2, HashSet<string> tableAttrHashSet2)
         {
@@ -1266,24 +1395,7 @@ namespace Assignment1
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
         public int allstarCount;
+        public bool isAllstarCount;
     }
 }
 
-class ProductComparer : IEqualityComparer< Dictionary<string, Guid> >
-{
-    // Products are equal if their names and product numbers are equal. 
-    public bool Equals(Dictionary<string, Guid>  x, Dictionary<string, Guid> y)
-    {
-
-        return x.SequenceEqual(y);
-    }
-
-    // If Equals() returns true for a pair of objects, 
-    // GetHashCode must return the same value for these objects. 
-
-    public int GetHashCode(Dictionary<string, Guid> x)
-    {
-        return x.Count.GetHashCode();
-    }
-
-}
