@@ -22,7 +22,10 @@ namespace Assignment1
             select new string(first.Concat(rest).ToArray())).Token();
 
         public static readonly Parser<string> IdentifierIncludeDot =
-           (from first in Parse.LetterOrDigit.Once().XOr(Parse.Chars("._").Once())
+           (
+            from breakPoint in Parse.Not(Parse.IgnoreCase("and").XOr(Parse.IgnoreCase("or")))
+            from first in Parse.LetterOrDigit.Once().XOr(Parse.Chars("._").Once())
+            //from breakPoint in Parse.Not(Condition_Conjunction)
             //can parse A-Z a-z 0-9 _ 
             from rest in Parse.LetterOrDigit.XOr(Parse.Chars("._")).Many()
             select new string(first.Concat(rest).ToArray())).Token();

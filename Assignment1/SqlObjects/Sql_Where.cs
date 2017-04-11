@@ -101,6 +101,7 @@ namespace Assignment1.SqlObjects
 
         public Sql_Condition(String leftOpd_str,  String op, String rightOpd_str)
         {
+            Console.WriteLine(leftOpd_str + " " + op + " " + rightOpd_str);
             if (leftOpd_str.Equals("") && op.Equals("") && rightOpd_str.Equals(""))
                 return;
 
@@ -194,6 +195,7 @@ namespace Assignment1.SqlObjects
 
         private Operators getOperatorsOrThrowException(String str, String leftOpd_str, String rightOpd_str)
         {
+            //Console.WriteLine(leftOpd_str + " " + str + " " + rightOpd_str);
             if (str.Equals("="))
                 return Operators.equal;
             else if (str.Equals(">"))
