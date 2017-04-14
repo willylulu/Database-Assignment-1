@@ -121,9 +121,19 @@ namespace Assignment1
             attribIndex[name][value].Add(address);
         }
 
-        private HashSet<Guid> getAttribIndex(string name, dynamic value)
+        public HashSet<Guid> getAttribIndex(string name, dynamic value)
         {
             return attribIndex[name][value];
+        }
+
+        public HashSet<dynamic> getAttribIndexKeys(string name)
+        {
+            return new HashSet<dynamic>(attribIndex[name].Keys);
+        }
+
+        public bool isAttribIndexContains(string name, dynamic value)
+        {
+            return attribIndex[name].ContainsKey(value);
         }
 
         public Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> getAllAttribIndex()
