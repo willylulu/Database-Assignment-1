@@ -479,14 +479,23 @@ namespace Assignment1
                 //    where attribIndex1[data1][index1] == attribIndex2[data2][index2]
                 //    select new { d1 = data1, d2 = data2 };
                 HashSet<dynamic> ans = new HashSet<dynamic>();
-                foreach (Guid g1 in dataKeys1)
+
+                bool ll = dataKeys1.Count <= dataKeys2.Count;
+                HashSet<Guid> tk1 = ll ? dataKeys1 : dataKeys2;
+                HashSet<Guid> tk2 = ll ? dataKeys2 : dataKeys1;
+                Table t1 = ll ? table1 : table2;
+                Table t2 = ll ? table2 : table1;
+                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
+                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
+
+                foreach (Guid g1 in tk1)
                 {
-                    dynamic key = table1.getTableOnlyOneData(g1, table.tableAttrPair1.Value);
-                    if (table2.isAttribIndexContains(table.tableAttrPair2.Value, key))
+                    dynamic key = t1.getTableOnlyOneData(g1, at1);
+                    if (t2.isAttribIndexContains(at2, key))
                     {
-                        foreach (Guid g2 in table2.getAttribIndex(table.tableAttrPair2.Value, key))
+                        foreach (Guid g2 in t2.getAttribIndex(at2, key))
                         {
-                            ans.Add(new { d1 = g1, d2 = g2 });
+                            ans.Add(ll ? new { d1 = g1, d2 = g2 } : new { d1 = g2, d2 = g1 });
                         }
                     }
                 }
@@ -607,14 +616,23 @@ namespace Assignment1
             else if (table.oper == Operators.equal && table.con1.GetType() == typeof(string))
             {
 
-                var ans =
-                    from data1 in dataKeys1
-                    where stringEqualCheck(attribIndex1[data1][index1], table.con1)
-                    select new { d1 = data1 };
-                foreach (var dataPair in ans)
+                //var ans =
+                //    from data1 in dataKeys1
+                //    where stringEqualCheck(attribIndex1[data1][index1], table.con1)
+                //    select new { d1 = data1 };
+                HashSet<Guid> ans = null;
+                if (table1.isAttribIndexContains(table.tableAttrPair1.Value, table.con1.Trim(new Char[] { '\'', '"' })))
+                {
+                    ans = table1.getAttribIndex(table.tableAttrPair1.Value, table.con1.Trim(new Char[] { '\'', '"' }));
+                }
+                else
+                {
+                    ans = new HashSet<Guid>();
+                }
+                foreach (Guid g in ans)
                 {
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                    aliasGidPair.Add(table.tableAttrPair1.Key, g);
                     elementSet.Add(aliasGidPair);
                 }
             }

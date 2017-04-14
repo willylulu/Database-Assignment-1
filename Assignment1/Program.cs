@@ -160,7 +160,7 @@ namespace Assignment1
             text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
             Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText(@"../../testcase/book2.sql");
+            text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
             Parser.sql_parser(text, tableManager);
 
             text = System.IO.File.ReadAllText(@"../../testcase/student.sql");

@@ -117,7 +117,11 @@ namespace Assignment1
             }
             else
             {
-                return new KeyValuePair<string, dynamic>("unKnown", null);
+                if (sql == string.Empty)
+                {
+                    return new KeyValuePair<string, dynamic>("empty", null);
+                }
+                else return new KeyValuePair<string, dynamic>("unKnown", null);
             }
         }
         public static SqlGrammar.Sql_Table CreateTable(string sql)
