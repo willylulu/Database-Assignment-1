@@ -126,9 +126,9 @@ namespace Assignment1
             return attribIndex[name][value];
         }
 
-        public HashSet<dynamic> getAttribIndexKeys(string name)
+        public Dictionary<dynamic,HashSet<Guid>>.KeyCollection getAttribIndexKeys(string name)
         {
-            return new HashSet<dynamic>(attribIndex[name].Keys);
+            return attribIndex[name].Keys;
         }
 
         public bool isAttribIndexContains(string name, dynamic value)
