@@ -152,6 +152,7 @@ namespace Assignment1
             //To use Create Table , just call CreateTable(str sql)
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
+
             if(args.Length == 1)
             {
                 if (args[0] == "-r")
@@ -176,7 +177,7 @@ namespace Assignment1
                 {
                     break;
                 }
-                else if (cmd == "text")
+                else if (cmd == "t")
                 {
                     sw.Reset();
                     sw = Stopwatch.StartNew();
@@ -196,8 +197,8 @@ namespace Assignment1
                     tableManager.print_table_context();
 
 
-                    text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
-                    Parser.sql_parser(text, tableManager);
+                    //text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
+                    //Parser.sql_parser(text, tableManager);
                     sw.Stop();
                     long ms = sw.ElapsedMilliseconds;
                     Console.WriteLine("Cost " + ms + " ms");

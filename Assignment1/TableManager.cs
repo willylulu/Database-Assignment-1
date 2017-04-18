@@ -638,28 +638,60 @@ namespace Assignment1
             }
             else if (table.oper == Operators.greater)
             {
-                var ans =
-                    from data1 in dataKeys1
-                    where attribIndex1[data1][index1] > table.con1
-                    select new { d1 = data1 };
-                foreach (var dataPair in ans)
+                if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    elementSet.Add(aliasGidPair);
+                    Console.WriteLine("A");
+                    HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    foreach (Guid dataPair in ans)
+                    {
+                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
+                        elementSet.Add(aliasGidPair);
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("B");
+                    var ans =
+                        from data1 in dataKeys1
+                        where attribIndex1[data1][index1] > table.con1
+                        select new { d1 = data1 };
+                    foreach (var dataPair in ans)
+                    {
+                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                        elementSet.Add(aliasGidPair);
+                    }
+                }
+
+
             }
             else if (table.oper == Operators.less)
             {
-                var ans =
-                    from data1 in dataKeys1
-                    where attribIndex1[data1][index1] < table.con1
-                    select new { d1 = data1 };
-                foreach (var dataPair in ans)
+                if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    elementSet.Add(aliasGidPair);
+                    Console.WriteLine("A");
+                    HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    foreach (Guid dataPair in ans)
+                    {
+                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
+                        elementSet.Add(aliasGidPair);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("B");
+                    var ans =
+                        from data1 in dataKeys1
+                        where attribIndex1[data1][index1] < table.con1
+                        select new { d1 = data1 };
+                    foreach (var dataPair in ans)
+                    {
+                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                        elementSet.Add(aliasGidPair);
+                    }
                 }
             }
             else if (table.oper == Operators.not_equal && table.con1.GetType() == typeof(int))
