@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+    [Serializable]
     class TableAttribute
     {
         public const string STRING_TYPE = "String";

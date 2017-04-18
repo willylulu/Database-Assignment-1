@@ -137,6 +137,8 @@ namespace Assignment1
             this.hasAggregation = hasAggregation;
         }
     }
+
+    [Serializable]
     class TableManager
     {
         public InstructionResult createTable(string name, List<string> TableAttributesOrder, Dictionary<string, TableAttribute> TableAttributes)
@@ -1424,11 +1426,9 @@ namespace Assignment1
 
             }
             File.WriteAllText("../../table_conetxt.csv", csv.ToString());
-
-
-
-
         }
+
+
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
         public int allstarCount;

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -141,7 +142,9 @@ namespace Assignment1
         }*/
         static void Main(string[] args)
         {
-            TableManager tableManager = new TableManager();
+            tableManager = new TableManager();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            Stopwatch sw = new Stopwatch();
             //TestCase -- open for updating
             //1. Insertion that has no values
             //2. Insertion that values('1'1, '2'3' ) raise exception
@@ -149,39 +152,127 @@ namespace Assignment1
             //To use Create Table , just call CreateTable(str sql)
             //To use Insert Table , just call Insert(str sql)
             //To determine which instruction, use  getInstruction(str str)
+            if(args.Length == 1)
+            {
+                if (args[0] == "-r")
+                {
+                    Console.WriteLine("Read File "+ args[1]);
+                    file = File.Open(args[1], FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    BinaryFormatter reader = new BinaryFormatter();
+                    tableManager = (TableManager)reader.Deserialize(file);
+                    file.Dispose();
+                    file.Close();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cold Start");
+            }
+            while (true)
+            {
+                string cmd = Console.ReadLine();
+                string[] cmd_split = cmd.Split(' ');
+                if (cmd == "exit")
+                {
+                    break;
+                }
+                else if (cmd == "text")
+                {
+                    sw.Reset();
+                    sw = Stopwatch.StartNew();
+                    string text = "";
+                    text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
+                    Parser.sql_parser(text, tableManager);
 
-            Stopwatch sw = new Stopwatch();
-            sw.Reset();
+                    text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
+                    Parser.sql_parser(text, tableManager);
 
-            string text = "";
-            text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
-            Parser.sql_parser(text, tableManager);
+                    text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
+                    Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
-            Parser.sql_parser(text, tableManager);
+                    text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
+                    Parser.sql_parser(text, tableManager);
 
-            text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
-            Parser.sql_parser(text, tableManager);
+                    tableManager.print_table_context();
 
-            text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
-            Parser.sql_parser(text, tableManager);
+
+                    text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
+                    Parser.sql_parser(text, tableManager);
+                    sw.Stop();
+                    long ms = sw.ElapsedMilliseconds;
+                    Console.WriteLine("Cost " + ms + " ms");
+                }
+                else if(cmd_split[0] == "read")
+                {
+                    string input = "";
+                    if (cmd_split[1] == "default")
+                    {
+                        input = "data.db2";
+                    }
+                    else input = cmd_split[1];
+                    Console.WriteLine("Read File " + input);
+                    sw.Reset();
+                    sw = Stopwatch.StartNew();
+                    file = File.Open(input, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    BinaryFormatter reader = new BinaryFormatter();
+                    tableManager = (TableManager)reader.Deserialize(file);
+                    file.Dispose();
+                    file.Close();
+                    sw.Stop();
+                    long ms = sw.ElapsedMilliseconds;
+                    Console.WriteLine("Cost " + ms + " ms");
+                }
+                else if(cmd_split[0] == "sql")
+                {
+                    sw.Reset();
+                    sw = Stopwatch.StartNew();
+                    string text = "";
+                    text = System.IO.File.ReadAllText(cmd_split[1]);
+                    Parser.sql_parser(text, tableManager);
+                    sw.Stop();
+                    long ms = sw.ElapsedMilliseconds;
+                    Console.WriteLine("Cost " + ms + " ms");
+                }
+                else
+                {
+                    sw.Reset();
+                    sw = Stopwatch.StartNew();
+                    Parser.sql_parser(cmd, tableManager);
+                    sw.Stop();
+                    long ms = sw.ElapsedMilliseconds;
+                    Console.WriteLine("Cost " + ms + " ms");
+                }
+            }
+
+            //string text = "";
+            //text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
+            //Parser.sql_parser(text, tableManager);
+
+            //text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
+            //Parser.sql_parser(text, tableManager);
+
+            //text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
+            //Parser.sql_parser(text, tableManager);
+
+            //text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
+            //Parser.sql_parser(text, tableManager);
 
             //tableManager.print_table_context();
-            sw = Stopwatch.StartNew();
 
-            text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
-            Parser.sql_parser(text, tableManager);
 
-           /* do
-            {
-                sql_path = Console.ReadLine();
-                text = System.IO.File.ReadAllText(sql_path);
-                Parser.sql_parser(text, tableManager);
-            } while (sql_path != null);*/
+            //text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
+            //Parser.sql_parser(text, tableManager);
+
+            /* do
+             {
+                 sql_path = Console.ReadLine();
+                 text = System.IO.File.ReadAllText(sql_path);
+                 Parser.sql_parser(text, tableManager);
+             } while (sql_path != null);*/
 
             //text = System.IO.File.ReadAllText(args.Length==0? "../../testcase/createTables.sql" : args[0]);
             //string text = System.IO.File.ReadAllText(@"../../sql_error3.sql");
-            
+
 
             //string[] seperated_query = text.Split(';');
             //foreach (string s in seperated_query)
@@ -189,13 +280,25 @@ namespace Assignment1
             //    console.writeline(s);
             //    parser.sql_selector(s.trimstart());
             //}
-            sw.Stop();
-            long ms = sw.ElapsedMilliseconds;
-            Console.WriteLine("Cost "+ms+" ms");
-            tableManager.print_table_context();
+            //sw.Stop();
+            //long ms = sw.ElapsedMilliseconds;
+            //Console.WriteLine("Cost "+ms+" ms");
+            //tableManager.print_table_context();
             //TestCreateTable();
             //TestInsertion();
-            Console.ReadKey(true);
         }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            tableManager.print_table_context();
+            file = File.Open("data.db2", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryFormatter writer = new BinaryFormatter();
+            writer.Serialize(file, tableManager);
+            file.Dispose();
+            file.Close();
+        }
+
+        static public FileStream file = null;
+        static public TableManager tableManager;
     }
 }

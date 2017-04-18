@@ -32,6 +32,7 @@ namespace Assignment1
         }
     }
 
+    [Serializable]
     class Table
     {
 
