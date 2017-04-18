@@ -1461,6 +1461,11 @@ namespace Assignment1
         }
 
 
+        public void turnOnIndexing(string tableName,string attriName)
+        {
+            tables[tableName].turnOnIndexing(attriName);
+        }
+
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
         public int allstarCount;
