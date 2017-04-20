@@ -512,38 +512,102 @@ namespace Assignment1
             }
             else if (table.oper == Operators.greater)
             {
-                var ans =
-                    from data1 in dataKeys1
-                    from data2 in dataKeys2
-                    where attribIndex1[data1][index1] > attribIndex2[data1][index2]
-                    select new { d1 = data1, d2 = data2 };
-                foreach (var dataPair in ans)
+                //var ans =
+                //    from data1 in dataKeys1
+                //    from data2 in dataKeys2
+                //    where attribIndex1[data1][index1] > attribIndex2[data1][index2]
+                //    select new { d1 = data1, d2 = data2 };
+                //Console.WriteLine(ans.Count());
+                //foreach (var dataPair in ans)
+                //{
+                //    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                //    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                //    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
+                //    {
+                //        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
+                //    }
+                //    elementSet.Add(aliasGidPair);
+                //}
+                bool ll = dataKeys1.Count <= dataKeys2.Count;
+                Table t1 = ll ? table1 : table2;
+                Table t2 = ll ? table2 : table1;
+                string ak1 = table.tableAttrPair1.Key;
+                string ak2 = table.tableAttrPair2.Key;
+                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
+                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
+
+                foreach (dynamic d1 in t1.getAttribIndexKeys(at1))
                 {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
+                    foreach (dynamic d2 in t2.getBoundinfSet(at2, d1, ll? Operators.less : Operators.greater))
                     {
-                        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
+                        HashSet<Guid> g1s = t1.getAttribIndex(at1, d1);
+                        HashSet<Guid> g2s = t2.getAttribIndex(at2, d2);
+                        foreach (Guid g1 in g1s)
+                        {
+                            foreach (Guid g2 in g2s)
+                            {
+                                Guid gg1 = ll ? g1 : g2;
+                                Guid gg2 = ll ? g2 : g1;
+                                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                                aliasGidPair.Add(ak1, gg1);
+                                if (!aliasGidPair.ContainsKey(ak2))
+                                {
+                                    aliasGidPair.Add(ak2, gg2);
+                                }
+                                elementSet.Add(aliasGidPair);
+                            }
+                        }
                     }
-                    elementSet.Add(aliasGidPair);
                 }
             }
             else if (table.oper == Operators.less)
             {
-                var ans =
-                    from data1 in dataKeys1
-                    from data2 in dataKeys2
-                    where attribIndex1[data1][index1] < attribIndex2[data1][index2]
-                    select new { d1 = data1, d2 = data2 };
-                foreach (var dataPair in ans)
+                //var ans =
+                //    from data1 in dataKeys1
+                //    from data2 in dataKeys2
+                //    where attribIndex1[data1][index1] < attribIndex2[data1][index2]
+                //    select new { d1 = data1, d2 = data2 };
+                //Console.WriteLine(ans.Count());
+                //foreach (var dataPair in ans)
+                //{
+                //    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                //    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
+                //    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
+                //    {
+                //        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
+                //    }
+                //    elementSet.Add(aliasGidPair);
+                //}
+                bool ll = dataKeys1.Count <= dataKeys2.Count;
+                Table t1 = ll ? table1 : table2;
+                Table t2 = ll ? table2 : table1;
+                string ak1 = table.tableAttrPair1.Key;
+                string ak2 = table.tableAttrPair2.Key;
+                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
+                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
+
+                foreach (dynamic d1 in t1.getAttribIndexKeys(at1))
                 {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
+                    foreach (dynamic d2 in t2.getBoundinfSet(at2, d1, ll ? Operators.greater : Operators.less))
                     {
-                        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
+                        HashSet<Guid> g1s = t1.getAttribIndex(at1, d1);
+                        HashSet<Guid> g2s = t2.getAttribIndex(at2, d2);
+                        foreach (Guid g1 in g1s)
+                        {
+                            foreach (Guid g2 in g2s)
+                            {
+                                Guid gg1 = ll ? g1 : g2;
+                                Guid gg2 = ll ? g2 : g1;
+                                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                                aliasGidPair.Add(ak1, gg1);
+                                if (!aliasGidPair.ContainsKey(ak2))
+                                {
+                                    aliasGidPair.Add(ak2, gg2);
+                                }
+                                elementSet.Add(aliasGidPair);
+                            }
+                        }
                     }
-                    elementSet.Add(aliasGidPair);
                 }
             }
             else
