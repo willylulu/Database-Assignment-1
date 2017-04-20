@@ -43,7 +43,7 @@ namespace Assignment1
             foreach(string s in TableAttributesOrder)
             {
                 attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>(Constants.DEFAULT_SPACE_SM));
-                indexingLookupTable.Add(s,false);
+                indexingLookupTable.Add(s,true);
                 attriSortedIndex.Add(s,new BPlusTree());
             }
         }

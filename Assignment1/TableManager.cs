@@ -643,11 +643,15 @@ namespace Assignment1
                     //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
-                    foreach (Guid dataPair in ans)
+                    foreach (dynamic d in ans)
                     {
-                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
-                        elementSet.Add(aliasGidPair);
+                        HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
+                        foreach(Guid dataPair in guids)
+                        {
+                            Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                            aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
+                            elementSet.Add(aliasGidPair);
+                        }
                     }
                 }
                 else
@@ -673,11 +677,15 @@ namespace Assignment1
                     //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
-                    foreach (Guid dataPair in ans)
+                    foreach (dynamic d in ans)
                     {
-                        Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                        aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
-                        elementSet.Add(aliasGidPair);
+                        HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
+                        foreach (Guid dataPair in guids)
+                        {
+                            Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                            aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
+                            elementSet.Add(aliasGidPair);
+                        }
                     }
                 }
                 else
