@@ -704,15 +704,22 @@ namespace Assignment1
             }
             else if (table.oper == Operators.not_equal && table.con1.GetType() == typeof(int))
             {
-                var ans =
-                    from data1 in dataKeys1
-                    where attribIndex1[data1][index1] != table.con1
-                    select new { d1 = data1 };
-                foreach (var dataPair in ans)
+                //var ans =
+                //    from data1 in dataKeys1
+                //    where attribIndex1[data1][index1] != table.con1
+                //    select new { d1 = data1 };
+                foreach(dynamic k in table1.getAttribIndexKeys(table.tableAttrPair1.Value))
                 {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    elementSet.Add(aliasGidPair);
+                    if(k!= table.con1)
+                    {
+                        HashSet<Guid> ans = table1.getAttribIndex(table.tableAttrPair1.Value, k);
+                        foreach (Guid dataPair in ans)
+                        {
+                            Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
+                            aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
+                            elementSet.Add(aliasGidPair);
+                        }
+                    }
                 }
             }
             else
