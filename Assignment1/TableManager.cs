@@ -640,8 +640,9 @@ namespace Assignment1
             {
                 if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
-                    Console.WriteLine("A");
-                    HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    //Console.WriteLine("A");
+                    //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     foreach (Guid dataPair in ans)
                     {
                         Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
@@ -651,7 +652,6 @@ namespace Assignment1
                 }
                 else
                 {
-                    Console.WriteLine("B");
                     var ans =
                         from data1 in dataKeys1
                         where attribIndex1[data1][index1] > table.con1
@@ -670,8 +670,9 @@ namespace Assignment1
             {
                 if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
-                    Console.WriteLine("A");
-                    HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    //Console.WriteLine("A");
+                    //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
+                    HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     foreach (Guid dataPair in ans)
                     {
                         Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
@@ -681,7 +682,6 @@ namespace Assignment1
                 }
                 else
                 {
-                    Console.WriteLine("B");
                     var ans =
                         from data1 in dataKeys1
                         where attribIndex1[data1][index1] < table.con1

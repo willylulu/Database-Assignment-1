@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BPlusTree.cs" />
     <Compile Include="DbException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ParserTest.cs" />

@@ -43,8 +43,8 @@ namespace Assignment1
             foreach(string s in TableAttributesOrder)
             {
                 attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>(Constants.DEFAULT_SPACE_SM));
-                attribSortedIndex.Add(s,new SortedSet<dynamic>());
                 indexingLookupTable.Add(s,false);
+                attriSortedIndex.Add(s,new BPlusTree());
             }
         }
 
@@ -96,7 +96,6 @@ namespace Assignment1
 
                 //let the every element in tuple put in the attribIndex for selection
                 setAttribIndex(s,tuple[s],guid);
-                if(indexingLookupTable[s])setAttribSortedIndex(s, tuple[s]);
             }
 
             dataKeys.Add(guid);
@@ -121,16 +120,10 @@ namespace Assignment1
             {
                 HashSet<Guid> temp = new HashSet<Guid>();
                 attribIndex[name].Add(value, temp);
+                if(value.GetType().ToString()=="System.Int32")
+                    attriSortedIndex[name].insert(value);
             }
             attribIndex[name][value].Add(address);
-        }
-
-        private void setAttribSortedIndex(string name, dynamic value)
-        {
-            if (!attribSortedIndex[name].Contains(value))
-            {
-                attribSortedIndex[name].Add(value);
-            }
         }
 
         public HashSet<Guid> getAttribIndex(string name, dynamic value)
@@ -147,6 +140,8 @@ namespace Assignment1
         {
             return attribIndex[name].ContainsKey(value);
         }
+
+    
 
         public Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> getAllAttribIndex()
         {
@@ -188,76 +183,28 @@ namespace Assignment1
             return false;
         }
 
-        public HashSet<Guid> findBoundSet(string name,dynamic value,Operators oper)
-        {
-            HashSet<Guid> ans = new HashSet<Guid>();
-            List<dynamic> l = new List<dynamic>(attribSortedIndex[name]);
-            int pointer;
-            switch (oper)
-            {
-                case Operators.greater:
-                    pointer = findUpperBound(l, 0, l.Count, value);
-                    Console.WriteLine(l[pointer]);
-                    for (int i= pointer; i < l.Count; i++)
-                    {
-                        dynamic tmp = l[i];
-                        if (tmp != value)
-                        {
-                            foreach (Guid g in getAttribIndex(name, tmp))
-                            {
-                                ans.Add(g);
-                            }
-                        }
-                    }
-                    break;
-                case Operators.less:
-                    pointer = findLowerBound(l, 0, l.Count, value);
-                    Console.WriteLine(l[pointer]);
-                    for (int i = 0; i < pointer; i++)
-                    {
-                        dynamic tmp = l[i];
-                        if (tmp != value)
-                        {
-                            foreach (Guid g in getAttribIndex(name, tmp))
-                            {
-                                ans.Add(g);
-                            }
-                        }
-                    }
-                    break;
-            }
-            return ans;
-        }
-
-        private int findLowerBound(List<dynamic> ls, int l, int u, int lowerBound)
-        {
-            int index = (l + u) / 2;
-            if (l == u) return index;
-            if (lowerBound < ls[index])
-            {
-                return findLowerBound(ls, l / 2, index, lowerBound);
-            }
-            else
-            {
-                return findLowerBound(ls, index + 1, u, lowerBound);
-            }
-        }
-
-        private int findUpperBound(List<dynamic> ls, int l, int u, int lowerBound)
-        {
-            int ansIndex = findLowerBound(ls, l, u, lowerBound);
-            return ansIndex - 1;
-        }
-
         public void turnOnIndexing(string name)
         {
             indexingLookupTable[name] = true;
-            attribSortedIndex[name] = new SortedSet<dynamic>(attribIndex[name].Keys);
         }
 
         public bool isAttrIndexing(string name)
         {
             return indexingLookupTable[name];
+        }
+
+        public HashSet<dynamic> getBoundinfSet(string name, dynamic value, Operators oper)
+        {
+            HashSet<dynamic> h = new HashSet<dynamic>();
+            if (oper == Operators.greater)
+            {
+                attriSortedIndex[name].findLowerBound(h,value);
+            }
+            else
+            {
+                attriSortedIndex[name].findUpperBound(h, value);
+            }
+            return h;
         }
 
         private List<string> TableAttributesOrder = new List<string>(Constants.MAX_ATTR_NUM);
@@ -266,6 +213,6 @@ namespace Assignment1
         private Dictionary<Guid,List<dynamic>> data = new Dictionary<Guid, List<dynamic>>(Constants.DEFAULT_SPACE);
         private Dictionary<string, Dictionary<dynamic, HashSet<Guid>>> attribIndex = new Dictionary<string, Dictionary<dynamic, HashSet<Guid>>>(Constants.MAX_ATTR_NUM);
         private Dictionary<string, bool> indexingLookupTable = new Dictionary<string, bool>();
-        private Dictionary<string, SortedSet<dynamic>> attribSortedIndex = new Dictionary<string, SortedSet<dynamic>>(Constants.MAX_ATTR_NUM);
+        private Dictionary<string, BPlusTree> attriSortedIndex = new Dictionary<string, BPlusTree>();
     }
 }
