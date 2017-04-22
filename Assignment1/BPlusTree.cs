@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+    [Serializable]
     class BPlusTree
     {
         public BPlusTree()
@@ -45,6 +46,7 @@ namespace Assignment1
         private node root;
     }
 
+    [Serializable]
     class node
     {
         static int ID = 0;
