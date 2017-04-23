@@ -1517,70 +1517,70 @@ namespace Assignment1
                 }
             }
 
-            Parallel.ForEach(es1, (d1) =>
-             {
-                 Guid target;
-                 HashSet<Dictionary<string, Guid>> temp = null;
-                 switch (dupAttr.Count)
-                 {
-                     case 0:
-                         temp = es2;
-                         break;
-                     case 1:
-                         target = d1[dupAttr[0]];
-                         if (dick.ContainsKey(target))
-                             temp = dick[target];
-                         else temp = new HashSet<Dictionary<string, Guid>>();
-                         break;
-                     case 2:
-                         target = d1[dupAttr[0]];
-                         if (dick.ContainsKey(target))
-                         {
-                             temp = dick[target];
-                             for (int i = 1; i < dupAttr.Count; i++)
-                             {
-                                 Dictionary<Guid, HashSet<Dictionary<string, Guid>>> cock = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>();
-                                 foreach (Dictionary<string, Guid> d2 in temp)
-                                 {
-                                     foreach (KeyValuePair<string, Guid> k in d2)
-                                     {
-                                         if (!cock.ContainsKey(k.Value)) cock.Add(k.Value, new HashSet<Dictionary<string, Guid>>());
-                                         cock[k.Value].Add(d2);
-                                     }
-                                 }
-                                 Guid target2 = d1[dupAttr[i]];
-                                 if (cock.ContainsKey(target2))
-                                 {
-                                     temp = cock[target2];
-                                 }
-                                 else
-                                 {
-                                     temp = new HashSet<Dictionary<string, Guid>>();
-                                 }
-                             }
-                         }
-                         break;
-                 }
-                 foreach (Dictionary<string, Guid> d2 in temp)
-                 {
-                     Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
-                     foreach (var dd in d1)
-                     {
-                         if (!temp_result.ContainsKey(dd.Key))
-                         {
-                             temp_result.Add(dd.Key, dd.Value);
-                         }
-                     }
-                     foreach (var dd in d2)
-                     {
-                         if (!temp_result.ContainsKey(dd.Key))
-                         {
-                             temp_result.Add(dd.Key, dd.Value);
-                         }
-                     }
-                     result.Add(temp_result);
-                 }
-             });
+            foreach(Dictionary<string, Guid> d1 in es1)
+            {
+                Guid target;
+                HashSet<Dictionary<string, Guid>> temp = null;
+                switch (dupAttr.Count)
+                {
+                    case 0:
+                        temp = es2;
+                        break;
+                    case 1:
+                        target = d1[dupAttr[0]];
+                        if (dick.ContainsKey(target))
+                            temp = dick[target];
+                        else temp = new HashSet<Dictionary<string, Guid>>();
+                        break;
+                    case 2:
+                        target = d1[dupAttr[0]];
+                        if (dick.ContainsKey(target))
+                        {
+                            temp = dick[target];
+                            for (int i = 1; i < dupAttr.Count; i++)
+                            {
+                                Dictionary<Guid, HashSet<Dictionary<string, Guid>>> cock = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>();
+                                foreach (Dictionary<string, Guid> d2 in temp)
+                                {
+                                    foreach (KeyValuePair<string, Guid> k in d2)
+                                    {
+                                        if (!cock.ContainsKey(k.Value)) cock.Add(k.Value, new HashSet<Dictionary<string, Guid>>());
+                                        cock[k.Value].Add(d2);
+                                    }
+                                }
+                                Guid target2 = d1[dupAttr[i]];
+                                if (cock.ContainsKey(target2))
+                                {
+                                    temp = cock[target2];
+                                }
+                                else
+                                {
+                                    temp = new HashSet<Dictionary<string, Guid>>();
+                                }
+                            }
+                        }
+                        break;
+                }
+                foreach (Dictionary<string, Guid> d2 in temp)
+                {
+                    Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                    foreach (var dd in d1)
+                    {
+                        if (!temp_result.ContainsKey(dd.Key))
+                        {
+                            temp_result.Add(dd.Key, dd.Value);
+                        }
+                    }
+                    foreach (var dd in d2)
+                    {
+                        if (!temp_result.ContainsKey(dd.Key))
+                        {
+                            temp_result.Add(dd.Key, dd.Value);
+                        }
+                    }
+                    result.Add(temp_result);
+                }
+            }
 
             //foreach (Dictionary<string, Guid> d1 in elementSet1)
             //{
