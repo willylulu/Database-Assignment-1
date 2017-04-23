@@ -475,15 +475,6 @@ namespace Assignment1
 
                 HashSet<dynamic> ans = new HashSet<dynamic>();
 
-                if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
-                {
-                    dataKeys1 = tableCache[aliaName[table.tableAttrPair1.Key]];
-                }
-                if (tableCache.ContainsKey(aliaName[table.tableAttrPair2.Key]))
-                {
-                    dataKeys2 = tableCache[aliaName[table.tableAttrPair2.Key]];
-                }
-
                 bool ll = dataKeys1.Count <= dataKeys2.Count;
                 HashSet<Guid> tk1 = ll ? dataKeys1 : dataKeys2;
                 HashSet<Guid> tk2 = ll ? dataKeys2 : dataKeys1;
@@ -491,40 +482,19 @@ namespace Assignment1
                 Table t2 = ll ? table2 : table1;
                 string ak1 = table.tableAttrPair1.Key;
                 string ak2 = table.tableAttrPair2.Key;
-                string name1 = ll ? aliaName[ak1] : aliaName[ak2];
-                string name2 = ll ? aliaName[ak2] : aliaName[ak1];
                 string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
                 string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
 
-                HashSet<dynamic> ic1,ic2;
-                if (tableCache.ContainsKey(name1))
-                {
-                    HashSet<dynamic> temp = new HashSet<dynamic>();
-                    foreach (Guid g in tableCache[name1])
-                    {
-                        temp.Add(t1.getTableOnlyOneData(g, at1));
-                    }
-                    ic1 = temp;
-                }
-                else ic1 = new HashSet<dynamic>(t1.getAttribIndexKeys(at1));
-                if (tableCache.ContainsKey(name2))
-                {
-                    HashSet<dynamic> temp = new HashSet<dynamic>();
-                    foreach (Guid g in tableCache[name2])
-                    {
-                        temp.Add(t2.getTableOnlyOneData(g, at2));
-                    }
-                    ic2 = temp;
-                }
-                else ic2 = new HashSet<dynamic>(t2.getAttribIndexKeys(at2));
-
+                HashSet<dynamic> hst1 = new HashSet<dynamic>(t1.getAttribIndexKeys(at1));
+                HashSet<dynamic> hst2 = new HashSet<dynamic>(t2.getAttribIndexKeys(at2));
                 HashSet<dynamic> tans = new HashSet<dynamic>();
-                foreach(dynamic data1 in ic1)
+
+                foreach (dynamic d in hst1)
                 {
-                    if (ic2.Contains(data1)) tans.Add(data1);
+                    if (hst2.Contains(d)) tans.Add(d);
                 }
 
-                foreach (var val1 in tans)
+                foreach (dynamic val1 in tans)
                 {
                     foreach(Guid g1 in t1.getAttribIndex(at1, val1))
                     {
@@ -705,11 +675,9 @@ namespace Assignment1
                     ans = new HashSet<Guid>();
                 }
 
-                tableCache.Add(aliaName[table.tableAttrPair1.Key],new HashSet<Guid>());
 
                 foreach (Guid g in ans)
                 {
-                    tableCache[aliaName[table.tableAttrPair1.Key]].Add(g);
 
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                     aliasGidPair.Add(table.tableAttrPair1.Key, g);
@@ -732,10 +700,8 @@ namespace Assignment1
                 {
                     ans = new HashSet<Guid>();
                 }
-                tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
                 foreach (Guid g in ans)
                 {
-                    tableCache[aliaName[table.tableAttrPair1.Key]].Add(g);
 
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                     aliasGidPair.Add(table.tableAttrPair1.Key, g);
@@ -749,14 +715,12 @@ namespace Assignment1
                     //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
-                    tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
                     foreach (dynamic d in ans)
                     {
 
                         HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
                         foreach(Guid dataPair in guids)
                         {
-                            tableCache[aliaName[table.tableAttrPair1.Key]].Add(dataPair);
 
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                             aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
@@ -791,15 +755,12 @@ namespace Assignment1
                     //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
-                    tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
 
                     foreach (dynamic d in ans)
                     {
                         HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
                         foreach (Guid dataPair in guids)
                         {
-                            tableCache[aliaName[table.tableAttrPair1.Key]].Add(dataPair);
-
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                             aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
                             elementSet.Add(aliasGidPair);
@@ -1018,6 +979,7 @@ namespace Assignment1
             List<string> tableList = new List<string>();
             HashSet<Dictionary<string, Guid>> exData = null;
             //find the table we need
+
             for (int i = 0; i < outputOrder.Length; i++)
             {
                 attribute.Add(outputOrder[i].attr);
@@ -1027,6 +989,7 @@ namespace Assignment1
                     tableList.Add(outputOrder[i].aliName);
                 }
             }
+
 
             //if no where use crossProduct add in exData
             if (data.Count == 0 && total.Count == 0)
@@ -1167,7 +1130,6 @@ namespace Assignment1
         public void select(Dictionary<string, string> aliaName, where[] tables, outputPair[] outputOrder)
         {
 
-            tableCache.Clear();
             //Dictionary<string, string> aliaNameDic = aliaName;
 
             HashSet<Dictionary<string, Guid>> selectAns = new HashSet<Dictionary<string, Guid>>();
@@ -1376,7 +1338,6 @@ namespace Assignment1
             else if (data[0].GetType() != typeof(Boolean) && data[1].GetType() != typeof(Boolean))
             {
                 //2 conditions are attr2attr
-
                 if (tables[1].operLink == OperatorLink.AND)
                 {
                     selectAns = intersect(data[0], left, data[1], right);
@@ -1385,7 +1346,6 @@ namespace Assignment1
                 {
                     selectAns = union(aliaName, data[0], left, data[1], right);
                 }
-
                 printSelect(outputOrder, selectAns, total);
 
             }
@@ -1530,42 +1490,123 @@ namespace Assignment1
             HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
 
             List<string> dupAttr = new List<string>();
+
             var ans1 =
                 from d1 in tableAttrHashSet1
                 from d2 in tableAttrHashSet2
                 where d1 == d2
                 select d1;
 
+
             foreach (string attr in ans1)
             {
                 dupAttr.Add(attr);
             }
 
-            var ans2 =
-                from d1 in elementSet1
-                from d2 in elementSet2
-                where checkIntersect(d1, d2, dupAttr)
-                select new { d1 = d1, d2 = d2 };
-            foreach (var data in ans2)
+            bool ll = elementSet1.Count < elementSet2.Count;
+            HashSet<Dictionary<string, Guid>> es1 = ll ? elementSet1 : elementSet2;
+            HashSet<Dictionary<string, Guid>> es2 = ll ? elementSet2 : elementSet1;
+
+            Dictionary<Guid, HashSet<Dictionary<string, Guid>>> dick = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>();
+            foreach(Dictionary<string, Guid> d2 in es2)
             {
-                Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
-                foreach (var dd in data.d1)
+                foreach(KeyValuePair<string,Guid> k in d2)
                 {
-                    if (!temp_result.ContainsKey(dd.Key))
-                    {
-                        temp_result.Add(dd.Key, dd.Value);
-                    }
+                    if (!dick.ContainsKey(k.Value)) dick.Add(k.Value,new HashSet<Dictionary<string, Guid>>());
+                    dick[k.Value].Add(d2);
                 }
-                foreach (var dd in data.d2)
-                {
-                    if (!temp_result.ContainsKey(dd.Key))
-                    {
-                        temp_result.Add(dd.Key, dd.Value);
-                    }
-                }
-                result.Add(temp_result);
             }
 
+            Parallel.ForEach(es1, (d1) =>
+             {
+                 Guid target;
+                 HashSet<Dictionary<string, Guid>> temp = null;
+                 switch (dupAttr.Count)
+                 {
+                     case 0:
+                         temp = es2;
+                         break;
+                     case 1:
+                         target = d1[dupAttr[0]];
+                         if (dick.ContainsKey(target))
+                             temp = dick[target];
+                         else temp = new HashSet<Dictionary<string, Guid>>();
+                         break;
+                     case 2:
+                         target = d1[dupAttr[0]];
+                         if (dick.ContainsKey(target))
+                         {
+                             temp = dick[target];
+                             for (int i = 1; i < dupAttr.Count; i++)
+                             {
+                                 Dictionary<Guid, HashSet<Dictionary<string, Guid>>> cock = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>();
+                                 foreach (Dictionary<string, Guid> d2 in temp)
+                                 {
+                                     foreach (KeyValuePair<string, Guid> k in d2)
+                                     {
+                                         if (!cock.ContainsKey(k.Value)) cock.Add(k.Value, new HashSet<Dictionary<string, Guid>>());
+                                         cock[k.Value].Add(d2);
+                                     }
+                                 }
+                                 Guid target2 = d1[dupAttr[i]];
+                                 if (cock.ContainsKey(target2))
+                                 {
+                                     temp = cock[target2];
+                                 }
+                                 else
+                                 {
+                                     temp = new HashSet<Dictionary<string, Guid>>();
+                                 }
+                             }
+                         }
+                         break;
+                 }
+                 foreach (Dictionary<string, Guid> d2 in temp)
+                 {
+                     Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                     foreach (var dd in d1)
+                     {
+                         if (!temp_result.ContainsKey(dd.Key))
+                         {
+                             temp_result.Add(dd.Key, dd.Value);
+                         }
+                     }
+                     foreach (var dd in d2)
+                     {
+                         if (!temp_result.ContainsKey(dd.Key))
+                         {
+                             temp_result.Add(dd.Key, dd.Value);
+                         }
+                     }
+                     result.Add(temp_result);
+                 }
+             });
+
+            //foreach (Dictionary<string, Guid> d1 in elementSet1)
+            //{
+            //    foreach(Dictionary<string, Guid> d2 in elementSet2)
+            //    {
+            //        if(checkIntersect(d1, d2, dupAttr))
+            //        {
+            //            Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+            //            foreach (var dd in d1)
+            //            {
+            //                if (!temp_result.ContainsKey(dd.Key))
+            //                {
+            //                    temp_result.Add(dd.Key, dd.Value);
+            //                }
+            //            }
+            //            foreach (var dd in d2)
+            //            {
+            //                if (!temp_result.ContainsKey(dd.Key))
+            //                {
+            //                    temp_result.Add(dd.Key, dd.Value);
+            //                }
+            //            }
+            //            result.Add(temp_result);
+            //        }
+            //    }
+            //}
             return result;
         }
 
@@ -1578,7 +1619,7 @@ namespace Assignment1
         public void print_table_context() //Print table data to csv file
         {
             var csv = new StringBuilder();
-            foreach (System.Collections.Generic.KeyValuePair<string, Table> tablePair in tables)
+            foreach (KeyValuePair<string, Table> tablePair in tables)
             {
 
                 Dictionary<Guid, List<dynamic>> ans = tablePair.Value.getTableData();
@@ -1592,7 +1633,7 @@ namespace Assignment1
                 var attr = String.Join(", ", attr_order.ToArray());
                 csv.AppendLine(attr);
 
-                foreach (System.Collections.Generic.KeyValuePair<Guid, List<dynamic>> ele in ans)
+                foreach (KeyValuePair<Guid, List<dynamic>> ele in ans)
                 {
 
                     //Print each tuple
@@ -1612,7 +1653,6 @@ namespace Assignment1
             tables[tableName].turnOnIndexing(attriName);
         }
 
-        private Dictionary<string, HashSet<Guid>> tableCache = new Dictionary<string, HashSet<Guid>>();
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
         public int allstarCount;

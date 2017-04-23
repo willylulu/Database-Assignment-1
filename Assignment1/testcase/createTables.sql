@@ -1,15 +1,15 @@
 CREATE TABLE Book (
     bookId int,
-    title varchar(30),
+    title varchar(40),
     pages int,
     authorId int,
-    editorial varchar(30)
+    editorial varchar(40)
 );
 
 CREATE TABLE Author (
     authorId int,
-    name varchar(30),
-    nationality varchar(30)
+    name varchar(40),
+    nationality varchar(40)
 );
 
 CREATE TABLE Student (

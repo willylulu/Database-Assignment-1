@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Dynamic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Assignment1
@@ -185,10 +186,10 @@ namespace Assignment1
                     text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
                     Parser.sql_parser(text, tableManager);
 
-                    text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
+                    text = System.IO.File.ReadAllText(@"../../testcase/autuor2.sql");
                     Parser.sql_parser(text, tableManager);
 
-                    text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
+                    text = System.IO.File.ReadAllText(@"../../testcase/book3.sql");
                     Parser.sql_parser(text, tableManager);
 
                     text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
