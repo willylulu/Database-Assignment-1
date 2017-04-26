@@ -11,7 +11,7 @@ namespace Assignment1
         static void Main87(string[] args)
         {
             //TestSelect();
-            //TestSelectError();
+            TestSelectError();
             string input = "";
             //input = @"SELECT bookId, title, pages, authorId, editorial FROM Book where a = 1;";
             input = @"SELECT * FROM Book as B Where 1 and 5;";

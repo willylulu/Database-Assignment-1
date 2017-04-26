@@ -235,7 +235,26 @@ namespace Assignment1
              from secondCondition in Condition.XOr(Parse.Return(new SqlObjects.Sql_Condition("", "", "")))
              select new SqlObjects.Sql_ListOfConditions(firstCondition, conjuction, secondCondition)
             ).Token();
+         /**********************
+         * 04/25
+         * Create Index
+         * *******************/
+        public static Parser<SqlObjects.SQL_Index> Index =
+            (from instruction in Instruction
+             from indexName in Identifier
+             from on_str in Parse.IgnoreCase("on").Text().Once()
+             from tableName in Identifier
+             from startParenthesis in Parse.Char('(').Once().Token()
+             from attr1 in Identifier
+             from attrs_rest in CommaAttr.Many()
+             from endParenthesis in Parse.Char(')').Once().Token()
+             select new SqlObjects.SQL_Index(indexName, false, tableName, new List<String> { attr1 }.Concat(attrs_rest.ToList()).ToList())
+                 //new List<string> { attr1 }.Concat(attrs_rest.ToList())).ToList());
+            ).Token();
 
+        public static Parser<String> CommaAttr =
+            (from attr in Parse.IgnoreCase(",").Token().Text().Then(attrs => Identifier).XOr(Parse.Return(""))
+             select attr).Token();
 
         /**********************
         * Check the string is a valid variable name or not, if not, throw exception
