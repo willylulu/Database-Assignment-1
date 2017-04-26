@@ -691,6 +691,7 @@ namespace Assignment1
                 //    from data1 in dataKeys1
                 //    where stringEqualCheck(attribIndex1[data1][index1], table.con1)
                 //    select new { d1 = data1 };
+                
                 HashSet<Guid> ans = null;
                 if (table1.isAttribIndexContains(table.tableAttrPair1.Value, table.con1.Trim(new Char[] { '\'', '"' })))
                 {
@@ -752,7 +753,6 @@ namespace Assignment1
             {
                 if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
-                    //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
 

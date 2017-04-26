@@ -259,9 +259,15 @@ namespace Assignment1
             List<dynamic> l = new List<dynamic>(keys);
             if (!leaf)
             {
-                int i;
-                for (i = 0; i < l.Count && v > l[i]; i++) ;
-                for(int j = i; j < childs.Count; j++)
+                int down = 0, up = l.Count;
+                int middle = (up + down) / 2;
+                while (up != middle && down != middle)
+                {
+                    middle = (up + down) / 2;
+                    if (v > l[middle]) down = middle;
+                    else up = middle;
+                }
+                for (int j = down; j < childs.Count; j++)
                 {
                     childs[j].findLowerBound(ary, v);
                 }
@@ -283,9 +289,15 @@ namespace Assignment1
             List<dynamic> l = new List<dynamic>(keys);
             if (!leaf)
             {
-                int i;
-                for (i = 0; i < l.Count && v > l[i]; i++) ;
-                for (int j = 0; j < i+1; j++)
+                int down = 0, up = l.Count;
+                int middle = (up + down) / 2;
+                while (up != middle && down != middle)
+                {
+                    middle = (up + down) / 2;
+                    if (v > l[middle]) down = middle;
+                    else up = middle;
+                }
+                for (int j = 0; j < up+1; j++)
                 {
                     childs[j].findUpperBound(ary, v);
                 }

@@ -194,7 +194,7 @@ namespace Assignment1
 
                     text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
                     Parser.sql_parser(text, tableManager);
-
+                    //
                     tableManager.print_table_context();
 
 
@@ -203,6 +203,10 @@ namespace Assignment1
                     sw.Stop();
                     long ms = sw.ElapsedMilliseconds;
                     Console.WriteLine("Cost " + ms + " ms");
+                }
+                else if(cmd == "c")
+                {
+                    tableManager.turnOnIndexing("book", "pages");
                 }
                 else if(cmd_split[0] == "read")
                 {

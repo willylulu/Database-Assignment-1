@@ -43,7 +43,7 @@ namespace Assignment1
             foreach(string s in TableAttributesOrder)
             {
                 attribIndex.Add(s,new Dictionary<dynamic, HashSet<Guid>>(Constants.DEFAULT_SPACE_SM));
-                indexingLookupTable.Add(s,true);
+                indexingLookupTable.Add(s,false);
                 attriSortedIndex.Add(s,new BPlusTree());
             }
         }
@@ -120,7 +120,7 @@ namespace Assignment1
             {
                 HashSet<Guid> temp = new HashSet<Guid>();
                 attribIndex[name].Add(value, temp);
-                if(value.GetType().ToString()=="System.Int32")
+                if(value.GetType().ToString()=="System.Int32" && isAttrIndexing(name))
                     attriSortedIndex[name].insert(value);
             }
             attribIndex[name][value].Add(address);
@@ -185,7 +185,14 @@ namespace Assignment1
 
         public void turnOnIndexing(string name)
         {
-            indexingLookupTable[name] = true;
+            if (!indexingLookupTable[name])
+            {
+                indexingLookupTable[name] = true;
+                foreach (KeyValuePair<dynamic, HashSet<Guid>> k in attribIndex[name])
+                {
+                    attriSortedIndex[name].insert(k.Key);
+                }
+            }
         }
 
         public bool isAttrIndexing(string name)
