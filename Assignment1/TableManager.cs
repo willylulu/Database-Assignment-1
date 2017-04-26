@@ -1488,8 +1488,6 @@ namespace Assignment1
         }
         private HashSet<Dictionary<string, Guid>> intersect(HashSet<Dictionary<string, Guid>> elementSet1, HashSet<string> tableAttrHashSet1, HashSet<Dictionary<string, Guid>> elementSet2, HashSet<string> tableAttrHashSet2)
         {
-            ConcurrentBag<Dictionary<string, Guid>> result = new ConcurrentBag<Dictionary<string, Guid>>();
-
             List<string> dupAttr = new List<string>();
 
             var ans1 =
@@ -1512,6 +1510,8 @@ namespace Assignment1
             Dictionary<string, Guid>[] as2 = new Dictionary<string, Guid>[es2.Count];
             es2.CopyTo(as2);
 
+            Dictionary<string, Guid>[][] result = new Dictionary<string, Guid>[as1.Length][];
+
             ConcurrentDictionary<Guid, HashSet<Dictionary<string, Guid>>> dick = new ConcurrentDictionary<Guid, HashSet<Dictionary<string, Guid>>>();
             foreach (Dictionary<string, Guid> d2 in es2)
             {
@@ -1524,15 +1524,18 @@ namespace Assignment1
 
             Parallel.For(0,as1.Length,(i)=>
             {
+                int j;
                 Dictionary<string, Guid> d1 = as1[i];
                 Guid target;
-                HashSet<Dictionary<string, Guid>> temp = null;
+                Dictionary<string, Guid>[] jerk = null;
                 switch (dupAttr.Count)
                 {
                     case 0:
+                        j = 0;
+                        jerk = new Dictionary<string, Guid>[es2.Count];
                         foreach (Dictionary<string, Guid> d2 in es2)
                         {
-                            Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                            Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>(4);
                             foreach (var dd in d1)
                             {
                                 if (!temp_result.ContainsKey(dd.Key))
@@ -1543,16 +1546,18 @@ namespace Assignment1
                                 if (!temp_result.ContainsKey(dd.Key))
                                     temp_result.Add(dd.Key, dd.Value);
                             }
-                            result.Add(temp_result);
+                            jerk[j++] = temp_result;
                         }
                         break;
                     case 1:
                         target = d1[dupAttr[0]];
                         if (dick.ContainsKey(target))
                         {
+                            j = 0;
+                            jerk = new Dictionary<string, Guid>[dick[target].Count];
                             foreach (Dictionary<string, Guid> d2 in dick[target])
                             {
-                                Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                                Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>(4);
                                 foreach (var dd in d1)
                                 {
                                     if (!temp_result.ContainsKey(dd.Key))
@@ -1563,7 +1568,7 @@ namespace Assignment1
                                     if (!temp_result.ContainsKey(dd.Key))
                                         temp_result.Add(dd.Key, dd.Value);
                                 }
-                                result.Add(temp_result);
+                                jerk[j++] = temp_result;
                             }
                         }
                         break;
@@ -1571,9 +1576,8 @@ namespace Assignment1
                         target = d1[dupAttr[0]];
                         if (dick.ContainsKey(target))
                         {
-                            temp = dick[target];
                             Dictionary<Guid, HashSet<Dictionary<string, Guid>>> cock = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>(100);
-                            foreach (Dictionary<string, Guid> d2 in temp)
+                            foreach (Dictionary<string, Guid> d2 in dick[target])
                             {
                                 foreach (KeyValuePair<string, Guid> k in d2)
                                 {
@@ -1585,9 +1589,11 @@ namespace Assignment1
                             Guid target2 = d1[dupAttr[1]];
                             if (cock.ContainsKey(target2))
                             {
+                                j = 0;
+                                jerk = new Dictionary<string, Guid>[cock[target2].Count];
                                 foreach (Dictionary<string, Guid> d2 in cock[target2])
                                 {
-                                    Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>();
+                                    Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>(4);
                                     foreach (var dd in d1)
                                     {
                                         if (!temp_result.ContainsKey(dd.Key))
@@ -1598,15 +1604,20 @@ namespace Assignment1
                                         if (!temp_result.ContainsKey(dd.Key))
                                             temp_result.Add(dd.Key, dd.Value);
                                     }
-                                    result.Add(temp_result);
+                                    jerk[j++] = temp_result;
                                 }
                             }
                         }
                         break;
                 }
+                result[i] = jerk;
             });
 
-            HashSet<Dictionary<string, Guid>> ans = new HashSet<Dictionary<string, Guid>>(result);
+            HashSet<Dictionary<string, Guid>> ans = new HashSet<Dictionary<string, Guid>>();
+            for(int i = 0; i < result.Length; i++)
+            {
+                if(result[i]!=null) ans.UnionWith(result[i]);
+            }
             return ans;
         }
 
