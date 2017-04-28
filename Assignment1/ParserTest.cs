@@ -8,7 +8,7 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Main(string[] args)
+        static void Main87(string[] args)
         {
             //TestSelect();
             //TestSelectError();
@@ -17,7 +17,6 @@ namespace Assignment1
             //input = @"SELECT * FROM Book as B Where 1 and 5;";
             input = @"CREATE INDEX IDX_CUSTOMER_LAST_NAME ON Customer (Last_Name, First_Name, Second_Name, haha);";
             input = @"CREATE INDEX ONX_CUSTOMER_LAST_NAME ON Onstomer (Last_Name, First_Name, Second_Name, haha);";
-
 
             SqlObjects.SQL_Index index =  Parser.Index(input);
             Console.WriteLine(index);
