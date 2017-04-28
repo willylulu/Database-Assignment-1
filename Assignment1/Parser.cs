@@ -215,6 +215,36 @@ namespace Assignment1
         }
 
 
+        public static SqlObjects.SQL_Index Index(string sql)
+        {
+            string error_prefix = "[INSERTION ERROR] - ";
+            try
+            {
+                //sql = sql.ToLower();
+                println(sql);
+                var index = SqlGrammar.Index.Parse(sql);
+                println(index + "\n");
+                return index;
+            }
+            catch (ParseException e)
+            {
+                Console.WriteLine(error_prefix + "Invalid SQL syntax: mismatch of ' or  uncompleted () or unexpected character~~\n" + e.Message + "\n");
+                return null;
+            }
+            catch (DbException.InvalidKeyword e)
+            {
+                //Console.WriteLine("[INSERT ERROR] - Invalid SQL Argument: " + e.Message + "\n");
+                Console.WriteLine(error_prefix + e.Message + "\n");
+                return null;
+            }
+            catch (DbException.MismatchingArguments e)
+            {
+                Console.WriteLine(error_prefix + e.Message + "\n");
+                return null;
+
+            }
+
+        }
 
         private static string getInstruction(string str)
         {

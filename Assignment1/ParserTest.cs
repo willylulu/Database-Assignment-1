@@ -8,14 +8,19 @@ namespace Assignment1
 {
     class ParserTest
     {
-        static void Main87(string[] args)
+        static void Main(string[] args)
         {
             //TestSelect();
-            TestSelectError();
+            //TestSelectError();
             string input = "";
             //input = @"SELECT bookId, title, pages, authorId, editorial FROM Book where a = 1;";
-            input = @"SELECT * FROM Book as B Where 1 and 5;";
-            Parser.Select(input);
+            //input = @"SELECT * FROM Book as B Where 1 and 5;";
+            input = @"CREATE INDEX IDX_CUSTOMER_LAST_NAME ON Customer (Last_Name, First_Name, Second_Name, haha);";
+            input = @"CREATE INDEX ONX_CUSTOMER_LAST_NAME ON Onstomer (Last_Name, First_Name, Second_Name, haha);";
+
+
+            SqlObjects.SQL_Index index =  Parser.Index(input);
+            Console.WriteLine(index);
             Console.ReadKey(true);
         }
         public static void TestSelect()

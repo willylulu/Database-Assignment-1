@@ -141,7 +141,7 @@ namespace Assignment1
             tableManager.print_table_context();
             Console.ReadKey(true);
         }*/
-        static void Main(string[] args)
+        static void Main87(string[] args)
         {
             tableManager = new TableManager();
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);

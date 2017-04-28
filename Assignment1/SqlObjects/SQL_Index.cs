@@ -22,6 +22,22 @@ namespace Assignment1.SqlObjects
             this.attrs = attrs;
         }
 
+        public override string ToString()
+        {
+            String output = "[Index]\n";
+            output += "index= "
+                      + index
+                      + " \nTable: "
+                      + Table + "\n";
+            foreach(String attr in attrs)
+            {
+                output += attr + ", ";
+            }
+
+            return output;
+
+        }
+
 
 
     }
