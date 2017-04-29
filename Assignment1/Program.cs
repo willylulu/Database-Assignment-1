@@ -186,13 +186,33 @@ namespace Assignment1
                     text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
                     Parser.sql_parser(text, tableManager);
 
+                    text = System.IO.File.ReadAllText(@"../../testcase/author.sql");
+                    Parser.sql_parser(text, tableManager);
+
+                    text = System.IO.File.ReadAllText(@"../../testcase/book.sql");
+                    Parser.sql_parser(text, tableManager);
+                    //
+                    tableManager.print_table_context();
+
+
+                    //text = System.IO.File.ReadAllText(@"../../testcase/select_test.sql");
+                    //Parser.sql_parser(text, tableManager);
+                    sw.Stop();
+                    long ms = sw.ElapsedMilliseconds;
+                    Console.WriteLine("Cost " + ms + " ms");
+                }
+                else if (cmd == "t2")
+                {
+                    sw.Reset();
+                    sw = Stopwatch.StartNew();
+                    string text = "";
+                    text = System.IO.File.ReadAllText(@"../../testcase/createTables.sql");
+                    Parser.sql_parser(text, tableManager);
+
                     text = System.IO.File.ReadAllText(@"../../testcase/autuor2.sql");
                     Parser.sql_parser(text, tableManager);
 
                     text = System.IO.File.ReadAllText(@"../../testcase/book3.sql");
-                    Parser.sql_parser(text, tableManager);
-
-                    text = System.IO.File.ReadAllText(@"../../testcase/student.sql");
                     Parser.sql_parser(text, tableManager);
                     //
                     tableManager.print_table_context();

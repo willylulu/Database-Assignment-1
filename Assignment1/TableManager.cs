@@ -458,178 +458,67 @@ namespace Assignment1
             Table table1 = getTable(aliaName[table.tableAttrPair1.Key]);
             Table table2 = getTable(aliaName[table.tableAttrPair2.Key]);
             // Get TableDatas from 2 tables
-            Dictionary<Guid, List<dynamic>> attribIndex1 = table1.getTableData();
-            Dictionary<Guid, List<dynamic>> attribIndex2 = table2.getTableData();
             // Get AllIndex form 2 tables
-            HashSet<Guid> dataKeys1 = table1.getAllIndex();
-            HashSet<Guid> dataKeys2 = table2.getAllIndex();
             // Set attribute index
-            int index1;
-            int index2;
-            List<string> TableAttributesOrder1 = table1.getAttributesOrder();
-            index1 = TableAttributesOrder1.FindIndex(x => x == table.tableAttrPair1.Value);
-            List<string> TableAttributesOrder2 = table2.getAttributesOrder();
-            index2 = TableAttributesOrder2.FindIndex(x => x == table.tableAttrPair2.Value);
 
             if (table.oper == Operators.equal)
             {
 
                 HashSet<dynamic> ans = new HashSet<dynamic>();
+                HashSet<dynamic> hst1, hst2;
 
-                bool ll = dataKeys1.Count <= dataKeys2.Count;
-                HashSet<Guid> tk1 = ll ? dataKeys1 : dataKeys2;
-                HashSet<Guid> tk2 = ll ? dataKeys2 : dataKeys1;
-                Table t1 = ll ? table1 : table2;
-                Table t2 = ll ? table2 : table1;
-                string ak1 = table.tableAttrPair1.Key;
-                string ak2 = table.tableAttrPair2.Key;
-                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
-                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
+                if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]) && isAndTriggered)
+                {
+                    hst1 = new HashSet<dynamic>();
+                    foreach (Guid g in tableCache[aliaName[table.tableAttrPair1.Key]])
+                    {
+                        hst1.Add(table1.getTableOnlyOneData(g, table.tableAttrPair1.Value));
+                    }
+                }
+                else
+                {
+                    hst1 = new HashSet<dynamic>(table1.getAttribIndexKeys(table.tableAttrPair1.Value));
+                }
 
-                HashSet<dynamic> hst1 = new HashSet<dynamic>(t1.getAttribIndexKeys(at1));
-                HashSet<dynamic> hst2 = new HashSet<dynamic>(t2.getAttribIndexKeys(at2));
+                if (tableCache.ContainsKey(aliaName[table.tableAttrPair2.Key]) && isAndTriggered)
+                {
+                    hst2 = new HashSet<dynamic>();
+                    foreach (Guid g in tableCache[aliaName[table.tableAttrPair2.Key]])
+                    {
+                        hst2.Add(table2.getTableOnlyOneData(g, table.tableAttrPair2.Value));
+                    }
+                }
+                else
+                {
+                    hst2 = new HashSet<dynamic>(table2.getAttribIndexKeys(table.tableAttrPair2.Value));
+                }
+
+                bool ll = hst1.Count <= hst2.Count;
+                HashSet<dynamic> hstt1 = ll ? hst1 : hst2;
+                HashSet<dynamic> hstt2 = ll ? hst2 : hst1;
+
                 HashSet<dynamic> tans = new HashSet<dynamic>();
 
-                foreach (dynamic d in hst1)
+                foreach (dynamic d in hstt1)
                 {
-                    if (hst2.Contains(d)) tans.Add(d);
+                    if (hstt2.Contains(d)) tans.Add(d);
                 }
 
                 foreach (dynamic val1 in tans)
                 {
-                    foreach(Guid g1 in t1.getAttribIndex(at1, val1))
+                    foreach (Guid g1 in table1.getAttribIndex(table.tableAttrPair1.Value, val1))
                     {
-                        foreach(Guid g2 in t2.getAttribIndex(at2, val1))
+                        foreach (Guid g2 in table2.getAttribIndex(table.tableAttrPair2.Value, val1))
                         {
-                            Guid gg1 = ll ? g1 : g2;
-                            Guid gg2 = ll ? g2 : g1;
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                            aliasGidPair.Add(ak1, gg1);
-                            if (!aliasGidPair.ContainsKey(ak2))
+                            aliasGidPair.Add(table.tableAttrPair1.Key, g1);
+                            if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
                             {
-                                aliasGidPair.Add(ak2, gg2);
+                                aliasGidPair.Add(table.tableAttrPair2.Key, g2);
                             }
                             elementSet.Add(aliasGidPair);
                         }
                     }
-                }
-            }
-            else if (table.oper == Operators.greater)
-            {
-                //var ans =
-                //    from data1 in dataKeys1
-                //    from data2 in dataKeys2
-                //    where attribIndex1[data1][index1] > attribIndex2[data1][index2]
-                //    select new { d1 = data1, d2 = data2 };
-                //Console.WriteLine(ans.Count());
-                //foreach (var dataPair in ans)
-                //{
-                //    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                //    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                //    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
-                //    {
-                //        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
-                //    }
-                //    elementSet.Add(aliasGidPair);
-                //}
-                bool ll = dataKeys1.Count <= dataKeys2.Count;
-                Table t1 = ll ? table1 : table2;
-                Table t2 = ll ? table2 : table1;
-                string ak1 = table.tableAttrPair1.Key;
-                string ak2 = table.tableAttrPair2.Key;
-                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
-                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
-
-                foreach (dynamic d1 in t1.getAttribIndexKeys(at1))
-                {
-                    foreach (dynamic d2 in t2.getBoundinfSet(at2, d1, ll? Operators.less : Operators.greater))
-                    {
-                        HashSet<Guid> g1s = t1.getAttribIndex(at1, d1);
-                        HashSet<Guid> g2s = t2.getAttribIndex(at2, d2);
-                        foreach (Guid g1 in g1s)
-                        {
-                            foreach (Guid g2 in g2s)
-                            {
-                                Guid gg1 = ll ? g1 : g2;
-                                Guid gg2 = ll ? g2 : g1;
-                                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                                aliasGidPair.Add(ak1, gg1);
-                                if (!aliasGidPair.ContainsKey(ak2))
-                                {
-                                    aliasGidPair.Add(ak2, gg2);
-                                }
-                                elementSet.Add(aliasGidPair);
-                            }
-                        }
-                    }
-                }
-            }
-            else if (table.oper == Operators.less)
-            {
-                //var ans =
-                //    from data1 in dataKeys1
-                //    from data2 in dataKeys2
-                //    where attribIndex1[data1][index1] < attribIndex2[data1][index2]
-                //    select new { d1 = data1, d2 = data2 };
-                //Console.WriteLine(ans.Count());
-                //foreach (var dataPair in ans)
-                //{
-                //    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                //    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                //    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
-                //    {
-                //        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
-                //    }
-                //    elementSet.Add(aliasGidPair);
-                //}
-                bool ll = dataKeys1.Count <= dataKeys2.Count;
-                Table t1 = ll ? table1 : table2;
-                Table t2 = ll ? table2 : table1;
-                string ak1 = table.tableAttrPair1.Key;
-                string ak2 = table.tableAttrPair2.Key;
-                string at1 = ll ? table.tableAttrPair1.Value : table.tableAttrPair2.Value;
-                string at2 = ll ? table.tableAttrPair2.Value : table.tableAttrPair1.Value;
-
-                foreach (dynamic d1 in t1.getAttribIndexKeys(at1))
-                {
-                    foreach (dynamic d2 in t2.getBoundinfSet(at2, d1, ll ? Operators.greater : Operators.less))
-                    {
-                        HashSet<Guid> g1s = t1.getAttribIndex(at1, d1);
-                        HashSet<Guid> g2s = t2.getAttribIndex(at2, d2);
-                        foreach (Guid g1 in g1s)
-                        {
-                            foreach (Guid g2 in g2s)
-                            {
-                                Guid gg1 = ll ? g1 : g2;
-                                Guid gg2 = ll ? g2 : g1;
-                                Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                                aliasGidPair.Add(ak1, gg1);
-                                if (!aliasGidPair.ContainsKey(ak2))
-                                {
-                                    aliasGidPair.Add(ak2, gg2);
-                                }
-                                elementSet.Add(aliasGidPair);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var ans =
-                    from data1 in dataKeys1
-                    from data2 in dataKeys2
-                    where attribIndex1[data1][index1] != attribIndex2[data1][index2]
-                    select new { d1 = data1, d2 = data2 };
-                foreach (var dataPair in ans)
-                {
-                    Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
-                    aliasGidPair.Add(table.tableAttrPair1.Key, dataPair.d1);
-                    if (!aliasGidPair.ContainsKey(table.tableAttrPair2.Key))
-                    {
-                        aliasGidPair.Add(table.tableAttrPair2.Key, dataPair.d2);
-                    }
-                    elementSet.Add(aliasGidPair);
                 }
             }
             return elementSet;
@@ -676,10 +565,19 @@ namespace Assignment1
                     ans = new HashSet<Guid>();
                 }
 
+                if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
+                {
+                    tableCache[aliaName[table.tableAttrPair1.Key]] = new HashSet<Guid>();
+                }
+                else
+                {
+                    tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
+                }
 
                 foreach (Guid g in ans)
                 {
 
+                    tableCache[aliaName[table.tableAttrPair1.Key]].Add(g);
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                     aliasGidPair.Add(table.tableAttrPair1.Key, g);
                     elementSet.Add(aliasGidPair);
@@ -692,7 +590,7 @@ namespace Assignment1
                 //    from data1 in dataKeys1
                 //    where stringEqualCheck(attribIndex1[data1][index1], table.con1)
                 //    select new { d1 = data1 };
-                
+
                 HashSet<Guid> ans = null;
                 if (table1.isAttribIndexContains(table.tableAttrPair1.Value, table.con1.Trim(new Char[] { '\'', '"' })))
                 {
@@ -702,9 +600,19 @@ namespace Assignment1
                 {
                     ans = new HashSet<Guid>();
                 }
+
+                if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
+                {
+                    tableCache[aliaName[table.tableAttrPair1.Key]] = new HashSet<Guid>();
+                }
+                else
+                {
+                    tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
+                }
+
                 foreach (Guid g in ans)
                 {
-
+                    tableCache[aliaName[table.tableAttrPair1.Key]].Add(g);
                     Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                     aliasGidPair.Add(table.tableAttrPair1.Key, g);
                     elementSet.Add(aliasGidPair);
@@ -714,6 +622,14 @@ namespace Assignment1
             {
                 if (table1.isAttrIndexing(table.tableAttrPair1.Value))
                 {
+                    if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
+                    {
+                        tableCache[aliaName[table.tableAttrPair1.Key]] = new HashSet<Guid>();
+                    }
+                    else
+                    {
+                        tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
+                    }
                     //Console.WriteLine("A");
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
@@ -721,8 +637,10 @@ namespace Assignment1
                     {
 
                         HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
-                        foreach(Guid dataPair in guids)
+                        foreach (Guid dataPair in guids)
                         {
+
+                            tableCache[aliaName[table.tableAttrPair1.Key]].Add(dataPair);
 
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                             aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
@@ -756,12 +674,21 @@ namespace Assignment1
                 {
                     //HashSet<Guid> ans = table1.findBoundSet(table.tableAttrPair1.Value, table.con1, table.oper);
                     HashSet<dynamic> ans = table1.getBoundinfSet(table.tableAttrPair1.Value, table.con1, table.oper);
-
+                    if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
+                    {
+                        tableCache[aliaName[table.tableAttrPair1.Key]] = new HashSet<Guid>();
+                    }
+                    else
+                    {
+                        tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
+                    }
                     foreach (dynamic d in ans)
                     {
                         HashSet<Guid> guids = table1.getAttribIndex(table.tableAttrPair1.Value, d);
                         foreach (Guid dataPair in guids)
                         {
+                            tableCache[aliaName[table.tableAttrPair1.Key]].Add(dataPair);
+
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                             aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
                             elementSet.Add(aliasGidPair);
@@ -792,13 +719,24 @@ namespace Assignment1
                 //    from data1 in dataKeys1
                 //    where attribIndex1[data1][index1] != table.con1
                 //    select new { d1 = data1 };
-                foreach(dynamic k in table1.getAttribIndexKeys(table.tableAttrPair1.Value))
+                if (tableCache.ContainsKey(aliaName[table.tableAttrPair1.Key]))
                 {
-                    if(k!= table.con1)
+                    tableCache[aliaName[table.tableAttrPair1.Key]] = new HashSet<Guid>();
+                }
+                else
+                {
+                    tableCache.Add(aliaName[table.tableAttrPair1.Key], new HashSet<Guid>());
+                }
+
+                foreach (dynamic k in table1.getAttribIndexKeys(table.tableAttrPair1.Value))
+                {
+                    if (k != table.con1)
                     {
                         HashSet<Guid> ans = table1.getAttribIndex(table.tableAttrPair1.Value, k);
                         foreach (Guid dataPair in ans)
                         {
+                            tableCache[aliaName[table.tableAttrPair1.Key]].Add(dataPair);
+
                             Dictionary<string, Guid> aliasGidPair = new Dictionary<string, Guid>();
                             aliasGidPair.Add(table.tableAttrPair1.Key, dataPair);
                             elementSet.Add(aliasGidPair);
@@ -1243,6 +1181,9 @@ namespace Assignment1
 
             List<dynamic> data = new List<dynamic>();
             Console.WriteLine("table size = " + tables.Length);
+
+            isAndTriggered = tables[1].operLink == OperatorLink.AND;
+
             for (int i = 0; i < tables.Length; i++)
             {
                 switch (tables[i].operType)
@@ -1252,7 +1193,7 @@ namespace Assignment1
                         {
                             data.Add(attr2conOper(aliaName, tables[i]));
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             Console.WriteLine("Error Compare type error");
                             return;
@@ -1263,7 +1204,7 @@ namespace Assignment1
                         {
                             data.Add(con2conOper(aliaName, tables[i]));
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             Console.WriteLine("Error Compare type error");
                             return;
@@ -1299,7 +1240,7 @@ namespace Assignment1
                         {
                             data.Add(attr2attrOper(aliaName, tables[i]));
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             Console.WriteLine("Error Compare type error");
                             return;
@@ -1436,7 +1377,8 @@ namespace Assignment1
                         string table_name = aliaName[attr];
                         foreach (Guid id in getTable(table_name).getAllIndex())
                         {
-                            temp_dic.Add(attr, id);
+                            if (!temp_dic.ContainsKey(attr)) temp_dic.Add(attr, id);
+                            else temp_dic[attr] = id;
                         }
                     }
                 }
@@ -1454,7 +1396,8 @@ namespace Assignment1
                         string table_name = aliaName[attr];
                         foreach (Guid id in getTable(table_name).getAllIndex())
                         {
-                            temp_dic.Add(attr, id);
+                            if (!temp_dic.ContainsKey(attr)) temp_dic.Add(attr, id);
+                            else temp_dic[attr] = id;
                         }
                     }
                 }
@@ -1465,12 +1408,10 @@ namespace Assignment1
             HashEqualityComparer tempCom = new HashEqualityComparer();
             HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
 
-            var union = temp_eleSet1.Union(temp_eleSet2, tempCom);
+            result.UnionWith(temp_eleSet1);
+            result.UnionWith(temp_eleSet2);
 
-            foreach (var aa in union)
-            {
-                result.Add(aa);
-            }
+
             return result;
             //return result;
         }
@@ -1512,17 +1453,17 @@ namespace Assignment1
 
             Dictionary<string, Guid>[][] result = new Dictionary<string, Guid>[as1.Length][];
 
-            ConcurrentDictionary<Guid, HashSet<Dictionary<string, Guid>>> dick = new ConcurrentDictionary<Guid, HashSet<Dictionary<string, Guid>>>();
+            Dictionary<Guid, HashSet<Dictionary<string, Guid>>> dick = new Dictionary<Guid, HashSet<Dictionary<string, Guid>>>();
             foreach (Dictionary<string, Guid> d2 in es2)
             {
                 foreach (KeyValuePair<string, Guid> k in d2)
                 {
-                    if (!dick.ContainsKey(k.Value)) dick.AddOrUpdate(k.Value, new HashSet<Dictionary<string, Guid>>(), (a, b) => dick[a] = b);
+                    if (!dick.ContainsKey(k.Value)) dick.Add(k.Value, new HashSet<Dictionary<string, Guid>>());
                     dick[k.Value].Add(d2);
                 }
             }
 
-            Parallel.For(0,as1.Length,(i)=>
+            for (int i = 0; i < as1.Length; i++)
             {
                 int j;
                 Dictionary<string, Guid> d1 = as1[i];
@@ -1611,12 +1552,12 @@ namespace Assignment1
                         break;
                 }
                 result[i] = jerk;
-            });
+            }
 
             HashSet<Dictionary<string, Guid>> ans = new HashSet<Dictionary<string, Guid>>();
-            for(int i = 0; i < result.Length; i++)
+            for (int i = 0; i < result.Length; i++)
             {
-                if(result[i]!=null) ans.UnionWith(result[i]);
+                if (result[i] != null) ans.UnionWith(result[i]);
             }
             return ans;
         }
@@ -1659,15 +1600,17 @@ namespace Assignment1
         }
 
 
-        public void turnOnIndexing(string tableName,string attriName)
+        public void turnOnIndexing(string tableName, string attriName)
         {
             tables[tableName].turnOnIndexing(attriName);
         }
 
+        private Dictionary<string, HashSet<Guid>> tableCache = new Dictionary<string, HashSet<Guid>>();
         private Dictionary<string, Table> tables = new Dictionary<string, Table>(1000000);
         public Dictionary<string, string> aliaName;
         public int allstarCount;
         public bool isAllstarCount;
+        public bool isAndTriggered = false;
     }
 }
 
