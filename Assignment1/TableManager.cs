@@ -1354,58 +1354,116 @@ namespace Assignment1
         private HashSet<Dictionary<string, Guid>> union(Dictionary<string, string> aliaName, HashSet<Dictionary<string, Guid>> elementSet1, HashSet<string> tableAttrHashSet1, HashSet<Dictionary<string, Guid>> elementSet2, HashSet<string> tableAttrHashSet2)
         {
             //Find duplicate table
-            HashSet<string> dupAttr = new HashSet<string>();
-            var ans =
-                from d1 in tableAttrHashSet1
-                from d2 in tableAttrHashSet2
-                where d1 == d2
-                select d1;
+            HashSet<string> uniAttr = new HashSet<string>();
+            HashSet<string> alisAttr1 = new HashSet<string>();
+            HashSet<string> alisAttr2 = new HashSet<string>();
 
-            foreach (string attr in ans)
+            foreach (string s in tableAttrHashSet1)
             {
-                dupAttr.Add(attr);
+                uniAttr.Add(aliaName[s]);
+                alisAttr1.Add(aliaName[s]);
+            }
+            foreach (string s in tableAttrHashSet2)
+            {
+                uniAttr.Add(aliaName[s]);
+                alisAttr2.Add(aliaName[s]);
+            }
+
+            HashSet<string> alisAttrr1, alisAttrr2;
+
+            if (alisAttr1.Count > alisAttr2.Count)
+            {
+                alisAttrr1 = alisAttr2;
+                alisAttrr2 = alisAttr1;
+            }
+            else
+            {
+                alisAttrr1 = alisAttr1;
+                alisAttrr2 = alisAttr2;
             }
 
             HashSet<Dictionary<string, Guid>> temp_eleSet1 = new HashSet<Dictionary<string, Guid>>();
-            foreach (Dictionary<string, Guid> data in elementSet1)
+            HashSet<string> exiAttr1 = new HashSet<string>();
+            foreach (string s in uniAttr)
             {
-                Dictionary<string, Guid> temp_dic = new Dictionary<string, Guid>(data);
-                foreach (string attr in tableAttrHashSet2)
+                if (!alisAttrr1.Contains(s)) exiAttr1.Add(s);
+            }
+            List<string> exiAttrs1 = new List<string>(exiAttr1);
+            Dictionary<string,HashSet<Guid>> otherSelect1 = new Dictionary<string, HashSet<Guid>>();
+            foreach(string s in exiAttr1)
+            {
+                otherSelect1.Add(s,getTable(s).getAllIndex());
+            }
+            HashSet<Dictionary<string, Guid>> otherSet1 = new HashSet<Dictionary<string, Guid>>();
+            if (exiAttrs1.Count > 0) crossProductRecur2(otherSet1, otherSelect1, new Dictionary<string, Guid>(), exiAttrs1, 0, exiAttrs1.Count);
+            if (otherSet1.Count > 0)
+            {
+                foreach (Dictionary<string, Guid> d1 in elementSet1)
                 {
-                    if (!dupAttr.Contains(attr))
+                    foreach (Dictionary<string, Guid> d2 in otherSet1)
                     {
-                        string table_name = aliaName[attr];
-                        foreach (Guid id in getTable(table_name).getAllIndex())
+                        Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>(4);
+                        foreach (var dd in d1)
                         {
-                            if (!temp_dic.ContainsKey(attr)) temp_dic.Add(attr, id);
-                            else temp_dic[attr] = id;
+                            if (!temp_result.ContainsKey(dd.Key))
+                                temp_result.Add(dd.Key, dd.Value);
                         }
+                        foreach (var dd in d2)
+                        {
+                            if (!temp_result.ContainsKey(dd.Key))
+                                temp_result.Add(dd.Key, dd.Value);
+                        }
+                        temp_eleSet1.Add(temp_result);
                     }
                 }
-                temp_eleSet1.Add(temp_dic);
+            }
+            else
+            {
+                temp_eleSet1 = elementSet1;
             }
 
+
             HashSet<Dictionary<string, Guid>> temp_eleSet2 = new HashSet<Dictionary<string, Guid>>();
-            foreach (Dictionary<string, Guid> data in elementSet2)
+            HashSet<string> exiAttr2 = new HashSet<string>();
+            foreach (string s in uniAttr)
             {
-                Dictionary<string, Guid> temp_dic = new Dictionary<string, Guid>(data);
-                foreach (string attr in tableAttrHashSet1)
+                if (!alisAttrr2.Contains(s)) exiAttr2.Add(s);
+            }
+            List<string> exiAttrs2 = new List<string>(exiAttr2);
+            Dictionary<string, HashSet<Guid>> otherSelect2 = new Dictionary<string, HashSet<Guid>>();
+            foreach (string s in exiAttr2)
+            {
+                otherSelect2.Add(s, getTable(s).getAllIndex());
+            }
+            HashSet<Dictionary<string, Guid>> otherSet2 = new HashSet<Dictionary<string, Guid>>();
+            if(exiAttrs2.Count > 0) crossProductRecur2(otherSet2, otherSelect2, new Dictionary<string, Guid>(), exiAttrs2, 0, exiAttrs2.Count);
+            if (otherSet2.Count > 0)
+            {
+                foreach (Dictionary<string, Guid> d1 in elementSet2)
                 {
-                    if (!dupAttr.Contains(attr))
+                    foreach (Dictionary<string, Guid> d2 in otherSet2)
                     {
-                        string table_name = aliaName[attr];
-                        foreach (Guid id in getTable(table_name).getAllIndex())
+                        Dictionary<string, Guid> temp_result = new Dictionary<string, Guid>(4);
+                        foreach (var dd in d1)
                         {
-                            if (!temp_dic.ContainsKey(attr)) temp_dic.Add(attr, id);
-                            else temp_dic[attr] = id;
+                            if (!temp_result.ContainsKey(dd.Key))
+                                temp_result.Add(dd.Key, dd.Value);
                         }
+                        foreach (var dd in d2)
+                        {
+                            if (!temp_result.ContainsKey(dd.Key))
+                                temp_result.Add(dd.Key, dd.Value);
+                        }
+                        temp_eleSet2.Add(temp_result);
                     }
                 }
-                temp_eleSet2.Add(temp_dic);
+            }
+            else
+            {
+                temp_eleSet2 = elementSet2;
             }
 
             //HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union((HashSet<Dictionary<string, Guid>>)temp_eleSet2);
-            HashEqualityComparer tempCom = new HashEqualityComparer();
             HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
 
             result.UnionWith(temp_eleSet1);
@@ -1414,6 +1472,25 @@ namespace Assignment1
 
             return result;
             //return result;
+        }
+
+        private void crossProductRecur2(HashSet<Dictionary<string, Guid>> otherSet, Dictionary<string, HashSet<Guid>> otherSelect, Dictionary<string, Guid> dictionary, List<string> exiAttrs, int v, int count)
+        {
+            if (v == count)
+            {
+                otherSet.Add(dictionary);
+            }
+            else
+            {
+                string s = exiAttrs[v];
+                HashSet<Guid> r = otherSelect[s];
+                foreach(Guid g in r)
+                {
+                    Dictionary<string, Guid> t = new Dictionary<string, Guid>(dictionary);
+                    t.Add(s, g);
+                    crossProductRecur2(otherSet, otherSelect, t, exiAttrs, v + 1, count);
+                }
+            }
         }
 
         private Boolean checkIntersect(Dictionary<string, Guid> element1, Dictionary<string, Guid> element2, List<string> dupAttr)
