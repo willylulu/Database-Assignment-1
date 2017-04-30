@@ -1464,14 +1464,30 @@ namespace Assignment1
             }
 
             //HashSet<Dictionary<string, Guid>> result = (HashSet<Dictionary<string, Guid>>)temp_eleSet1.Union((HashSet<Dictionary<string, Guid>>)temp_eleSet2);
-            HashSet<Dictionary<string, Guid>> result = new HashSet<Dictionary<string, Guid>>();
-
-            result.UnionWith(temp_eleSet1);
-            result.UnionWith(temp_eleSet2);
-
-
-            return result;
-            //return result;
+            HashSet<Dictionary<string, Guid>> ans = new HashSet<Dictionary<string, Guid>>(temp_eleSet1);
+            HashSet<string> guidHash = new HashSet<string>();
+            foreach (Dictionary<string, Guid> d1 in temp_eleSet1)
+            {
+                string ts = "";
+                foreach(string s in uniAttr)
+                {
+                    ts = ts + d1[s];
+                }
+                guidHash.Add(ts);
+            }
+            foreach (Dictionary<string, Guid> d1 in temp_eleSet2)
+            {
+                string ts = "";
+                foreach (string s in uniAttr)
+                {
+                    ts = ts + d1[s];
+                }
+                if (!guidHash.Contains(ts))
+                {
+                    ans.Add(d1);
+                }
+            }
+            return ans;
         }
 
         private void crossProductRecur2(HashSet<Dictionary<string, Guid>> otherSet, Dictionary<string, HashSet<Guid>> otherSelect, Dictionary<string, Guid> dictionary, List<string> exiAttrs, int v, int count)
