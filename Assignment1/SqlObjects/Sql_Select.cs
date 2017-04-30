@@ -144,7 +144,7 @@ namespace Assignment1.SqlObjects
         private Aggregation getMatchedAggregatioinOrRaiseException(String str)
         {
             str = str.ToLower();
-            Console.WriteLine(str);
+            //Console.WriteLine(str);
             if (str.Equals(Aggregation.count.ToString()))
                 return Aggregation.count;
             else if (str.Equals(Aggregation.sum.ToString()))

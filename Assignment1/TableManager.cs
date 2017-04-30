@@ -201,7 +201,7 @@ namespace Assignment1
 
                 if (exTable.hasAttr(attrName) == true)
                 {
-                    Console.WriteLine(table.hasAlias ? table.alias : table.name);
+                    //Console.WriteLine(table.hasAlias ? table.alias : table.name);
                     return table.hasAlias ? table.alias : table.name;
                 }
             }
@@ -328,7 +328,7 @@ namespace Assignment1
                     {
 
                         Sql_Condition condition = sqlSelect.where.listOfConditions.firstCondition;
-                        Console.WriteLine("Name = " + condition.leftOpd.content.tableAlias);
+                        //Console.WriteLine("Name = " + condition.leftOpd.content.tableAlias);
 
                         tables[0] = new where(condition.leftOpd.content.tableAlias,
                                                 condition.leftOpd.content.name,
@@ -1070,6 +1070,7 @@ namespace Assignment1
         {
 
             //Dictionary<string, string> aliaNameDic = aliaName;
+            tableCache.Clear();
 
             HashSet<Dictionary<string, Guid>> selectAns = new HashSet<Dictionary<string, Guid>>();
 
@@ -1180,7 +1181,7 @@ namespace Assignment1
             }
 
             List<dynamic> data = new List<dynamic>();
-            Console.WriteLine("table size = " + tables.Length);
+            //Console.WriteLine("table size = " + tables.Length);
 
             isAndTriggered = tables[1].operLink == OperatorLink.AND;
 
