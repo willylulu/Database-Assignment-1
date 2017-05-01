@@ -29,6 +29,12 @@ namespace Assignment1
                     case "select":
                         tableManager.parseToSelect(com.Value);
                         break;
+                    case "index":
+                        foreach (string attr in com.Value.attrs)
+                        {
+                            tableManager.turnOnIndexing(com.Value.Table, attr);
+                        }
+                        break;
                     case "unKnown": Console.WriteLine("Unknown keywords"); break;
                 }
             }
@@ -114,6 +120,11 @@ namespace Assignment1
                 //public string table;
                 //public List<string> AttrNames;
                 //public List<dynamic> AttrValues;
+            }
+            else if(string.Compare(seperated_query[0].ToLower(),"create index") == 0)
+            {
+                SqlObjects.SQL_Index Indexing = Parser.Index(sql);
+                return new KeyValuePair<string, dynamic>("index", Indexing);
             }
             else
             {
