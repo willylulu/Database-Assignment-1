@@ -1346,7 +1346,11 @@ namespace Assignment1
             }
             public int GetHashCode(Dictionary<string, Guid> bx)
             {
-                int hCode = bx.Count;
+                int hCode = 0;
+                foreach(KeyValuePair<string,Guid> attr in bx)
+                {
+                    hCode += attr.Value.GetHashCode();   
+                }
                 return hCode.GetHashCode();
             }
 

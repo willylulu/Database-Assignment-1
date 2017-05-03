@@ -25,6 +25,20 @@ namespace Assignment1
                 return false;
             }
         }
+        static void Main4(string[] args)
+        {
+            Guid id1 = Guid.NewGuid();
+            Guid id2 = Guid.NewGuid();
+            int hash1 = id1.GetHashCode();
+            int hash2 = id2.GetHashCode();
+            Console.WriteLine(id1);
+            Console.WriteLine(id2);
+            Console.WriteLine(hash1);
+            Console.WriteLine(hash2);
+            int hash = (hash1 + hash2).GetHashCode();
+            Console.WriteLine(hash);
+            Console.ReadKey(true);
+        }
         static void Main3(string[] args)
         {
             HashSet<Dictionary<string, Guid>> elementSet = new HashSet<Dictionary<string, Guid>>();
